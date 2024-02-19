@@ -16,13 +16,13 @@ public class Main {
     private static final double beta = 0.2;
 
     //TODO: per phones al tempo 840000 sembra maxD = 30 e minD = 5e-4
-    private static final double minDist = 0.1;
-    private static final double maxDist = 10e90;
-    private static final int wSize = 10000;
+    private static final double minDist = 5e-4;
+    private static final double maxDist = 30;
+    private static final int wSize = 100000;
     public static final double INF = maxDist+1;
 
-    //Da un'indicazione di quante volte andremo a fare update e query dopo aver raggiunto wSize
-    private static final int stride = 2000;
+    //It tells how many times we will query the algorithms after having a complete window
+    private static final int stride = 500000;
 
     public static void main(String[] args) {
         DatasetReader reader;
@@ -43,7 +43,7 @@ public class Main {
             }
 
             //TEST THINGS
-            calculateMinMaxDist(reader);
+            testAlgorithms(reader);
 
 
             //FLUSH AND CLOSE
