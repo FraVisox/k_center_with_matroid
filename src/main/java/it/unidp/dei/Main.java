@@ -13,16 +13,17 @@ public class Main {
     //TODO: il numero di centri puo' essere minore di 8 in questo caso? Per come è ora l'algoritmo si. Volendo si potrebbe aumentare in modo da ottenere 8 aggiungendo punti a caso della categoria giusta
     private static final int[] ki = {5, 5, 5, 5, 5, 5, 5};
     private static final double epsilon = 1;
-    private static final double beta = 0.2;
+    private static final double beta = 1;
 
-    //TODO: per phones al tempo 840000 sembra maxD = 30 e minD = 5e-4
+    //PHONES: maxD = 30 and minD = 5e-4 (tested for 840000 points)
+    //HIGGS: maxD = 29 and minD = 0.008 (tested for 620000 points). Pellizzoni used 100 and 0.01
     private static final double minDist = 5e-4;
     private static final double maxDist = 30;
-    private static final int wSize = 100000;
+    private static final int wSize = 1000;
     public static final double INF = maxDist+1;
 
     //It tells how many times we will query the algorithms after having a complete window
-    private static final int stride = 500000;
+    private static final int stride = 50000;
 
     public static void main(String[] args) {
         DatasetReader reader;
@@ -43,7 +44,7 @@ public class Main {
             }
 
             //TEST THINGS
-            testAlgorithms(reader);
+            testAlgorithms(reader, writerChen, writerCapp);
 
 
             //FLUSH AND CLOSE
@@ -57,8 +58,12 @@ public class Main {
         }
     }
 
-    private static void testAlgorithms(DatasetReader reader) {
+    //In every line of the output file we will have:
+    //updateTime;queryTime;radius;independence;memory
+    private static void testAlgorithms(DatasetReader reader, PrintWriter writerChen, PrintWriter writerCapp) {
         long startTime, endTime;
+        System.out.println("In every line of the output file we will have:");
+        System.out.println("updateTime;queryTime;radius;independence;memory\n\n");
 
         //Testing LinkedList, contains all the window
         LinkedList<Point> window = new LinkedList<>();
@@ -70,7 +75,7 @@ public class Main {
         for (int time = 0; time <= wSize+stride; time++) {
 
             //Check of passing of time, only used for debug
-            if (time % wSize == 0) {
+            if (time % wSize == 0 && time != 0) {
                 System.out.println(time);
             }
 
@@ -101,15 +106,17 @@ public class Main {
             chen.update(p, time);
             endTime = System.nanoTime();
             System.out.println("TEMPO UPDATE CHEN: "+(endTime-startTime)+"\n");
-
+            //Write on file the time of update
+            writerChen.print((endTime-startTime)+";");
 
             System.gc();
             startTime = System.nanoTime();
             capp.update(p, time);
             endTime = System.nanoTime();
             System.out.println("TEMPO UPDATE CAPP: "+(endTime-startTime)+"\n");
+            //Write on file the time of update
+            writerCapp.print((endTime-startTime)+";");
 
-            //TODO: write on file the time of update
 
             //1b. TIME TEST OF QUERY
             ArrayList<Point> centersChen;
@@ -121,6 +128,9 @@ public class Main {
             centersChen = chen.query();
             endTime = System.nanoTime();
             System.out.println("TEMPO QUERY CHEN: "+(endTime-startTime)+"\n");
+            //Write on file the time of query
+            writerChen.print((endTime-startTime)+";");
+
 
             System.out.println("CAPP:");
             System.gc();
@@ -132,24 +142,35 @@ public class Main {
                 return;
             }
             System.out.println("TEMPO QUERY CAPP: "+(endTime-startTime)+"\n");
+            //Write on file the time of query
+            writerCapp.print((endTime-startTime)+";");
 
-            //TODO: write on file
 
             //2. QUALITY TEST: Check of the radius of the centers returned and the independence of the set
-            System.out.println("RAGGIO CHEN: "+maxDistanceBetweenSets(window, centersChen));
-            System.out.println("INDIPENDENZA CHEN: "+(isIndependent(centersChen) ? "Verificata" : "NON SUSSISTE"));
-            System.out.println("RAGGIO CAPP: "+maxDistanceBetweenSets(window, centersCapp));
-            System.out.println("INDIPENDENZA CAPP: "+(isIndependent(centersCapp) ? "Verificata" : "NON SUSSISTE"));
+            double radius = maxDistanceBetweenSets(window, centersChen);
+            System.out.println("RAGGIO CHEN: "+radius);
+            boolean independence = isIndependent(centersChen);
+            System.out.println("INDIPENDENZA CHEN: "+(independence ? "Verificata" : "NON SUSSISTE"));
+            //Write on file
+            writerChen.print(radius+";"+(independence ? "t": "f")+";");
 
-            //TODO: write on file
+            radius = maxDistanceBetweenSets(window, centersCapp);
+            System.out.println("RAGGIO CAPP: "+radius);
+            independence = isIndependent(centersCapp);
+            System.out.println("INDIPENDENZA CAPP: "+(independence ? "Verificata" : "NON SUSSISTE"));
+            writerCapp.print(radius+";"+(independence ? "t": "f")+";");
+
 
             //3. MEMORY TEST: we only sum the number of points for every algorithm
-            int memory = capp.getSize();
-            System.out.println("MEMORIA CAPP: "+memory);
-            memory = chen.getSize();
+            int memory = chen.getSize();
             System.out.println("MEMORIA CHEN: "+memory);
+            //Write on file
+            writerChen.println(memory);
 
-            //TODO: write on file
+            memory = capp.getSize();
+            System.out.println("MEMORIA CAPP: "+memory);
+            //Write on file
+            writerCapp.println(memory);
         }
     }
 

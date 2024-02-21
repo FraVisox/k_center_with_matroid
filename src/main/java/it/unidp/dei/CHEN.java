@@ -28,19 +28,20 @@ public class CHEN implements Algorithm {
     public ArrayList<Point> query() {
         //TODO: test this algorithm
 
-        TreeSet<Double> distances = new TreeSet<>();
+        //We use Distance objects as these implement a difference between doubles with an epsilon
+        TreeSet<Distance> distances = new TreeSet<>();
         for (Point p : pts) {
             for (Point q : pts) {
                 //By doing this, we delete all the zero distances
                 if (!q.equals(p)) {
-                    distances.add(p.getDistance(q));
+                    distances.add(new Distance(p.getDistance(q)));
                 }
             }
         }
 
         //They are naturally in ascending order
-        for (double dist : distances) {
-            ArrayList<Point> sol = queryDist(dist);
+        for (Distance dist : distances) {
+            ArrayList<Point> sol = queryDist(dist.toDouble());
             if (!(sol == null)) {
                 return sol;
             }
@@ -111,7 +112,10 @@ public class CHEN implements Algorithm {
 
                 //Connect every point with its group, capacity 1
                 e = graph.addEdge("m"+p.toString(), "r"+Integer.toString(p.getGroup()));
-                graph.setEdgeWeight(e, 1);
+                //If the edge does not exist, it sets its capacity
+                if (e != null) {
+                    graph.setEdgeWeight(e, 1);
+                }
             }
         }
 
@@ -141,12 +145,14 @@ public class CHEN implements Algorithm {
 
         ArrayList<Point> centers = new ArrayList<>(partition.keySet().size());
 
-        //For every point of the partition (which contains every point of pts, so we can simplify by searching only in pts)
-        //if the flow value of the edge that connects it to its group is 1, we add it to the centers
-        for (Point p : pts) {
-            DefaultWeightedEdge edge = (graph.getEdge("m"+p, "r"+p.getGroup()));
-            if (flows.get(edge) == 1) {
-                centers.add(p);
+        //For every point of the partition if the flow value of the edge that connects it to its group is 1, we add it to the centers
+        //The points of the partition are not all the points that are in pts
+        for (Point pivot : partition.keySet()) {
+            for (Point p : partition.get(pivot)) {
+                DefaultWeightedEdge edge = graph.getEdge("m" + p, "r" + p.getGroup());
+                if (flows.get(edge) == 1) {
+                    centers.add(p);
+                }
             }
         }
         return centers;

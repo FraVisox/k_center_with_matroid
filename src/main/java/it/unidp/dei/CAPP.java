@@ -12,10 +12,10 @@ public class CAPP implements Algorithm {
         //Initiate the guesses array
         int number_of_guesses = (int) (Math.ceil(Math.log(maxDist)/Math.log(1+_beta))-Math.floor(Math.log(minDist)/Math.log(1+_beta))+1);
         guesses = new Guess[number_of_guesses];
-        int i = 0;
-        for (double gamma = minDist; gamma <= maxDist; gamma *= (1+_beta)) {
+        double gamma = minDist;
+        for (int i = 0; i<number_of_guesses; i++) {
             guesses[i] = new Guess(gamma, delta, _ki);
-            i++;
+            gamma *= (1+_beta);
         }
     }
 

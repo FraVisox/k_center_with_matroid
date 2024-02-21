@@ -26,11 +26,11 @@ public class Guess {
                 O.addAll(l);
             }
         }
-        if (!OV.isEmpty() && OV.getFirst().hasExpired(time)) {
-            OV.remove(OV.getFirst());
+        if (!OV.isEmpty() && OV.first().hasExpired(time)) {
+            OV.remove(OV.first());
         }
-        if (!O.isEmpty() && O.getFirst().hasExpired(time)) {
-            O.remove(O.getFirst());
+        if (!O.isEmpty() && O.first().hasExpired(time)) {
+            O.remove(O.first());
         }
 
         //Selects the attraction points near to the new point
@@ -78,11 +78,11 @@ public class Guess {
                     }
                 }
 
-                while (!OV.isEmpty() && OV.getFirst().compareTo(vold) <= 0) {
+                while (!OV.isEmpty() && OV.first().compareTo(vold) <= 0) {
                     OV.removeFirst();
                 }
 
-                while (!O.isEmpty() && O.getFirst().compareTo(vold) <= 0 ) {
+                while (!O.isEmpty() && O.first().compareTo(vold) <= 0 ) {
                     O.removeFirst();
                 }
             }
@@ -133,7 +133,6 @@ public class Guess {
                 union.addAll(l);
             }
         }
-        //TODO: devo passargli la guess? In teoria no
         CHEN chenEtAl = new CHEN(union, ki);
         return chenEtAl.query();
     }
@@ -162,13 +161,13 @@ public class Guess {
                     }
                 }
             }
-            return C.size() <= k;
+            return true;
         }
         return false;
     }
 
     public int getSize() {
-        int size = 2*AV.size()+O.size()+OV.size()+2*RV.size()+R.keySet().size();
+        int size = AV.size()+O.size()+OV.size()+2*RV.size()+R.keySet().size();
         //TODO: e' da contare anche la dimensione di AV 2 volte? Se si, vedi se togliendolo cambia il tempo/memoria in maniera significativa
         for (LinkedList<Point>[] list : R.values()) {
             for (LinkedList<Point> l : list) {
@@ -178,10 +177,7 @@ public class Guess {
         return size;
     }
 
-    //TODO: FINISCI DI FARE CHECK
-
     private final double gamma;
-
     private final double delta;
     private final int k;
     private final int[] ki;
