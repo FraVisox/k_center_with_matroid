@@ -10,9 +10,12 @@ public class CAPP implements Algorithm {
         double delta = epsilon1/(1+_beta);
 
         //Initiate the guesses array
-        int number_of_guesses = (int) (Math.ceil(Math.log(maxDist)/Math.log(1+_beta))-Math.floor(Math.log(minDist)/Math.log(1+_beta))+1);
+        //TODO: questo usa la definizione fatta, ma in effetti si puo' iniziare da minDist?
+        int first_i = (int)Math.floor(Math.log(minDist)/Math.log(1+_beta));
+        int last_i = (int)Math.ceil(Math.log(maxDist)/Math.log(1+_beta));
+        int number_of_guesses = last_i-first_i+1;
         guesses = new Guess[number_of_guesses];
-        double gamma = minDist;
+        double gamma = Math.pow((1+_beta), first_i);
         for (int i = 0; i<number_of_guesses; i++) {
             guesses[i] = new Guess(gamma, delta, _ki);
             gamma *= (1+_beta);

@@ -1,18 +1,21 @@
 package it.unidp.dei;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
-public class Guess {
+public class CAPPWithoutGuesses implements Algorithm {
 
-    public Guess(double _gamma, double _delta, int[] _ki) {
-        gamma = _gamma;
-        delta = _delta;
-        ki = _ki;
-        int tmp = 0;
-        for (int kj : _ki) {
-            tmp += kj;
-        }
-        k = tmp;
+    public CAPPWithoutGuesses(int[] _ki, double _epsilon, double _beta, double minDist, double maxDist) {
+        //Calculate epsilon1 and then delta
+        double epsilon1 = _epsilon/(1+2*alfa);
+        double delta = epsilon1/(1+_beta);
+
+        //Initiate the guesses array
+        //TODO: questo usa la definizione fatta, ma in effetti si puo' iniziare da minDist?
+        int first_i = (int)Math.floor(Math.log(minDist)/Math.log(1+_beta));
+        int last_i = (int)Math.ceil(Math.log(maxDist)/Math.log(1+_beta));
+        number_of_guesses = last_i-first_i+1;
     }
 
     public void update(Point p, int time) {
@@ -126,62 +129,44 @@ public class Guess {
     }
 
     public ArrayList<Point> query() {
-        LinkedList<Point> union = new LinkedList<>(O);
-        for (LinkedList<Point>[] list : R.values()) {
-            for (LinkedList<Point> l : list) {
-                union.addAll(l);
-            }
-        }
-        CHEN chenEtAl = new CHEN(union, ki);
-        return chenEtAl.query();
-    }
+        //Binary search on guesses
+        int valid = binarySearchGuess();
 
-    public boolean isCorrect() {
-        if (RV.size() <= k) {
-            ArrayList<Point> C = new ArrayList<>(RV.keySet());
-            if(C.size() > k) {
-                return false;
-            }
-            for(Point p : OV)
-            {
-                if (p.getMinDistance(C) > 2*gamma) {
-                    C.add(p);
-                    if(C.size() > k) {
-                        return false;
-                    }
-                }
-            }
-            for(Point p : RV.values())
-            {
-                if(p.getMinDistance(C) > 2*gamma) {
-                    C.add(p);
-                    if(C.size() > k) {
-                        return false;
-                    }
-                }
-            }
-            return true;
+        //If there isn't a valid guess, it returns an empty ArrayList
+        if (valid == -1) {
+            return new ArrayList<>();
         }
-        return false;
+        return guesses[valid].query();
     }
 
     public int getSize() {
-        int size = O.size()+OV.size()+RV.size()+R.keySet().size();
-        //TODO: e' da contare anche la dimensione di AV 2 volte? Se si, vedi se togliendolo cambia il tempo/memoria in maniera significativa
-        for (LinkedList<Point>[] list : R.values()) {
-            for (LinkedList<Point> l : list) {
-                size += l.size();
-            }
+        int size = 0;
+        for (Guess g : guesses) {
+            size += g.getSize();
         }
         return size;
     }
 
-    private final double gamma;
-    private final double delta;
-    private final int k;
-    private final int[] ki;
-    private final TreeSet<Point> O = new TreeSet<>();
-    private final TreeSet<Point> OV = new TreeSet<>();
-    private final TreeMap<Point, Point> RV = new TreeMap<>();
-    private final TreeMap<Point, LinkedList<Point>[]> R = new TreeMap<>();
+    private int binarySearchGuess() {
+        int valid = -1;
+        int low = 0;
+        int high = guesses.length-1;
+        while (low <= high) {
+            int mid = (high + low) / 2;
+            if (guesses[mid].isCorrect()) {
+                valid = mid;
+                high = mid - 1;
+            } else  {
+                low = mid + 1;
+            }
+        }
+        return valid;
+    }
+
+    //Array of guesses
+    private final int number_of_guesses;
+
+    //Approximation of sequential algorithm. In our case, CHEN gives a 3-approximation
+    private static final int alfa = 3;
+
 }

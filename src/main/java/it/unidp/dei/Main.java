@@ -10,7 +10,7 @@ import java.util.*;
 public class Main {
     private static final String[] datasets = {"src/main/java/it/unidp/dei/data/Phones/Phones_accelerometer.csv"};
 
-    //TODO: il numero di centri puo' essere minore di 8 in questo caso? Per come è ora l'algoritmo si. Volendo si potrebbe aumentare in modo da ottenere 8 aggiungendo punti a caso della categoria giusta
+    //TODO: il numero di centri puo' essere minore di k? Per come è ora l'algoritmo si. Volendo si potrebbe aumentare in modo da ottenere k aggiungendo punti a caso della categoria giusta
     private static final int[] ki = {5, 5, 5, 5, 5, 5, 5};
     private static final double epsilon = 1;
     private static final double beta = 1;
@@ -23,7 +23,7 @@ public class Main {
     public static final double INF = maxDist+1;
 
     //It tells how many times we will query the algorithms after having a complete window
-    private static final int stride = 50000;
+    private static final int stride = 1;
 
     public static void main(String[] args) {
         DatasetReader reader;

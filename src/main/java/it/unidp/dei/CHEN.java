@@ -11,11 +11,21 @@ public class CHEN implements Algorithm {
     public CHEN(int[] _ki) {
         pts = new LinkedList<>();
         ki = _ki;
+        int tmp = 0;
+        for (int kj : ki) {
+            tmp += kj;
+        }
+        k = tmp;
     }
 
     public CHEN (LinkedList<Point> p, int[] _ki) {
         pts = p;
         ki = _ki;
+        int tmp = 0;
+        for (int kj : ki) {
+            tmp += kj;
+        }
+        k = tmp;
     }
 
     public void update(Point p, int time) {
@@ -28,28 +38,35 @@ public class CHEN implements Algorithm {
     public ArrayList<Point> query() {
         //TODO: test this algorithm
 
-        //We use Distance objects as these implement a difference between doubles with an epsilon
-        TreeSet<Distance> distances = new TreeSet<>();
+        double[] distances = new double[pts.size()* pts.size()- pts.size()];
+        int i = 0;
         for (Point p : pts) {
             for (Point q : pts) {
                 //By doing this, we delete all the zero distances
                 if (!q.equals(p)) {
-                    distances.add(new Distance(p.getDistance(q)));
+                    distances[i] = p.getDistance(q);
+                    i++;
                 }
             }
         }
 
-        //They are naturally in ascending order
-        for (Distance dist : distances) {
-            ArrayList<Point> sol = queryDist(dist.toDouble());
-            if (!(sol == null)) {
-                return sol;
+        Arrays.sort(distances);
+
+        //Binary search on distances
+        ArrayList<Point> sol = new ArrayList<>(pts);
+        int low = 0;
+        int high = distances.length-1;
+        while (low <= high) {
+            int mid = (high + low) / 2;
+            ArrayList<Point> thisSol = queryDist(distances[mid]);
+            if (thisSol != null) {
+                sol = thisSol;
+                high = mid - 1;
+            } else  {
+                low = mid + 1;
             }
         }
-
-        //This happens only if we have only one point. In all the other cases, a valid
-        //non-zero distance is found
-        return new ArrayList<>(pts);
+        return sol;
     }
 
     public int getSize() {
@@ -68,6 +85,9 @@ public class CHEN implements Algorithm {
             double minD = p.getMinDistance(partition.keySet());
             if (minD > 2*dist) {
                 partition.put(p, new ArrayList<>());
+                if (partition.keySet().size() > k) {
+                    return null;
+                }
             }
         }
 
@@ -160,4 +180,5 @@ public class CHEN implements Algorithm {
 
     private final LinkedList<Point> pts;
     private final int[] ki;
+    private final int k;
 }
