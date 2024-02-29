@@ -61,7 +61,6 @@ public class Guess {
                 Point vold = RV.firstKey();
                 List<Point> ptsToDelete = new ArrayList<>();
 
-                //TODO: e' corretto? E' fatto solo per andare in ordine e risparmiare tempo
                 for (Point a : R.navigableKeySet()) {
                     if (a.compareTo(vold) <= 0) {
                         ptsToDelete.add(a);
@@ -121,7 +120,6 @@ public class Guess {
             if (aaddRep[pGroup].size() > ki[pGroup]) {
                 aaddRep[pGroup].removeFirst();
             }
-            //TODO: questo modifica la struttura dati interna o no? In teoria si, perche' e' un oggetto
         }
     }
 
@@ -137,11 +135,8 @@ public class Guess {
     }
 
     public boolean isCorrect() {
-        if (RV.size() <= k) {
+        if (RV.keySet().size() <= k) {
             ArrayList<Point> C = new ArrayList<>(RV.keySet());
-            if(C.size() > k) {
-                return false;
-            }
             for(Point p : OV)
             {
                 if (p.getMinDistance(C) > 2*gamma) {
@@ -151,15 +146,7 @@ public class Guess {
                     }
                 }
             }
-            for(Point p : RV.values())
-            {
-                if(p.getMinDistance(C) > 2*gamma) {
-                    C.add(p);
-                    if(C.size() > k) {
-                        return false;
-                    }
-                }
-            }
+            //We don't check if any point in RV is at distance > 2*gamma from C because we know this isn't true
             return true;
         }
         return false;
@@ -167,7 +154,6 @@ public class Guess {
 
     public int getSize() {
         int size = O.size()+OV.size()+2*RV.size()+R.keySet().size();
-        //TODO: e' da contare anche la dimensione di AV 2 volte? Se si, vedi se togliendolo cambia il tempo/memoria in maniera significativa
         for (LinkedList<Point>[] list : R.values()) {
             for (LinkedList<Point> l : list) {
                 size += l.size();

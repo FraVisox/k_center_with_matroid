@@ -1,6 +1,5 @@
 package it.unidp.dei;
 
-import java.util.Arrays;
 import java.util.Collection;
 
 public class Point implements Comparable<Point> {
@@ -19,7 +18,6 @@ public class Point implements Comparable<Point> {
     }
 
     public double getDistance(Point p) {
-        //TODO: la distanza puo' venire 4.9999999 invece che 5, come risolvere (se si deve risolvere)?
         double quad_dist = 0;
         for (int i = 0; i<coords.length; i++) {
             //It's faster to multiply than to use Math.pow
@@ -31,17 +29,22 @@ public class Point implements Comparable<Point> {
     public double getMinDistance(Collection<Point> set) {
         double mind = Main.INF;
         for(Point q : set) {
-            if (!Arrays.equals(q.coords, this.coords)) {
+            if (!(q.equals(this))) {
                 mind = Math.min(mind, this.getDistance(q));
             }
+        }
+        //This happens only if the set only contains this point
+        if (mind == Main.INF) {
+            return 0;
         }
         return mind;
     }
 
     public double getMaxDistance(Collection<Point> set) {
         double maxd = 0;
-        for(Point q : set)
+        for(Point q : set) {
             maxd = Math.max(maxd, this.getDistance(q));
+        }
         return maxd;
     }
 

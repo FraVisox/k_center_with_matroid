@@ -2,6 +2,8 @@ package it.unidp.dei;
 
 import java.util.*;
 
+//Conclusione: non fa nulla in più né in meno, e non ha grossi vantaggi
+
 public class CAPPWithoutGuesses implements Algorithm {
 
     public CAPPWithoutGuesses(int[] _ki, double _epsilon, double _beta, double _minDist, double _maxDist) {
@@ -19,7 +21,6 @@ public class CAPPWithoutGuesses implements Algorithm {
         k = tmp;
 
         //Initiate the guesses array
-        //TODO: questo usa la definizione fatta, ma in effetti si puo' iniziare da minDist?
         first_i = (int)Math.floor(Math.log(_minDist)/Math.log(1+_beta));
         last_i = (int)Math.ceil(Math.log(_maxDist)/Math.log(1+_beta));
         int number_of_guesses = last_i-first_i+1;
@@ -146,7 +147,6 @@ public class CAPPWithoutGuesses implements Algorithm {
                 if (aaddRep[pGroup].size() > ki[pGroup]) {
                     aaddRep[pGroup].removeFirst();
                 }
-                //TODO: questo modifica la struttura dati interna o no? In teoria si, perche' e' un oggetto
             }
             gamma *= (1+beta);
         }

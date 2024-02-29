@@ -9,17 +9,25 @@ public class CAPP implements Algorithm {
         double epsilon1 = _epsilon/(1+2*alfa);
         double delta = epsilon1/(1+_beta);
 
-        //Initiate the guesses array
-        //TODO: questo usa la definizione fatta, ma in effetti si puo' iniziare da minDist?
+        //Initiate the guesses array. We don't use the definition, but an equivalent form
+        int number_of_guesses = (int)Math.ceil(Math.log(maxDist/minDist)/Math.log(1+_beta))+1;
+
+        /* This is how to use the definition
+
         int first_i = (int)Math.floor(Math.log(minDist)/Math.log(1+_beta));
         int last_i = (int)Math.ceil(Math.log(maxDist)/Math.log(1+_beta));
         int number_of_guesses = last_i-first_i+1;
-        guesses = new Guess[number_of_guesses];
         double gamma = Math.pow((1+_beta), first_i);
+
+         */
+
+        guesses = new Guess[number_of_guesses];
+        double gamma = minDist;
         for (int i = 0; i<number_of_guesses; i++) {
             guesses[i] = new Guess(gamma, delta, _ki);
             gamma *= (1+_beta);
         }
+        assert gamma >= maxDist;
     }
 
     public void update(Point p, int time) {
@@ -29,14 +37,6 @@ public class CAPP implements Algorithm {
     }
 
     public ArrayList<Point> query() {
-        //TODO: testa se meglio lineare o binaria
-        for (Guess g : guesses) {
-            if (g.isCorrect()) {
-                return g.query();
-            }
-        }
-        return new ArrayList<>();
-        /*
         //Binary search on guesses
         int valid = binarySearchGuess();
 
@@ -45,7 +45,6 @@ public class CAPP implements Algorithm {
             return new ArrayList<>();
         }
         return guesses[valid].query();
-         */
     }
 
     public int getSize() {

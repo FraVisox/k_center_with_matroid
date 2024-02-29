@@ -36,8 +36,6 @@ public class CHEN implements Algorithm {
     }
 
     public ArrayList<Point> query() {
-        //TODO: test this algorithm
-
         double[] distances = new double[pts.size()* pts.size()- pts.size()];
         int i = 0;
         for (Point p : pts) {
@@ -96,6 +94,7 @@ public class CHEN implements Algorithm {
             for (Point pivot : partition.keySet()) {
                 if (p.getDistance(pivot) <= dist) {
                     partition.get(pivot).add(p);
+                    break;
                 }
             }
         }
@@ -113,25 +112,25 @@ public class CHEN implements Algorithm {
 
         for (Point pivot : partition.keySet()) {
             //Add a vertex l+exitTime for every head of every partition
-            graph.addVertex("l"+pivot.toString());
+            graph.addVertex("pivot"+pivot.toString());
 
             //Connect every pivot with the source, capacity 1
-            DefaultWeightedEdge e = graph.addEdge("s", "l"+pivot.toString());
+            DefaultWeightedEdge e = graph.addEdge("s", "pivot"+pivot.toString());
             graph.setEdgeWeight(e, 1);
 
             for (Point p : partition.get(pivot)) {
 
                 //Add a vertex m+exitTime for every point
-                graph.addVertex("m"+p.toString());
+                graph.addVertex("point"+p.toString());
                 //Add a vertex r+indexOfGroup for every group
-                graph.addVertex("r"+Integer.toString(p.getGroup()));
+                graph.addVertex("group"+Integer.toString(p.getGroup()));
 
                 //Connect every head of partition with its points, capacity 1
-                e = graph.addEdge("l"+pivot.toString(), "m"+p.toString());
+                e = graph.addEdge("pivot"+pivot.toString(), "point"+p.toString());
                 graph.setEdgeWeight(e, 1);
 
                 //Connect every point with its group, capacity 1
-                e = graph.addEdge("m"+p.toString(), "r"+Integer.toString(p.getGroup()));
+                e = graph.addEdge("point"+p.toString(), "group"+Integer.toString(p.getGroup()));
                 //If the edge does not exist, it sets its capacity
                 if (e != null) {
                     graph.setEdgeWeight(e, 1);
@@ -144,10 +143,10 @@ public class CHEN implements Algorithm {
 
         for (int i = 0; i < ki.length; i++) {
             //Add all the remaining vertices for the other groups
-            graph.addVertex("r"+Integer.toString(i));
+            graph.addVertex("group"+Integer.toString(i));
 
             //Connect the groups with the sink, capacity ki of that group
-            DefaultWeightedEdge e = graph.addEdge("r"+i, "t");
+            DefaultWeightedEdge e = graph.addEdge("group"+i, "t");
             graph.setEdgeWeight(e, ki[i]);
         }
 
@@ -163,13 +162,14 @@ public class CHEN implements Algorithm {
         //Get the values of flow through each edge
         Map<DefaultWeightedEdge, Double> flows = alg.getFlowMap();
 
-        ArrayList<Point> centers = new ArrayList<>(partition.keySet().size());
+        ArrayList<Point> centers = new ArrayList<>((int)flow);
 
         //For every point of the partition if the flow value of the edge that connects it to its group is 1, we add it to the centers
         //The points of the partition are not all the points that are in pts
+        int i = 0;
         for (Point pivot : partition.keySet()) {
             for (Point p : partition.get(pivot)) {
-                DefaultWeightedEdge edge = graph.getEdge("m" + p, "r" + p.getGroup());
+                DefaultWeightedEdge edge = graph.getEdge("point" + p, "group" + p.getGroup());
                 if (flows.get(edge) == 1) {
                     centers.add(p);
                 }
