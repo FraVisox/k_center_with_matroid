@@ -166,7 +166,7 @@ public class Guess {
     }
 
     public int getSize() {
-        int size = O.size()+OV.size()+RV.size()+R.keySet().size();
+        int size = O.size()+OV.size()+2*RV.size()+R.keySet().size();
         //TODO: e' da contare anche la dimensione di AV 2 volte? Se si, vedi se togliendolo cambia il tempo/memoria in maniera significativa
         for (LinkedList<Point>[] list : R.values()) {
             for (LinkedList<Point> l : list) {

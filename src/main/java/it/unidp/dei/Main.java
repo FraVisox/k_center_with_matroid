@@ -23,12 +23,13 @@ public class Main {
     public static final double INF = maxDist+1;
 
     //It tells how many times we will query the algorithms after having a complete window
-    private static final int stride = 1;
+    private static final int stride = 50;
 
     public static void main(String[] args) {
         DatasetReader reader;
         PrintWriter writerChen;
         PrintWriter writerCapp;
+        PrintWriter writerCappUpdated;
         for (String set : datasets) {
 
             try {
@@ -37,6 +38,7 @@ public class Main {
                 //Create a results writer
                 writerChen = new PrintWriter("out/testPhonesCHEN.csv");
                 writerCapp = new PrintWriter("out/testPhonesCAPP.csv");
+                writerCappUpdated = new PrintWriter("out/testPhonesCAPPUpd.csv");
 
             } catch (FileNotFoundException e) {
                 System.out.println("File " + set + " not found, skipping to next dataset");
@@ -44,15 +46,17 @@ public class Main {
             }
 
             //TEST THINGS
-            testAlgorithms(reader, writerChen, writerCapp);
+            testImprovementOfAlg(reader, writerCappUpdated, writerCapp);
 
 
             //FLUSH AND CLOSE
             writerChen.flush();
             writerCapp.flush();
+            writerCappUpdated.flush();
 
             writerChen.close();
             writerCapp.close();
+            writerCappUpdated.close();
 
             reader.close();
         }
@@ -171,6 +175,127 @@ public class Main {
             System.out.println("MEMORIA CAPP: "+memory);
             //Write on file
             writerCapp.println(memory);
+            System.out.println("\n\n----------------------------------------------------\n\n");
+        }
+    }
+
+    //In every line of the output file we will have:
+    //updateTime;queryTime;radius;independence;memory
+    private static void testImprovementOfAlg(DatasetReader reader, PrintWriter writerCappUpdated, PrintWriter writerCapp) {
+        long startTime, endTime;
+        System.out.println("In every line of the output file we will have:");
+        System.out.println("updateTime;queryTime;radius;independence;memory\n\n");
+
+        //Testing LinkedList, contains all the window
+        LinkedList<Point> window = new LinkedList<>();
+
+        //Initialize the algorithm
+        CAPP capp = new CAPP(ki, epsilon, beta, minDist, maxDist);
+        CAPPWithoutGuesses cappWithoutGuesses = new CAPPWithoutGuesses(ki, epsilon, beta, minDist, maxDist);
+
+        for (int time = 0; time <= wSize+stride; time++) {
+
+            //Check of passing of time, only used for debug
+            if (time % wSize == 0 && time != 0) {
+                System.out.println(time);
+            }
+
+            Point p = reader.nextPoint(time, wSize);
+
+            if (p == null) {
+                continue;
+            }
+
+            //If window is not full, we don't query
+            if (time < wSize) {
+                window.addLast(p);
+                cappWithoutGuesses.update(p, time);
+                capp.update(p, time);
+                continue;
+            }
+
+            //Update the window
+            window.addLast(p);
+            window.removeFirst();
+
+            //1. TIME TEST: we call explicitly the garbage collector to allow our algorithm
+            //              to run without having to wait for the garbage collector
+
+            //1a. TIME TEST OF UPDATE
+            System.gc();
+            startTime = System.nanoTime();
+            cappWithoutGuesses.update(p, time);
+            endTime = System.nanoTime();
+            System.out.println("TEMPO UPDATE CAPP UPDATED: "+(endTime-startTime)+"\n");
+            //Write on file the time of update
+            writerCappUpdated.print((endTime-startTime)+";");
+
+            System.gc();
+            startTime = System.nanoTime();
+            capp.update(p, time);
+            endTime = System.nanoTime();
+            System.out.println("TEMPO UPDATE CAPP: "+(endTime-startTime)+"\n");
+            //Write on file the time of update
+            writerCapp.print((endTime-startTime)+";");
+
+
+            //1b. TIME TEST OF QUERY
+            ArrayList<Point> centersCappWithoutGuess;
+            ArrayList<Point> centersCapp;
+
+            System.out.println("CAPP WITHOUT GUESS:");
+            System.gc();
+            startTime = System.nanoTime();
+            centersCappWithoutGuess = cappWithoutGuesses.query();
+            endTime = System.nanoTime();
+            System.out.println("TEMPO QUERY CAPP UPDATED: "+(endTime-startTime)+"\n");
+            //Write on file the time of query
+            writerCappUpdated.print((endTime-startTime)+";");
+
+            //TODO: indipendenza non sussiste
+            //TODO: meglio fare una linear o binaria ricerca sulle guess?
+
+
+            System.out.println("CAPP:");
+            System.gc();
+            startTime = System.nanoTime();
+            centersCapp = capp.query();
+            endTime = System.nanoTime();
+            if (centersCapp.isEmpty()) {
+                System.out.println("Max or min distances are not correct. There isn't a valid guess");
+                return;
+            }
+            System.out.println("TEMPO QUERY CAPP: "+(endTime-startTime)+"\n");
+            //Write on file the time of query
+            writerCapp.print((endTime-startTime)+";");
+
+
+            //2. QUALITY TEST: Check of the radius of the centers returned and the independence of the set
+            double radius = maxDistanceBetweenSets(window, centersCappWithoutGuess);
+            System.out.println("RAGGIO CAPP UPDATED: "+radius);
+            boolean independence = isIndependent(centersCappWithoutGuess);
+            System.out.println("INDIPENDENZA CAPP UPDATED: "+(independence ? "Verificata" : "NON SUSSISTE"));
+            //Write on file
+            writerCappUpdated.print(radius+";"+(independence ? "t": "f")+";");
+
+            radius = maxDistanceBetweenSets(window, centersCapp);
+            System.out.println("RAGGIO CAPP: "+radius);
+            independence = isIndependent(centersCapp);
+            System.out.println("INDIPENDENZA CAPP: "+(independence ? "Verificata" : "NON SUSSISTE"));
+            writerCapp.print(radius+";"+(independence ? "t": "f")+";");
+
+
+            //3. MEMORY TEST: we only sum the number of points for every algorithm
+            int memory = cappWithoutGuesses.getSize();
+            System.out.println("MEMORIA CAPP UPDATED: "+memory);
+            //Write on file
+            writerCappUpdated.println(memory);
+
+            memory = capp.getSize();
+            System.out.println("MEMORIA CAPP: "+memory);
+            //Write on file
+            writerCapp.println(memory);
+            System.out.println("\n\n----------------------------------------------------\n\n");
         }
     }
 

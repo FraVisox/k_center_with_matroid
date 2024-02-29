@@ -29,6 +29,14 @@ public class CAPP implements Algorithm {
     }
 
     public ArrayList<Point> query() {
+        //TODO: testa se meglio lineare o binaria
+        for (Guess g : guesses) {
+            if (g.isCorrect()) {
+                return g.query();
+            }
+        }
+        return new ArrayList<>();
+        /*
         //Binary search on guesses
         int valid = binarySearchGuess();
 
@@ -37,6 +45,7 @@ public class CAPP implements Algorithm {
             return new ArrayList<>();
         }
         return guesses[valid].query();
+         */
     }
 
     public int getSize() {
