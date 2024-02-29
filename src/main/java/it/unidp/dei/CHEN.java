@@ -1,8 +1,9 @@
 package it.unidp.dei;
 
+import org.jgrapht.Graphs;
 import org.jgrapht.alg.flow.PushRelabelMFImpl;
+import org.jgrapht.graph.DefaultDirectedWeightedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
-import org.jgrapht.graph.SimpleDirectedWeightedGraph;
 
 import java.util.*;
 
@@ -32,15 +33,15 @@ public class CHEN implements Algorithm {
         if (!pts.isEmpty() && pts.getFirst().hasExpired(time)) {
             pts.removeFirst();
         }
-        pts.add(p);
+        pts.addLast(p);
     }
 
     public ArrayList<Point> query() {
-        double[] distances = new double[pts.size()* pts.size()- pts.size()];
+        double[] distances = new double[pts.size()*pts.size()-pts.size()];
         int i = 0;
         for (Point p : pts) {
             for (Point q : pts) {
-                //By doing this, we delete all the zero distances
+                //By doing this, we delete all the distances of one point from itself (that are zeroes)
                 if (!q.equals(p)) {
                     distances[i] = p.getDistance(q);
                     i++;
@@ -56,6 +57,9 @@ public class CHEN implements Algorithm {
         int high = distances.length-1;
         while (low <= high) {
             int mid = (high + low) / 2;
+            if (distances[mid] == 0) {
+                low = mid + 1;
+            }
             ArrayList<Point> thisSol = queryDist(distances[mid]);
             if (thisSol != null) {
                 sol = thisSol;
@@ -71,6 +75,7 @@ public class CHEN implements Algorithm {
         return pts.size();
     }
 
+    //It returns null if the distance is not suitable to create a k-center clustering
     private ArrayList<Point> queryDist(double dist) {
         //Create the partition: the point in the map is the head of the partition
         TreeMap<Point, ArrayList<Point>> partition = new TreeMap<>();
@@ -94,6 +99,7 @@ public class CHEN implements Algorithm {
             for (Point pivot : partition.keySet()) {
                 if (p.getDistance(pivot) <= dist) {
                     partition.get(pivot).add(p);
+                    //We already know that every point can be at distance <= dist from only one point of pivots
                     break;
                 }
             }
@@ -104,55 +110,27 @@ public class CHEN implements Algorithm {
 
     //The idea is taken from CHIPLUNKAR ET AL.
     private ArrayList<Point> partitionMatroidIntersection(TreeMap<Point, ArrayList<Point>> partition) {
-        //Create a directed weighted graph
-        SimpleDirectedWeightedGraph<String, DefaultWeightedEdge>  graph = new SimpleDirectedWeightedGraph<>(DefaultWeightedEdge.class);
 
-        //Add the source vertex
-        graph.addVertex("s");
+        //Create a directed weighted graph
+        DefaultDirectedWeightedGraph<String, DefaultWeightedEdge> graph = new DefaultDirectedWeightedGraph<>(DefaultWeightedEdge.class);
 
         for (Point pivot : partition.keySet()) {
-            //Add a vertex l+exitTime for every head of every partition
-            graph.addVertex("pivot"+pivot.toString());
 
-            //Connect every pivot with the source, capacity 1
-            DefaultWeightedEdge e = graph.addEdge("s", "pivot"+pivot.toString());
-            graph.setEdgeWeight(e, 1);
+            Graphs.addEdgeWithVertices(graph, "source", "pivot"+pivot.toString(), 1);
 
             for (Point p : partition.get(pivot)) {
-
-                //Add a vertex m+exitTime for every point
-                graph.addVertex("point"+p.toString());
-                //Add a vertex r+indexOfGroup for every group
-                graph.addVertex("group"+Integer.toString(p.getGroup()));
-
-                //Connect every head of partition with its points, capacity 1
-                e = graph.addEdge("pivot"+pivot.toString(), "point"+p.toString());
-                graph.setEdgeWeight(e, 1);
-
-                //Connect every point with its group, capacity 1
-                e = graph.addEdge("point"+p.toString(), "group"+Integer.toString(p.getGroup()));
-                //If the edge does not exist, it sets its capacity
-                if (e != null) {
-                    graph.setEdgeWeight(e, 1);
-                }
+                Graphs.addEdgeWithVertices(graph, "pivot"+pivot.toString(), "point"+p.toString(), 1);
+                Graphs.addEdgeWithVertices(graph, "point"+p.toString(), "group"+p.getGroup(), 1);
             }
         }
 
-        //Add sink vertex
-        graph.addVertex("t");
-
         for (int i = 0; i < ki.length; i++) {
-            //Add all the remaining vertices for the other groups
-            graph.addVertex("group"+Integer.toString(i));
-
-            //Connect the groups with the sink, capacity ki of that group
-            DefaultWeightedEdge e = graph.addEdge("group"+i, "t");
-            graph.setEdgeWeight(e, ki[i]);
+            Graphs.addEdgeWithVertices(graph, "group"+i, "sink", ki[i]);
         }
 
-        //Use the PushRelabel algorithm to calculate the flow from source to sink
+        //Use the PushRelabel algorithm to calculate the flow from source to sink. It's the most efficient algorithm
         PushRelabelMFImpl<String, DefaultWeightedEdge> alg = new PushRelabelMFImpl<>(graph);
-        double flow = alg.calculateMaximumFlow("s", "t");
+        double flow = alg.calculateMaximumFlow("source", "sink");
 
         //If the flow is less than the number of partitions
         if (flow != partition.keySet().size()) {
@@ -166,12 +144,13 @@ public class CHEN implements Algorithm {
 
         //For every point of the partition if the flow value of the edge that connects it to its group is 1, we add it to the centers
         //The points of the partition are not all the points that are in pts
-        int i = 0;
         for (Point pivot : partition.keySet()) {
             for (Point p : partition.get(pivot)) {
                 DefaultWeightedEdge edge = graph.getEdge("point" + p, "group" + p.getGroup());
                 if (flows.get(edge) == 1) {
                     centers.add(p);
+                    //Pass to the next partition
+                    break;
                 }
             }
         }

@@ -24,7 +24,7 @@ public class Main {
     public static final double INF = maxDist+1;
 
     //It tells how many times we will query the algorithms after having a complete window
-    private static final int stride = 500;
+    private static final int stride = 50;
 
     public static void main(String[] args) {
         DatasetReader reader;
