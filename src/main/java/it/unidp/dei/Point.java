@@ -1,5 +1,6 @@
 package it.unidp.dei;
 
+import java.util.Arrays;
 import java.util.Collection;
 
 public class Point implements Comparable<Point> {
@@ -29,13 +30,22 @@ public class Point implements Comparable<Point> {
     public double getMinDistance(Collection<Point> set) {
         double mind = Main.INF;
         for(Point q : set) {
-            if (!(q.equals(this))) {
+            if (!this.equals(q)) {
                 mind = Math.min(mind, this.getDistance(q));
             }
         }
-        //This happens only if the set only contains this point
-        if (mind == Main.INF) {
+        if (mind == Main.INF && !set.isEmpty()) {
             return 0;
+        }
+        return mind;
+    }
+
+    public double getMinDistanceWithoutZeroes(Collection<Point> set) {
+        double mind = Main.INF;
+        for(Point q : set) {
+            if (!Arrays.equals(coords, q.coords)) {
+                mind = Math.min(mind, this.getDistance(q));
+            }
         }
         return mind;
     }

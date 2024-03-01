@@ -1,5 +1,6 @@
 package it.unidp.dei;
 
+import it.unidp.dei.datasetReaders.CovertypeReader;
 import it.unidp.dei.datasetReaders.DatasetReader;
 import it.unidp.dei.datasetReaders.PhonesReader;
 
@@ -8,7 +9,7 @@ import java.io.PrintWriter;
 import java.util.*;
 
 public class Main {
-    private static final String[] datasets = {"src/main/java/it/unidp/dei/data/Phones/Phones_accelerometer.csv"};
+    private static final String[] datasets = {"src/main/java/it/unidp/dei/data/covtype.dat"};
 
     //TODO: il numero di centri puo' essere minore di k? Per come è ora l'algoritmo si. Volendo si potrebbe aumentare in modo da ottenere k aggiungendo punti a caso della categoria giusta
     //TODO: testa CHEN per bene
@@ -18,13 +19,14 @@ public class Main {
 
     //PHONES: maxD = 30 and minD = 5e-4 (tested for 840000 points)
     //HIGGS: maxD = 29 and minD = 0.008 (tested for 620000 points). Pellizzoni used 100 and 0.01
-    private static final double minDist = 5e-4;
-    private static final double maxDist = 30;
+    //COVTYPE: maxD = 13244 and minD = 4.8 (tested for 510000 points). Pellizzoni used 10000 and 0.1
+    private static final double minDist = 4.8;
+    private static final double maxDist = 13244;
     private static final int wSize = 1000;
     public static final double INF = maxDist+1;
 
     //It tells how many times we will query the algorithms after having a complete window
-    private static final int stride = 50;
+    private static final int stride = 30;
 
     public static void main(String[] args) {
         DatasetReader reader;
@@ -34,7 +36,7 @@ public class Main {
 
             try {
                 //Create a dataset reader
-                reader = new PhonesReader(set);
+                reader = new CovertypeReader(set);
                 //Create a results writer
                 writerChen = new PrintWriter("out/testPhonesCHEN.csv");
                 writerCapp = new PrintWriter("out/testPhonesCAPP.csv");
@@ -45,7 +47,7 @@ public class Main {
             }
 
             //TEST THINGS
-            testAlgorithms(reader, writerChen, writerCapp);
+            calculateMinMaxDist(reader);
 
             //FLUSH AND CLOSE
             writerChen.flush();
@@ -198,7 +200,7 @@ public class Main {
             window.add(p);
 
             maxD = Math.max(maxD, p.getMaxDistance(window));
-            minD = Math.min(minD, p.getMinDistance(window));
+            minD = Math.min(minD, p.getMinDistanceWithoutZeroes(window));
 
             if (time % 10000 == 0) {
                 System.out.println("Al tempo: " + time);
