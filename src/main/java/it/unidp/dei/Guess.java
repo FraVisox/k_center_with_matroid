@@ -146,6 +146,17 @@ public class Guess {
                     }
                 }
             }
+            //TODO: è corretto?
+            for(Point p : RV.values())
+            {
+                if (p.getMinDistance(C) > 2*gamma) {
+                    System.out.println("NOOOOOO NON PUO' SUCCEDEREEEE");
+                    C.add(p);
+                    if(C.size() > k) {
+                        return false;
+                    }
+                }
+            }
             //We don't check if any point in RV is at distance > 2*gamma from C because we know this isn't true
             return true;
         }
@@ -161,6 +172,9 @@ public class Guess {
         }
         return size;
     }
+
+    //TODO: elimina se non oblivious
+    public double getValue() {return gamma;}
 
     private final double gamma;
     private final double delta;

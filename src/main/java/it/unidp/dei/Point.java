@@ -4,9 +4,9 @@ import java.util.Arrays;
 import java.util.Collection;
 
 public class Point implements Comparable<Point> {
-    public Point(double[] _coords, int _time, int windowSize, int _group) {
+    public Point(double[] _coords, int _time, int _windowSize, int _group) {
         coords = _coords;
-        exitTime = _time+windowSize;
+        exitTime = _time+_windowSize;
         group = _group;
     }
 
@@ -30,20 +30,17 @@ public class Point implements Comparable<Point> {
     public double getMinDistance(Collection<Point> set) {
         double mind = Main.INF;
         for(Point q : set) {
-            if (!this.equals(q)) {
-                mind = Math.min(mind, this.getDistance(q));
-            }
-        }
-        if (mind == Main.INF && !set.isEmpty()) {
-            return 0;
+            mind = Math.min(mind, this.getDistance(q));
         }
         return mind;
     }
 
+    //It returns the minimum distance of this point from a Collection of points. If this
+    //point is in that collection, that distance is skipped
     public double getMinDistanceWithoutZeroes(Collection<Point> set) {
         double mind = Main.INF;
         for(Point q : set) {
-            if (!Arrays.equals(coords, q.coords)) {
+            if (!this.equals(q)) {
                 mind = Math.min(mind, this.getDistance(q));
             }
         }
