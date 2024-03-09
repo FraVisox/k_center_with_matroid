@@ -26,7 +26,7 @@ public class Main {
     public static final double INF = maxDist+1;
 
     //It tells how many times we will query the algorithms after having a complete window
-    private static final int stride = 100;
+    private static final int stride = 10;
 
     public static void main(String[] args) {
         DatasetReader reader;
@@ -202,19 +202,19 @@ public class Main {
             double radius = maxDistanceBetweenSets(window, centersChen);
             boolean independence = isIndependent(centersChen);
             //Write on file
-            writerChen.print(radius+";"+(independence ? "": "NO")+";");
+            writerChen.print(String.format(Locale.ITALIAN, "%.20f", radius)+";"+(independence ? "SI": "NO")+";");
 
             radius = maxDistanceBetweenSets(window, centersCapp);
             independence = isIndependent(centersCapp);
-            writerCapp.print(radius+";"+(independence ? "": "NO")+";");
+            writerCapp.print(String.format(Locale.ITALIAN, "%.20f", radius)+";"+(independence ? "SI": "NO")+";");
 
             radius = maxDistanceBetweenSets(window, centersChenWithK);
             independence = isIndependent(centersChenWithK);
-            writerChenWithK.print(radius+";"+(independence ? "": "NO")+";");
+            writerChenWithK.print(String.format(Locale.ITALIAN, "%.20f", radius)+";"+(independence ? "SI": "NO")+";");
 
             radius = maxDistanceBetweenSets(window, centersCappWithK);
             independence = isIndependent(centersCappWithK);
-            writerCappWithK.print(radius+";"+(independence ? "": "NO")+";");
+            writerCappWithK.print(String.format(Locale.ITALIAN, "%.20f", radius)+";"+(independence ? "SI": "NO")+";");
 
 
             //3. MEMORY TEST: we only sum the number of points for every algorithm
@@ -231,14 +231,6 @@ public class Main {
 
             memory = cappWithK.getSize();
             writerCappWithK.println(memory);
-
-            if (centersCapp.size() != centersCappWithK.size()) {
-                System.out.println("EFFETTIVAMENTE K AGGIUNGE PUNTI A CAPP");
-            }
-
-            if (centersChen.size() != centersChenWithK.size()) {
-                System.out.println("EFFETTIVAMENTE K AGGIUNGE PUNTI A CHEN");
-            }
         }
     }
 

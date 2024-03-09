@@ -5,9 +5,9 @@ import org.jgrapht.alg.flow.PushRelabelMFImpl;
 import org.jgrapht.alg.util.Triple;
 import org.jgrapht.graph.DefaultDirectedWeightedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
-import org.jgrapht.opt.graph.sparse.SparseIntDirectedWeightedGraph;
 
 import java.util.*;
+import org.jgrapht.opt.graph.sparse.SparseIntDirectedWeightedGraph;
 
 public class CHENWithK implements Algorithm {
 
@@ -39,6 +39,8 @@ public class CHENWithK implements Algorithm {
     }
 
     public ArrayList<Point> query() {
+
+        //First we create all the distances and put them in an array
         double[] distances = new double[pts.size()*pts.size()-pts.size()];
         int i = 0;
         for (Point p : pts) {
@@ -51,17 +53,22 @@ public class CHENWithK implements Algorithm {
             }
         }
 
+        //Then we sort all the distances, so that they are in non decreasing order
         Arrays.sort(distances);
 
-        //Binary search on distances
+        //Then we perform a binary search on the distances to search the best answer
         ArrayList<Point> sol = new ArrayList<>(pts);
         int low = 0;
         int high = distances.length-1;
         while (low <= high) {
             int mid = (high + low) / 2;
-            if (distances[mid] == 0) {
+
+            //Distance 0 is optimal only if we have less than k points
+            if (distances[mid] == 0 && pts.size() > k) {
                 low = mid + 1;
             }
+
+            //We try to obtain k centers with that distance as the radius
             ArrayList<Point> thisSol = queryDist(distances[mid]);
             if (thisSol != null) {
                 sol = thisSol;
@@ -79,17 +86,22 @@ public class CHENWithK implements Algorithm {
 
     //It returns null if the distance is not suitable to create a k-center clustering
     private ArrayList<Point> queryDist(double dist) {
-        //Create the partition: the point in the map is the head of the partition
+
+        //Create the partition: the key point in the map is the head of the partition
         TreeMap<Point, ArrayList<Point>> partition = new TreeMap<>();
 
-        //First point is inserted
+        //We take a random point (the first one to simplify)
         partition.put(pts.getFirst(), new ArrayList<>());
 
         //Then every other point
-        for (Point p : pts) {
+        for (int i = 1; i< pts.size(); i++) {
+            Point p = pts.get(i);
             double minD = p.getMinDistance(partition.keySet());
+            //If its distance from the set of centers is more than 2*dist, it becomes another center
             if (minD > 2*dist) {
                 partition.put(p, new ArrayList<>());
+
+                //If the number of centers is more than k, we already know that this won't be a valid guess
                 if (partition.keySet().size() > k) {
                     return null;
                 }
@@ -100,14 +112,17 @@ public class CHENWithK implements Algorithm {
         for (Point p : pts) {
             for (Point pivot : partition.keySet()) {
                 if (p.getDistance(pivot) <= dist) {
+                    //We know that every point can be at distance <= dist from only one point of pivots
+                    //The demonstration is in the paper by Chen et al.
                     partition.get(pivot).add(p);
-                    //We already know that every point can be at distance <= dist from only one point of pivots
                     break;
                 }
             }
         }
+
+        //Then we resolve the partition matroid intersection
         //TODO: meglio sparse o no?
-        return partitionMatroidIntersectionSPARSE(partition);
+        return sparsePartitionMatroidIntersection(partition);
     }
 
     //The idea is taken from CHIPLUNKAR ET AL.
@@ -158,44 +173,15 @@ public class CHENWithK implements Algorithm {
         }
 
         //Now we can have less than k centers
-        while (centers.size() < k && pointAtMaxDistanceBetweenSets(pts, centers)) {
+        boolean end = false;
+        while (centers.size()<k && !end) {
+            end = insertPointAtMaxDistanceBetweenSets(pts, centers);
         }
 
         return centers;
     }
 
-    private boolean pointAtMaxDistanceBetweenSets(Collection<Point> set, ArrayList<Point> centers){
-        int[] kj = ki.clone();
-        for (Point p : set) {
-            kj[p.getGroup()]--;
-        }
-        boolean complete = true;
-        for (int kjj : kj) {
-            if (kjj > 0) {
-                complete = false;
-                break;
-            }
-        }
-        if (complete) {
-            return false;
-        }
-        double maxD = 0;
-        Point toInsert = null;
-        for(Point p : set){
-            double dd = p.getMaxDistance(centers);
-            if (dd > maxD && kj[p.getGroup()] > 0) {
-                maxD = dd;
-                toInsert = p;
-            }
-        }
-        if (toInsert != null) {
-            centers.add(toInsert);
-            return true;
-        }
-        return false;
-    }
-
-    private ArrayList<Point> partitionMatroidIntersectionSPARSE(TreeMap<Point, ArrayList<Point>> partition) {
+    private ArrayList<Point> sparsePartitionMatroidIntersection(TreeMap<Point, ArrayList<Point>> partition) {
 
         List<Triple<Integer, Integer, Double>> edges = new ArrayList<>(partition.size());
         //Node 0 is the source, node 1 to group.size() are the group nodes, nodes partition.size()+1 to
@@ -206,8 +192,7 @@ public class CHENWithK implements Algorithm {
             i++;
             for (Point p : partition.get(pivot)) {
                 edges.add(new Triple<>(i_pivot, i, (double)1));
-                int p_group = p.getGroup()+1;
-                edges.add(new Triple<>(i, p_group, (double)1));
+                edges.add(new Triple<>(i, p.getGroup()+1, (double)1));
                 i++;
             }
         }
@@ -222,7 +207,7 @@ public class CHENWithK implements Algorithm {
         PushRelabelMFImpl<Integer, Integer> alg = new PushRelabelMFImpl<>(graph);
         double flow = alg.calculateMaximumFlow(0, i);
 
-        //If the flow is less than the number of partitions
+        //If the flow is less than the number of partitions, it's a failure
         if (flow != partition.keySet().size()) {
             return null;
         }
@@ -237,15 +222,52 @@ public class CHENWithK implements Algorithm {
         int new_i = ki.length+1;
         for (Point pivot : partition.keySet()) {
             new_i++;
-            for (Point p : partition.get(pivot)) {
+            ArrayList<Point> thisPartition = partition.get(pivot);
+            for (int z = 0; z<thisPartition.size(); z++) {
+                Point p = thisPartition.get(z);
                 Integer edge = graph.getEdge(new_i, p.getGroup()+1);
                 if (flows.get(edge) == 1) {
                     centers.add(p);
+
+                    //TODO: testa se è corretto
+                    new_i += thisPartition.size()-z;
+                    break;
                 }
                 new_i++;
             }
         }
+
+        //Now we can have less than k centers
+        boolean end = false;
+        while (centers.size()<k && !end) {
+            end = insertPointAtMaxDistanceBetweenSets(pts, centers);
+        }
+
         return centers;
+    }
+
+    //CHIPLUNKAR uses an algorithm that only inserts a casual point in the set of centers
+    private boolean insertPointAtMaxDistanceBetweenSets(Collection<Point> set, ArrayList<Point> centers){
+        int[] kj = ki.clone();
+        for (Point p : set) {
+            kj[p.getGroup()]--;
+        }
+
+        //Take the point at the maximum distance from the centers
+        double maxD = 0;
+        Point toInsert = null;
+        for(Point p : set){
+            double dd = p.getMaxDistance(centers);
+            if (dd > maxD && kj[p.getGroup()] > 0) {
+                maxD = dd;
+                toInsert = p;
+            }
+        }
+
+        if (toInsert != null) {
+            centers.add(toInsert);
+        }
+        return toInsert == null;
     }
 
     private final LinkedList<Point> pts;
