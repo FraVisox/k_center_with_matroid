@@ -5,10 +5,12 @@ import it.unidp.dei.Point;
 import java.io.FileNotFoundException;
 
 public class CovertypeReader implements DatasetReader {
-    private final InputFileReader reader;
-    public static final int dimension = 54;
-    public CovertypeReader(String fileName) throws FileNotFoundException {
-        reader = new InputFileReader(fileName);
+    private InputFileReader reader = null;
+    public static final int dimension = 53;
+    public void setFile(String fileName) throws FileNotFoundException {
+        if (reader == null) {
+            reader = new InputFileReader(fileName);
+        }
     }
     @Override
     public boolean hasNext() {
@@ -20,9 +22,8 @@ public class CovertypeReader implements DatasetReader {
         for(int i=0; i<dimension; i++){
             coords[i] = reader.getDouble();
         }
-
-        //TODO: assegna ad ogni punto una categoria in modo intelligente
-        return new Point(coords, time, wSize, 0);
+        //TODO: giusto?
+        return new Point(coords, time, wSize, reader.getInt());
     }
 
     public void close() {

@@ -1,5 +1,6 @@
 package it.unidp.dei;
 
+import it.unidp.dei.datasetReaders.CovertypeReader;
 import it.unidp.dei.datasetReaders.DatasetReader;
 import it.unidp.dei.datasetReaders.PhonesReader;
 
@@ -8,23 +9,31 @@ import java.io.PrintWriter;
 import java.util.*;
 
 public class Main {
+    //TODO: sistema i readers
+
+    //Some parameters that are the same for every dataset
+    private static final double epsilon = 0.1;
+    private static final double beta = 0.2;
+    private static final int wSize = 5000;
+    public static final double INF = findMax()+1;
+    //It tells how many times we will query the algorithms after having a complete window
+    private static final int stride = 10;
+
+    //Folders of input and output files
     public static final String inFolderOriginals = "src/main/java/it/unidp/dei/data/originals/";
     public static final String inFolderRandomized = "src/main/java/it/unidp/dei/data/randomized/";
-    private static final String[] datasets = {"Phones_accelerometer.csv"};
-    private static final int[] ki = {5, 5, 5, 5, 5, 5, 5};
-    private static final double epsilon = 1;
-    private static final double beta = 1;
+    private static final String outFolder = "out/";
 
+    //For every dataset we save the name of the input file, the name of the output file, ki, minDist, maxDist and the object to read the file
+    private static final String[] datasets = {"Phones_accelerometer.csv", "covtype.dat"};
+    private static final String[] outFiles = {"testPhones.csv", "testCovtype.csv"};
+    private static final int[][] ki = {{5, 5, 5, 5, 5, 5, 5}, {5, 5, 5, 5, 5, 5, 5}};
     //PHONES: maxD = 30 and minD = 5e-4 (tested for 840000 points)
     //HIGGS: maxD = 29 and minD = 0.008 (tested for 620000 points). Pellizzoni used 100 and 0.01
     //COVTYPE: maxD = 13244 and minD = 4.8 (tested for 510000 points). Pellizzoni used 10000 and 0.1
-    private static final double minDist = 5e-4;
-    private static final double maxDist = 30;
-    private static final int wSize = 5000;
-    public static final double INF = maxDist+1;
-
-    //It tells how many times we will query the algorithms after having a complete window
-    private static final int stride = 10;
+    private static final double[] minDist = {5e-4, 4.8};
+    private static final double[] maxDist = {30, 13244};
+    private static final DatasetReader[] readers = {new PhonesReader(), new CovertypeReader()};
 
     public static void main(String[] args) {
         DatasetReader reader;
@@ -32,16 +41,17 @@ public class Main {
         PrintWriter writerCapp;
         PrintWriter writerChenWithK;
         PrintWriter writerCappWihtK;
-        for (String set : datasets) {
-
+        for (int i = 0; i< datasets.length; i++) {
+            String set = datasets[i];
+            reader = readers[i];
             try {
                 //Create a dataset reader
-                reader = new PhonesReader(inFolderRandomized+set);
+                readers[i].setFile(inFolderRandomized+set);
                 //Create a results writer
-                writerChen = new PrintWriter("out/testPhonesCHEN.csv");
-                writerCapp = new PrintWriter("out/testPhonesCAPP.csv");
-                writerChenWithK = new PrintWriter("out/testPhonesCHENWithK.csv");
-                writerCappWihtK = new PrintWriter("out/testPhonesCAPPWithK.csv");
+                writerChen = new PrintWriter(outFolder+"CHEN"+outFiles[i]);
+                writerCapp = new PrintWriter(outFolder+"CAPP"+outFiles[i]);
+                writerChenWithK = new PrintWriter(outFolder+"CHENWITHK"+outFiles[i]);
+                writerCappWihtK = new PrintWriter(outFolder+"CAPPWITHK"+outFiles[i]);
 
             } catch (FileNotFoundException e) {
                 System.out.println("File " + set + " not found, skipping to next dataset");
@@ -49,7 +59,11 @@ public class Main {
             }
 
             //TEST THINGS
-            testAlgorithms(reader, writerChen, writerCapp, writerChenWithK, writerCappWihtK);
+            int[] kiSet = ki[i];
+            double max = maxDist[i];
+            double min = minDist[i];
+
+            testAlgorithms(reader, kiSet, min, max, writerChen, writerCapp, writerChenWithK, writerCappWihtK);
 
             //FLUSH AND CLOSE
             writerChen.flush();
@@ -70,7 +84,7 @@ public class Main {
 
     //In every line of the output file we will have an header:
     //updateTime;queryTime;radius;independence;memory
-    private static void testAlgorithms(DatasetReader reader, PrintWriter writerChen, PrintWriter writerCapp, PrintWriter writerChenWithK, PrintWriter writerCappWithK) {
+    private static void testAlgorithms(DatasetReader reader, int[] kiSet, double min, double max, PrintWriter writerChen, PrintWriter writerCapp, PrintWriter writerChenWithK, PrintWriter writerCappWithK) {
         long startTime, endTime;
 
         String header = "Update Time;Query Time;Radius;Independence;Memory";
@@ -84,10 +98,10 @@ public class Main {
         LinkedList<Point> window = new LinkedList<>();
 
         //Initialize the algorithm
-        CAPP capp = new CAPP(ki, epsilon, beta, minDist, maxDist);
-        CAPPWithK cappWithK = new CAPPWithK(ki, epsilon, beta, minDist, maxDist);
-        CHEN chen = new CHEN(ki);
-        CHENWithK chenWithK = new CHENWithK(ki);
+        CAPP capp = new CAPP(kiSet, epsilon, beta, min, max);
+        CAPPWithK cappWithK = new CAPPWithK(kiSet, epsilon, beta, min, max);
+        CHEN chen = new CHEN(kiSet);
+        CHENWithK chenWithK = new CHENWithK(kiSet);
 
         for (int time = 1; time <= wSize+stride; time++) {
 
@@ -202,20 +216,20 @@ public class Main {
 
             //2. QUALITY TEST: Check of the radius of the centers returned and the independence of the set
             double radius = maxDistanceBetweenSets(window, centersChen);
-            boolean independence = isIndependent(centersChen);
+            boolean independence = isIndependent(centersChen, kiSet);
             //Write on file
             writerChen.print(String.format(Locale.ITALIAN, "%.16f", radius)+";"+(independence ? "SI": "NO")+";");
 
             radius = maxDistanceBetweenSets(window, centersCapp);
-            independence = isIndependent(centersCapp);
+            independence = isIndependent(centersCapp, kiSet);
             writerCapp.print(String.format(Locale.ITALIAN, "%.16f", radius)+";"+(independence ? "SI": "NO")+";");
 
             radius = maxDistanceBetweenSets(window, centersChenWithK);
-            independence = isIndependent(centersChenWithK);
+            independence = isIndependent(centersChenWithK, kiSet);
             writerChenWithK.print(String.format(Locale.ITALIAN, "%.16f", radius)+";"+(independence ? "SI": "NO")+";");
 
             radius = maxDistanceBetweenSets(window, centersCappWithK);
-            independence = isIndependent(centersCappWithK);
+            independence = isIndependent(centersCappWithK, kiSet);
             writerCappWithK.print(String.format(Locale.ITALIAN, "%.16f", radius)+";"+(independence ? "SI": "NO")+";");
 
 
@@ -248,8 +262,8 @@ public class Main {
         return ans;
     }
 
-    public static boolean isIndependent(Collection<Point> set) {
-        int[] kj = ki.clone();
+    private static boolean isIndependent(Collection<Point> set, int[] kiSet) {
+        int[] kj = kiSet.clone();
         for (Point p : set) {
             kj[p.getGroup()] -= 1;
             if (kj[p.getGroup()] < 0) {
@@ -257,6 +271,14 @@ public class Main {
             }
         }
         return true;
+    }
+
+    private static double findMax() {
+        double max = Main.maxDist[0];
+        for (double d : Main.maxDist) {
+            max = Math.max(max, d);
+        }
+        return max;
     }
 
     private static void calculateMinMaxDist(DatasetReader reader) {
