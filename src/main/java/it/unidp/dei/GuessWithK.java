@@ -16,6 +16,7 @@ public class GuessWithK {
     }
 
     public void update(Point p, int time) {
+        //TODO: removeFirst non funziona in Linux?
         //Removes expired points
         if (!RV.isEmpty() && RV.firstKey().hasExpired(time)) {
             OV.add(RV.remove(RV.firstKey()));
@@ -52,22 +53,21 @@ public class GuessWithK {
             //Add it to AV
             RV.put(p, p);
 
-            //If the size is greater than k+1, remove the oldest points
-            if (RV.keySet().size() > k+1) {
+            //If the size is greater than k+1, remove the oldest point
+            if (RV.size() > k+1) {
                 OV.add(RV.remove(RV.firstKey()));
             }
-            //If the size is greater than k, remove points older from A, OV and O
+            //If the size is greater than k, remove points older than the oldest of AV from A, OV and O
             if (RV.size() > k) {
-                Point vold = RV.firstKey();
+                Point vOld = RV.firstKey();
                 List<Point> ptsToDelete = new ArrayList<>();
 
-                for (Point a : R.navigableKeySet()) {
-                    if (a.compareTo(vold) <= 0) {
-                        ptsToDelete.add(a);
-                    }
-                    else {
+                //TODO: è >= o solo > ? Sembra funzionare allo stesso modo, da vedere in COHEN
+                for (Point a : R.keySet()) {
+                    if (a.compareTo(vOld) >= 0) {
                         break;
                     }
+                    ptsToDelete.add(a);
                 }
                 for (Point a : ptsToDelete) {
                     LinkedList<Point>[] pts = R.remove(a);
@@ -76,11 +76,11 @@ public class GuessWithK {
                     }
                 }
 
-                while (!OV.isEmpty() && OV.first().compareTo(vold) <= 0) {
+                while (!OV.isEmpty() && OV.first().compareTo(vOld) < 0) {
                     OV.removeFirst();
                 }
 
-                while (!O.isEmpty() && O.first().compareTo(vold) <= 0 ) {
+                while (!O.isEmpty() && O.first().compareTo(vOld) < 0) {
                     O.removeFirst();
                 }
             }
@@ -97,28 +97,25 @@ public class GuessWithK {
             //Add this point as a new attraction c-point
             LinkedList<Point>[] ptsGroups = new LinkedList[ki.length];
             for (int i = 0; i< ki.length; i++) {
-                LinkedList<Point> pGroup = new LinkedList<>();
-                if (i == p.getGroup()) {
-                    pGroup.add(p);
-                }
-                ptsGroups[i] = pGroup;
+                ptsGroups[i] = new LinkedList<>();
             }
+            ptsGroups[p.getGroup()].add(p);
             R.put(p, ptsGroups);
         }
         else {
             //If there is a tie, the first point inserted in E gets this point as a representative
             int pGroup = p.getGroup();
-            Point aadd = E.get(0);
+            Point aAdd = E.get(0);
             for (int i = 1; i<E.size(); i++) {
                 Point a = E.get(i);
-                if (R.get(a)[pGroup].size() < R.get(aadd)[pGroup].size()) {
-                    aadd = a;
+                if (R.get(a)[pGroup].size() < R.get(aAdd)[pGroup].size()) {
+                    aAdd = a;
                 }
             }
-            LinkedList<Point>[] aaddRep = R.get(aadd);
-            aaddRep[pGroup].addLast(p);
-            if (aaddRep[pGroup].size() > ki[pGroup]) {
-                aaddRep[pGroup].removeFirst();
+            LinkedList<Point>[] aAddRep = R.get(aAdd);
+            aAddRep[pGroup].addLast(p);
+            if (aAddRep[pGroup].size() > ki[pGroup]) {
+                aAddRep[pGroup].removeFirst();
             }
         }
     }
@@ -135,32 +132,21 @@ public class GuessWithK {
     }
 
     public boolean isCorrect() {
-        if (RV.keySet().size() <= k) {
-            ArrayList<Point> C = new ArrayList<>(RV.keySet());
-            for(Point p : OV)
-            {
-                if (p.getMinDistance(C) > 2*gamma) {
-                    C.add(p);
-                    if(C.size() > k) {
-                        return false;
-                    }
-                }
-            }
-            //TODO: è corretto?
-            for(Point p : RV.values())
-            {
-                if (p.getMinDistance(C) > 2*gamma) {
-                    System.out.println("NOOOOOO NON PUO' SUCCEDEREEEE");
-                    C.add(p);
-                    if(C.size() > k) {
-                        return false;
-                    }
-                }
-            }
-            //We don't check if any point in RV is at distance > 2*gamma from C because we know this isn't true
-            return true;
+        if (RV.size() > k) {
+            return false;
         }
-        return false;
+        ArrayList<Point> C = new ArrayList<>(RV.keySet());
+        for(Point p : OV)
+        {
+            if (p.getMinDistance(C) > 2*gamma) {
+                C.add(p);
+                if(C.size() > k) {
+                    return false;
+                }
+            }
+        }
+        //We don't check if any point in RV is at distance > 2*gamma from C because we know this isn't true
+        return true;
     }
 
     public int getSize() {

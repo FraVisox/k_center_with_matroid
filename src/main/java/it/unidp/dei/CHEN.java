@@ -9,8 +9,8 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import java.util.*;
 import org.jgrapht.opt.graph.sparse.SparseIntDirectedWeightedGraph;
 
+//TODO: improvements
 public class CHEN implements Algorithm {
-
     public CHEN(int[] _ki) {
         pts = new LinkedList<>();
         ki = _ki;

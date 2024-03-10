@@ -11,8 +11,6 @@ public class Main {
     public static final String inFolderOriginals = "src/main/java/it/unidp/dei/data/originals/";
     public static final String inFolderRandomized = "src/main/java/it/unidp/dei/data/randomized/";
     private static final String[] datasets = {"Phones_accelerometer.csv"};
-
-    //TODO: testa CHEN per bene
     private static final int[] ki = {5, 5, 5, 5, 5, 5, 5};
     private static final double epsilon = 1;
     private static final double beta = 1;
@@ -193,6 +191,10 @@ public class Main {
             System.gc();
             startTime = System.nanoTime();
             centersCappWithK = cappWithK.query();
+            if (centersCappWithK.isEmpty()) {
+                System.out.println("Max or min distances are not correct. There isn't a valid guess");
+                return;
+            }
             endTime = System.nanoTime();
             //Write on file the time of query
             writerCappWithK.print((endTime-startTime)+";");
@@ -202,19 +204,19 @@ public class Main {
             double radius = maxDistanceBetweenSets(window, centersChen);
             boolean independence = isIndependent(centersChen);
             //Write on file
-            writerChen.print(String.format(Locale.ITALIAN, "%.20f", radius)+";"+(independence ? "SI": "NO")+";");
+            writerChen.print(String.format(Locale.ITALIAN, "%.16f", radius)+";"+(independence ? "SI": "NO")+";");
 
             radius = maxDistanceBetweenSets(window, centersCapp);
             independence = isIndependent(centersCapp);
-            writerCapp.print(String.format(Locale.ITALIAN, "%.20f", radius)+";"+(independence ? "SI": "NO")+";");
+            writerCapp.print(String.format(Locale.ITALIAN, "%.16f", radius)+";"+(independence ? "SI": "NO")+";");
 
             radius = maxDistanceBetweenSets(window, centersChenWithK);
             independence = isIndependent(centersChenWithK);
-            writerChenWithK.print(String.format(Locale.ITALIAN, "%.20f", radius)+";"+(independence ? "SI": "NO")+";");
+            writerChenWithK.print(String.format(Locale.ITALIAN, "%.16f", radius)+";"+(independence ? "SI": "NO")+";");
 
             radius = maxDistanceBetweenSets(window, centersCappWithK);
             independence = isIndependent(centersCappWithK);
-            writerCappWithK.print(String.format(Locale.ITALIAN, "%.20f", radius)+";"+(independence ? "SI": "NO")+";");
+            writerCappWithK.print(String.format(Locale.ITALIAN, "%.16f", radius)+";"+(independence ? "SI": "NO")+";");
 
 
             //3. MEMORY TEST: we only sum the number of points for every algorithm
@@ -260,8 +262,8 @@ public class Main {
     private static void calculateMinMaxDist(DatasetReader reader) {
         double maxD = 0, minD = INF;
         ArrayList<Point> window = new ArrayList<>(wSize);
-
-        for (int time = 0; reader.hasNext(); time++) {
+        int time;
+        for (time = 0; reader.hasNext(); time++) {
             Point p = reader.nextPoint(time, wSize);
             window.add(p);
 
@@ -269,13 +271,13 @@ public class Main {
             minD = Math.min(minD, p.getMinDistanceWithoutZeroes(window));
 
             if (time % 10000 == 0) {
-                System.out.println("Al tempo: " + time);
-                System.out.println("Minima distanza: " + minD);
-                System.out.println("Massima distanza: " + maxD+"\n");
+                System.out.println("At time: " + time);
+                System.out.println("Min distance: " + minD);
+                System.out.println("Max distance: " + maxD+"\n");
             }
         }
-        System.out.println("Distanze finali:");
-        System.out.println("Minima distanza: "+minD);
-        System.out.println("Massima distanza: "+maxD);
+        System.out.println("FINAL DISTANCES at time: "+time);
+        System.out.println("Min distance: " + minD);
+        System.out.println("Max distance: " + maxD+"\n");
     }
 }

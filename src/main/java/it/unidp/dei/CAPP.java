@@ -6,6 +6,8 @@ public class CAPP implements Algorithm {
 
     public CAPP(int[] _ki, double _epsilon, double _beta, double minDist, double maxDist) {
         //Calculate epsilon1 and then delta
+
+        //TODO: e' corretto questo epsilon1 a livello teorico?
         double epsilon1 = _epsilon/(1+2*alfa);
         double delta = epsilon1/(1+_beta);
 
@@ -14,20 +16,21 @@ public class CAPP implements Algorithm {
 
         /* This is how to use the definition
 
-        int first_i = (int)Math.floor(Math.log(minDist)/Math.log(1+_beta));
         int last_i = (int)Math.ceil(Math.log(maxDist)/Math.log(1+_beta));
         int number_of_guesses = last_i-first_i+1;
-        double gamma = Math.pow((1+_beta), first_i);
 
          */
-
         guesses = new Guess[number_of_guesses];
-        double gamma = minDist;
+
+        int first_i = (int)Math.floor(Math.log(minDist)/Math.log(1+_beta));
+
+        //TODO: e se gamma parte da minDist? Come fa Pellizzoni
+        double gamma = Math.pow((1+_beta), first_i);
+
         for (int i = 0; i<number_of_guesses; i++) {
             guesses[i] = new Guess(gamma, delta, _ki);
             gamma *= (1+_beta);
         }
-        assert gamma >= maxDist;
     }
 
     public void update(Point p, int time) {
