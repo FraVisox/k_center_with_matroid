@@ -7,7 +7,7 @@ import java.io.FileNotFoundException;
 public class HiggsReader implements DatasetReader {
     private InputFileReader reader;
     public static final int dimension = 7;
-    public static final int ignored = 22;
+    public static final int ignored = 21;
 
     public void setFile(String fileName) throws FileNotFoundException {
         if (reader == null) {
@@ -16,18 +16,19 @@ public class HiggsReader implements DatasetReader {
     }
 
     public Point nextPoint(int time, int wSize) {
+        int pGroup = reader.getInt();
+
         //Coordinates to be discarded
-        for(int i=1; i<=ignored; i++) {
+        for(int i=0; i<ignored; i++) {
             reader.getWord();
         }
 
         //Coordinates to be saved
         double[] coords = new double[dimension];
-        for(int i=1; i<=dimension; i++) {
+        for(int i=0; i<dimension; i++) {
             coords[i] = reader.getDouble();
         }
-        //TODO: assegna ad ogni punto una categoria in modo intelligente
-        return new Point(coords, time, wSize, 0);
+        return new Point(coords, time, wSize, pGroup);
     }
 
     @Override

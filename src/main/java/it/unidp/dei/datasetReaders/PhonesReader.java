@@ -9,6 +9,7 @@ public class PhonesReader implements DatasetReader {
     public static final int dimension = 3;
     public static final int firstIgnored = 3;
     public static final int secondIgnored = 3;
+    private boolean first = true;
 
     public void setFile(String fileName) throws FileNotFoundException {
         if (reader == null) {
@@ -17,8 +18,13 @@ public class PhonesReader implements DatasetReader {
     }
 
     public Point nextPoint(int time, int wSize) {
+        if (first) {
+            reader.skipLine();
+            first = false;
+        }
+
         //Index, Arrival_time, Creation_time: to be discarded
-        for(int i=1; i<=firstIgnored; i++) {
+        for(int i=0; i<firstIgnored; i++) {
             reader.getWord();
         }
 
@@ -29,7 +35,7 @@ public class PhonesReader implements DatasetReader {
         }
 
         //User, model, device: to be discarded
-        for(int i=1; i<=secondIgnored; i++) {
+        for(int i=0; i<secondIgnored; i++) {
             reader.getWord();
         }
 

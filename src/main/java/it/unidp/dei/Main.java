@@ -2,6 +2,7 @@ package it.unidp.dei;
 
 import it.unidp.dei.datasetReaders.CovertypeReader;
 import it.unidp.dei.datasetReaders.DatasetReader;
+import it.unidp.dei.datasetReaders.HiggsReader;
 import it.unidp.dei.datasetReaders.PhonesReader;
 
 import java.io.FileNotFoundException;
@@ -9,15 +10,15 @@ import java.io.PrintWriter;
 import java.util.*;
 
 public class Main {
-    //TODO: sistema i readers
+    //TODO: testa HIGGSREADER
 
     //Some parameters that are the same for every dataset
     private static final double epsilon = 0.1;
     private static final double beta = 0.2;
-    private static final int wSize = 5000;
-    public static final double INF = findMax()+1;
+    private static final int wSize = 10;
+    public static final double INF = 14000;
     //It tells how many times we will query the algorithms after having a complete window
-    private static final int stride = 10;
+    private static final int stride = 0;
 
     //Folders of input and output files
     public static final String inFolderOriginals = "src/main/java/it/unidp/dei/data/originals/";
@@ -25,15 +26,15 @@ public class Main {
     private static final String outFolder = "out/";
 
     //For every dataset we save the name of the input file, the name of the output file, ki, minDist, maxDist and the object to read the file
-    private static final String[] datasets = {"Phones_accelerometer.csv", "covtype.dat"};
-    private static final String[] outFiles = {"testPhones.csv", "testCovtype.csv"};
-    private static final int[][] ki = {{5, 5, 5, 5, 5, 5, 5}, {5, 5, 5, 5, 5, 5, 5}};
+    private static final String[] datasets = {"Phones_accelerometer.csv", "covtype.dat", /*"HIGGS.csv"*/};
+    private static final String[] outFiles = {"testPhones.csv", "testCovtype.csv", "testHiggs.csv"};
+    private static final int[][] ki = {{5, 5, 5, 5, 5, 5, 5}, {10, 10, 10, 10, 10, 10, 10}, {10, 10}};
     //PHONES: maxD = 30 and minD = 5e-4 (tested for 840000 points)
+    //COVTYPE: maxD = 13244 and minD = 4.8 (tested for 510000 points). Pellizzoni used 10000 and 0.1 TODO: ritestalo
     //HIGGS: maxD = 29 and minD = 0.008 (tested for 620000 points). Pellizzoni used 100 and 0.01
-    //COVTYPE: maxD = 13244 and minD = 4.8 (tested for 510000 points). Pellizzoni used 10000 and 0.1
-    private static final double[] minDist = {5e-4, 4.8};
-    private static final double[] maxDist = {30, 13244};
-    private static final DatasetReader[] readers = {new PhonesReader(), new CovertypeReader()};
+    private static final double[] minDist = {5e-4, 4.8, 0.008};
+    private static final double[] maxDist = {30, 13244, 29};
+    private static final DatasetReader[] readers = {new PhonesReader(), new CovertypeReader(), new HiggsReader()};
 
     public static void main(String[] args) {
         DatasetReader reader;
@@ -103,7 +104,7 @@ public class Main {
         CHEN chen = new CHEN(kiSet);
         CHENWithK chenWithK = new CHENWithK(kiSet);
 
-        for (int time = 1; time <= wSize+stride; time++) {
+        for (int time = 1; time <= wSize+stride && reader.hasNext(); time++) {
 
             //Check of passing of time, only used for debug purposes
             if (time > wSize) {
@@ -113,6 +114,7 @@ public class Main {
             Point p = reader.nextPoint(time, wSize);
 
             if (p == null) {
+                System.out.println("NULL");
                 continue;
             }
 
@@ -253,11 +255,7 @@ public class Main {
     private static double maxDistanceBetweenSets(Collection<Point> set, Collection<Point> centers){
         double ans = 0;
         for(Point p : set){
-            double dd = INF+1;
-            for(Point q : centers){
-                dd = Math.min(dd, p.getDistance(q));
-            }
-            ans = Math.max(dd, ans);
+            ans = Math.max(p.getMinDistance(centers), ans);
         }
         return ans;
     }
@@ -271,35 +269,5 @@ public class Main {
             }
         }
         return true;
-    }
-
-    private static double findMax() {
-        double max = Main.maxDist[0];
-        for (double d : Main.maxDist) {
-            max = Math.max(max, d);
-        }
-        return max;
-    }
-
-    private static void calculateMinMaxDist(DatasetReader reader) {
-        double maxD = 0, minD = INF;
-        ArrayList<Point> window = new ArrayList<>(wSize);
-        int time;
-        for (time = 0; reader.hasNext(); time++) {
-            Point p = reader.nextPoint(time, wSize);
-            window.add(p);
-
-            maxD = Math.max(maxD, p.getMaxDistance(window));
-            minD = Math.min(minD, p.getMinDistanceWithoutZeroes(window));
-
-            if (time % 10000 == 0) {
-                System.out.println("At time: " + time);
-                System.out.println("Min distance: " + minD);
-                System.out.println("Max distance: " + maxD+"\n");
-            }
-        }
-        System.out.println("FINAL DISTANCES at time: "+time);
-        System.out.println("Min distance: " + minD);
-        System.out.println("Max distance: " + maxD+"\n");
     }
 }

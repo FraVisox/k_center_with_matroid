@@ -38,11 +38,19 @@ public class InputFileReader {
     public String getLine(){
         try{
             tokenizer = null;
+            token = null;
             return reader.readLine();
         }
         catch(IOException ignored){}
         return null;
     }
+
+    public void skipLine(){
+        tokenizer = null;
+        token = null;
+    }
+
+    //TODO: sistema
 
     private final BufferedReader reader;
     private StringTokenizer tokenizer;
