@@ -16,7 +16,7 @@ public class HiggsReader implements DatasetReader {
     }
 
     public Point nextPoint(int time, int wSize) {
-        int pGroup = reader.getInt();
+        int pGroup = (int) reader.getDouble();
 
         //Coordinates to be discarded
         for(int i=0; i<ignored; i++) {

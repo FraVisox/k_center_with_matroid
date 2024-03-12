@@ -2,9 +2,9 @@ package it.unidp.dei;
 
 import java.util.ArrayList;
 
-public class CAPPWithK implements Algorithm {
+public class KCAPP implements Algorithm {
 
-    public CAPPWithK(int[] _ki, double _epsilon, double _beta, double minDist, double maxDist) {
+    public KCAPP(int[] _ki, double _epsilon, double _beta, double minDist, double maxDist) {
         //Calculate epsilon1 and then delta
 
         //TODO: e' corretto questo epsilon1 a livello teorico?
@@ -20,7 +20,7 @@ public class CAPPWithK implements Algorithm {
         int number_of_guesses = last_i-first_i+1;
 
          */
-        guesses = new GuessWithK[number_of_guesses];
+        guesses = new KGuess[number_of_guesses];
 
         int first_i = (int)Math.floor(Math.log(minDist)/Math.log(1+_beta));
 
@@ -28,13 +28,13 @@ public class CAPPWithK implements Algorithm {
         double gamma = Math.pow((1+_beta), first_i);
 
         for (int i = 0; i<number_of_guesses; i++) {
-            guesses[i] = new GuessWithK(gamma, delta, _ki);
+            guesses[i] = new KGuess(gamma, delta, _ki);
             gamma *= (1+_beta);
         }
     }
 
     public void update(Point p, int time) {
-        for (GuessWithK g : guesses) {
+        for (KGuess g : guesses) {
             g.update(p, time);
         }
     }
@@ -52,7 +52,7 @@ public class CAPPWithK implements Algorithm {
 
     public int getSize() {
         int size = 0;
-        for (GuessWithK g : guesses) {
+        for (KGuess g : guesses) {
             size += g.getSize();
         }
         return size;
@@ -75,7 +75,7 @@ public class CAPPWithK implements Algorithm {
     }
 
     //Array of guesses
-    private final GuessWithK[] guesses;
+    private final KGuess[] guesses;
 
     //Approximation of sequential algorithm. In our case, CHEN gives a 3-approximation
     private static final int alfa = 3;

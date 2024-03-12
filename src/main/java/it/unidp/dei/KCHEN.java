@@ -9,9 +9,9 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import java.util.*;
 import org.jgrapht.opt.graph.sparse.SparseIntDirectedWeightedGraph;
 
-public class CHENWithK implements Algorithm {
+public class KCHEN implements Algorithm {
 
-    public CHENWithK(int[] _ki) {
+    public KCHEN(int[] _ki) {
         pts = new LinkedList<>();
         ki = _ki;
         int tmp = 0;
@@ -21,7 +21,7 @@ public class CHENWithK implements Algorithm {
         k = tmp;
     }
 
-    public CHENWithK(LinkedList<Point> p, int[] _ki) {
+    public KCHEN(LinkedList<Point> p, int[] _ki) {
         pts = p;
         ki = _ki;
         int tmp = 0;
@@ -228,8 +228,6 @@ public class CHENWithK implements Algorithm {
                 Integer edge = graph.getEdge(new_i, p.getGroup()+1);
                 if (flows.get(edge) == 1) {
                     centers.add(p);
-
-                    //TODO: testa se è corretto
                     new_i += thisPartition.size()-z;
                     break;
                 }
@@ -257,7 +255,7 @@ public class CHENWithK implements Algorithm {
         double maxD = 0;
         Point toInsert = null;
         for(Point p : set){
-            double dd = p.getMaxDistance(centers);
+            double dd = p.getMinDistance(centers);
             if (dd > maxD && kj[p.getGroup()] > 0) {
                 maxD = dd;
                 toInsert = p;

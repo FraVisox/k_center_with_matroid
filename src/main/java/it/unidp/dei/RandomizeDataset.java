@@ -10,6 +10,8 @@ import java.util.Collections;
 public class RandomizeDataset {
     private static final String outFolder = Main.inFolderRandomized;
     private static final String inFolder = Main.inFolderOriginals;
+
+    //HIGGS does not need to be randomized, as it is already randomized
     private static final String[] datasets = {"Phones_accelerometer.csv", "covtype.dat"};
     private static final boolean[] isThereFirst = {true, false};
 
@@ -37,16 +39,16 @@ public class RandomizeDataset {
             }
 
             String p = reader.getLine();
+            int j = 0;
             while (p != null) {
+                j++;
                 strings.add(p);
                 p = reader.getLine();
             }
+            System.out.println(j);
+            
             reader.close();
 
-            //We shuffle 4 times just to be sure it is completely randomized
-            Collections.shuffle(strings);
-            Collections.shuffle(strings);
-            Collections.shuffle(strings);
             Collections.shuffle(strings);
 
             if (isThereFirst[i]) {

@@ -19,7 +19,7 @@ public class PhonesReader implements DatasetReader {
 
     public Point nextPoint(int time, int wSize) {
         if (first) {
-            reader.skipLine();
+            reader.skipFirstLine();
             first = false;
         }
 

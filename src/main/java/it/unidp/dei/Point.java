@@ -35,12 +35,12 @@ public class Point implements Comparable<Point> {
         return mind;
     }
 
-    //It returns the minimum distance of this point from a Collection of points. If this
-    //point is in that collection, that distance is skipped
-    public double getMinDistanceWithoutZeroes(Collection<Point> set) {
-        double mind = Main.INF;
+    //It returns the minimum distance of this point from a Collection of points.
+    //If that distance is zero, it is returned the second minimum distance
+    public double getMinDistanceWithoutZeroes(Collection<Point> set, double INF) {
+        double mind = INF;
         for(Point q : set) {
-            if (!this.equals(q)) {
+            if (!Arrays.equals(coords, q.coords)) {
                 mind = Math.min(mind, this.getDistance(q));
             }
         }

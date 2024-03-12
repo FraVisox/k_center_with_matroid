@@ -3,7 +3,6 @@ package it.unidp.dei.datasetReaders;
 import it.unidp.dei.Point;
 
 import java.io.FileNotFoundException;
-import java.util.Arrays;
 
 public class CovertypeReader implements DatasetReader {
     private InputFileReader reader = null;
@@ -23,7 +22,6 @@ public class CovertypeReader implements DatasetReader {
         for(int i=0; i<dimension; i++){
             coords[i] = reader.getDouble();
         }
-        System.out.println(Arrays.toString(coords));
 
         return new Point(coords, time, wSize, reader.getInt()-1);
     }

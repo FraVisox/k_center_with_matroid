@@ -3,19 +3,13 @@ package it.unidp.dei;
 import it.unidp.dei.datasetReaders.*;
 
 import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class CalculateMinMaxDist {
-    private static final String outFolder = Main.inFolderRandomized;
-    private static final String inFolder = Main.inFolderOriginals;
-    private static final String[] datasets = {"Phones_accelerometer.csv", "covtype.dat"};
-    private static final boolean[] isThereFirst = {true, false};
+    private static final String[] datasets = {"Phones_accelerometer.csv", "covtype.dat", "HIGGS.csv"};
     private static final DatasetReader[] readers = {new PhonesReader(), new CovertypeReader(), new HiggsReader()};
-
     private static final double INFINITE = 10e20;
-
+    private static final int outputTime = 10000;
     public static void main(String[] args) {
         DatasetReader reader;
         for (int i = 0; i<datasets.length; i++) {
@@ -23,9 +17,13 @@ public class CalculateMinMaxDist {
             try {
                 //Create a file reader
                 reader = readers[i];
-                reader.setFile(inFolder + set);
+                if (!set.equals("HIGGS.csv")) {
+                    reader.setFile(Main.inFolderRandomized + set);
+                } else {
+                    reader.setFile(Main.inFolderOriginals + set);
+                }
             } catch (FileNotFoundException e) {
-                System.out.println("File " + inFolder + set + " not found, skipping to next dataset");
+                System.out.println("File " + set + " not found, skipping to next dataset");
                 continue;
             }
 
@@ -37,10 +35,12 @@ public class CalculateMinMaxDist {
                 window.add(p);
 
                 maxD = Math.max(maxD, p.getMaxDistance(window));
-                minD = Math.min(minD, p.getMinDistanceWithoutZeroes(window));
 
-                if (time % 10000 == 0) {
-                    System.out.println("At time: " + time);
+                //We don't want zeroes as log(0) is undefined
+                minD = Math.min(minD, p.getMinDistanceWithoutZeroes(window, INFINITE));
+
+                if (time % outputTime == 0) {
+                    System.out.println(set+": at time: " + time);
                     System.out.println("Min distance: " + minD);
                     System.out.println("Max distance: " + maxD + "\n");
                 }

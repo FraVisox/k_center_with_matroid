@@ -45,16 +45,10 @@ public class InputFileReader {
         return null;
     }
 
-    public void skipLine(){
+    public void skipFirstLine(){
         tokenizer = null;
         token = null;
     }
-
-    //TODO: sistema
-
-    private final BufferedReader reader;
-    private StringTokenizer tokenizer;
-    private String token;
 
     private String peekToken() {
         if (token == null)
@@ -74,4 +68,8 @@ public class InputFileReader {
         token = null;
         return ans;
     }
+
+    private final BufferedReader reader;
+    private StringTokenizer tokenizer;
+    private String token;
 }

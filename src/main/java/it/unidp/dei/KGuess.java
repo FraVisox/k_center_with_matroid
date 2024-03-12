@@ -2,9 +2,9 @@ package it.unidp.dei;
 
 import java.util.*;
 
-public class GuessWithK {
+public class KGuess {
 
-    public GuessWithK(double _gamma, double _delta, int[] _ki) {
+    public KGuess(double _gamma, double _delta, int[] _ki) {
         gamma = _gamma;
         delta = _delta;
         ki = _ki;
@@ -127,7 +127,7 @@ public class GuessWithK {
                 union.addAll(l);
             }
         }
-        CHENWithK chenEtAl = new CHENWithK(union, ki);
+        KCHEN chenEtAl = new KCHEN(union, ki);
         return chenEtAl.query();
     }
 
