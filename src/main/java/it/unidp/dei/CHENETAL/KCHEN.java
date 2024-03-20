@@ -1,5 +1,7 @@
-package it.unidp.dei;
+package it.unidp.dei.CHENETAL;
 
+import it.unidp.dei.Algorithm;
+import it.unidp.dei.Point;
 import org.jgrapht.Graphs;
 import org.jgrapht.alg.flow.PushRelabelMFImpl;
 import org.jgrapht.alg.util.Triple;
@@ -9,9 +11,9 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import java.util.*;
 import org.jgrapht.opt.graph.sparse.SparseIntDirectedWeightedGraph;
 
-//TODO: improvements
-public class CHEN implements Algorithm {
-    public CHEN(int[] _ki) {
+public class KCHEN implements Algorithm {
+
+    public KCHEN(int[] _ki) {
         pts = new LinkedList<>();
         ki = _ki;
         int tmp = 0;
@@ -21,7 +23,7 @@ public class CHEN implements Algorithm {
         k = tmp;
     }
 
-    public CHEN (LinkedList<Point> p, int[] _ki) {
+    public KCHEN(LinkedList<Point> p, int[] _ki) {
         pts = p;
         ki = _ki;
         int tmp = 0;
@@ -41,7 +43,11 @@ public class CHEN implements Algorithm {
     public ArrayList<Point> query() {
 
         //First we create all the distances and put them in an array
-        double[] distances = new double[pts.size()*pts.size()-pts.size()];
+        int length = pts.size()*pts.size()-pts.size();
+        if (pts.size() <= k) {
+            length++;
+        }
+        double[] distances = new double[length];
         int i = 0;
         for (Point p : pts) {
             for (Point q : pts) {
@@ -51,6 +57,9 @@ public class CHEN implements Algorithm {
                     i++;
                 }
             }
+        }
+        if (pts.size() <= k) {
+            distances[i] = 0;
         }
 
         //Then we sort all the distances, so that they are in non decreasing order
@@ -171,6 +180,13 @@ public class CHEN implements Algorithm {
                 }
             }
         }
+
+        //Now we can have less than k centers
+        boolean end = false;
+        while (centers.size()<k && !end) {
+            end = insertPointAtMaxDistanceBetweenSets(pts, centers);
+        }
+
         return centers;
     }
 
@@ -221,15 +237,44 @@ public class CHEN implements Algorithm {
                 Integer edge = graph.getEdge(new_i, p.getGroup()+1);
                 if (flows.get(edge) == 1) {
                     centers.add(p);
-
-                    //TODO: testa se è corretto
                     new_i += thisPartition.size()-z;
                     break;
                 }
                 new_i++;
             }
         }
+
+        //Now we can have less than k centers
+        boolean end = false;
+        while (centers.size()<k && !end) {
+            end = insertPointAtMaxDistanceBetweenSets(pts, centers);
+        }
+
         return centers;
+    }
+
+    //CHIPLUNKAR uses an algorithm that only inserts a casual point in the set of centers
+    private boolean insertPointAtMaxDistanceBetweenSets(Collection<Point> set, ArrayList<Point> centers){
+        int[] kj = ki.clone();
+        for (Point p : set) {
+            kj[p.getGroup()]--;
+        }
+
+        //Take the point at the maximum distance from the centers
+        double maxD = 0;
+        Point toInsert = null;
+        for(Point p : set){
+            double dd = p.getMinDistance(centers);
+            if (dd > maxD && kj[p.getGroup()] > 0) {
+                maxD = dd;
+                toInsert = p;
+            }
+        }
+
+        if (toInsert != null) {
+            centers.add(toInsert);
+        }
+        return toInsert == null;
     }
 
     private final LinkedList<Point> pts;

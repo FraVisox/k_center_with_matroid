@@ -1,10 +1,13 @@
-package it.unidp.dei;
+package it.unidp.dei.CAPPELLOTTO;
+
+import it.unidp.dei.CHENETAL.CHEN;
+import it.unidp.dei.Point;
 
 import java.util.*;
 
-public class KGuess {
+public class Guess {
 
-    public KGuess(double _gamma, double _delta, int[] _ki) {
+    public Guess(double _gamma, double _delta, int[] _ki) {
         gamma = _gamma;
         delta = _delta;
         ki = _ki;
@@ -13,6 +16,21 @@ public class KGuess {
             tmp += kj;
         }
         k = tmp;
+        RV = new TreeMap<>();
+        R = new TreeMap<>();
+    }
+
+    public Guess(double _gamma, double _delta, int[] _ki, TreeMap<Point, Point> _RV, TreeMap<Point, LinkedList<Point>[]> _R) {
+        gamma = _gamma;
+        delta = _delta;
+        ki = _ki;
+        int tmp = 0;
+        for (int kj : _ki) {
+            tmp += kj;
+        }
+        k = tmp;
+        RV = _RV;
+        R = _R;
     }
 
     public void update(Point p, int time) {
@@ -127,7 +145,7 @@ public class KGuess {
                 union.addAll(l);
             }
         }
-        KCHEN chenEtAl = new KCHEN(union, ki);
+        CHEN chenEtAl = new CHEN(union, ki);
         return chenEtAl.query();
     }
 
@@ -159,15 +177,12 @@ public class KGuess {
         return size;
     }
 
-    //TODO: elimina se non oblivious
-    public double getValue() {return gamma;}
-
     private final double gamma;
     private final double delta;
     private final int k;
     private final int[] ki;
     private final TreeSet<Point> O = new TreeSet<>();
     private final TreeSet<Point> OV = new TreeSet<>();
-    private final TreeMap<Point, Point> RV = new TreeMap<>();
-    private final TreeMap<Point, LinkedList<Point>[]> R = new TreeMap<>();
+    private final TreeMap<Point, Point> RV;
+    private final TreeMap<Point, LinkedList<Point>[]> R;
 }

@@ -1,10 +1,13 @@
-package it.unidp.dei;
+package it.unidp.dei.CAPPELLOTTO;
+
+import it.unidp.dei.Algorithm;
+import it.unidp.dei.Point;
 
 import java.util.ArrayList;
 
-public class KCAPP implements Algorithm {
+public class CAPP implements Algorithm {
 
-    public KCAPP(int[] _ki, double _epsilon, double _beta, double minDist, double maxDist) {
+    public CAPP(int[] _ki, double _epsilon, double _beta, double _minDist, double _maxDist) {
         //Calculate epsilon1 and then delta
 
         //TODO: e' corretto questo epsilon1 a livello teorico?
@@ -12,7 +15,7 @@ public class KCAPP implements Algorithm {
         double delta = epsilon1/(1+_beta);
 
         //Initiate the guesses array. We don't use the definition, but an equivalent form
-        int number_of_guesses = (int)Math.ceil(Math.log(maxDist/minDist)/Math.log(1+_beta))+1;
+        int number_of_guesses = (int)Math.ceil(Math.log(_maxDist/_minDist)/Math.log(1+_beta))+1;
 
         /* This is how to use the definition
 
@@ -20,21 +23,21 @@ public class KCAPP implements Algorithm {
         int number_of_guesses = last_i-first_i+1;
 
          */
-        guesses = new KGuess[number_of_guesses];
+        guesses = new Guess[number_of_guesses];
 
-        int first_i = (int)Math.floor(Math.log(minDist)/Math.log(1+_beta));
+        int first_i = (int)Math.floor(Math.log(_minDist)/Math.log(1+_beta));
 
         //TODO: e se gamma parte da minDist? Come fa Pellizzoni
         double gamma = Math.pow((1+_beta), first_i);
 
         for (int i = 0; i<number_of_guesses; i++) {
-            guesses[i] = new KGuess(gamma, delta, _ki);
+            guesses[i] = new Guess(gamma, delta, _ki);
             gamma *= (1+_beta);
         }
     }
 
     public void update(Point p, int time) {
-        for (KGuess g : guesses) {
+        for (Guess g : guesses) {
             g.update(p, time);
         }
     }
@@ -52,7 +55,7 @@ public class KCAPP implements Algorithm {
 
     public int getSize() {
         int size = 0;
-        for (KGuess g : guesses) {
+        for (Guess g : guesses) {
             size += g.getSize();
         }
         return size;
@@ -75,7 +78,7 @@ public class KCAPP implements Algorithm {
     }
 
     //Array of guesses
-    private final KGuess[] guesses;
+    private final Guess[] guesses;
 
     //Approximation of sequential algorithm. In our case, CHEN gives a 3-approximation
     private static final int alfa = 3;
