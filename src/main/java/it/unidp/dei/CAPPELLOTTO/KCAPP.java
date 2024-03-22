@@ -1,6 +1,7 @@
 package it.unidp.dei.CAPPELLOTTO;
 
 import it.unidp.dei.Algorithm;
+import it.unidp.dei.CHENETAL.CHEN;
 import it.unidp.dei.Point;
 
 import java.util.ArrayList;
@@ -9,9 +10,7 @@ public class KCAPP implements Algorithm {
 
     public KCAPP(int[] _ki, double _epsilon, double _beta, double minDist, double maxDist) {
         //Calculate epsilon1 and then delta
-
-        //TODO: e' corretto questo epsilon1 a livello teorico?
-        double epsilon1 = _epsilon/(1+2*alfa);
+        double epsilon1 = _epsilon/(1+2*CHEN.alfa);
         double delta = epsilon1/(1+_beta);
 
         //Initiate the guesses array. We don't use the definition, but an equivalent form
@@ -79,8 +78,4 @@ public class KCAPP implements Algorithm {
 
     //Array of guesses
     private final KGuess[] guesses;
-
-    //Approximation of sequential algorithm. In our case, CHEN gives a 3-approximation
-    private static final int alfa = 3;
-
 }

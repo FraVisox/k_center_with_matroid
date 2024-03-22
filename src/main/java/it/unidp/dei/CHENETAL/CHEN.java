@@ -13,6 +13,10 @@ import org.jgrapht.opt.graph.sparse.SparseIntDirectedWeightedGraph;
 
 //TODO: improvements
 public class CHEN implements Algorithm {
+
+    //Approximation of sequential algorithm. In our case, CHEN gives a 3-approximation
+    public static final int alfa = 3;
+
     public CHEN(int[] _ki) {
         pts = new LinkedList<>();
         ki = _ki;

@@ -18,11 +18,12 @@ import java.util.*;
 public class Main {
     //Some parameters that are the same for every dataset
     private static final double epsilon = 0.1;
-    private static final double beta = 0.2;
-    private static final int wSize = 10;
+    private static final double beta = 1;
+    //private static final int[] wSize = {10, 100, 1000, 10000, 100000};
+    private static final int wSize = 1000;
     public static final double INF = 14000;
     //It tells how many times we will query the algorithms after having a complete window
-    private static final int stride = 100;
+    private static final int stride = 20;
 
     //Folders of input and output files
     public static final String inFolderOriginals = "src/main/java/it/unidp/dei/data/originals/";
@@ -32,7 +33,8 @@ public class Main {
     //For every dataset we save the name of the input file, the name of the output file, ki, minDist, maxDist and the object to read the file
     private static final String[] datasets = {"Phones_accelerometer.csv", "covtype.dat", "HIGGS.csv"};
     private static final String[] outFiles = {"testPhones.csv", "testCovtype.csv", "testHiggs.csv"};
-    private static final int[][] ki = {{5, 5, 5, 5, 5, 5, 5}, {5, 5, 5, 5, 5, 5, 5}, {10, 10}};
+    //private static final int[][] ki = {{5, 5, 5, 5, 5, 5, 5}, {5, 5, 5, 5, 5, 5, 5}, {10, 10}}; TODO: decidi i ki
+    private static final int[][] ki = {{5, 5, 5, 5, 5, 5, 5}, {10, 10, 10, 10, 10, 10, 10}, {10, 10}};
     //PHONES: maxD = 53 and minD = 8e-5 (tested for 840000 points and 530000 randomized, and there are 13062475)
     //COVTYPE: maxD = 13244 and minD = 4.8 (tested for 510000 points and there are 581012). Pellizzoni used 10000 and 0.1 TODO: ritestalo
     //HIGGS: maxD = 29 and minD = 0.008 (tested for 620000 points and there are 11000000). Pellizzoni used 100 and 0.01
@@ -43,15 +45,17 @@ public class Main {
     public static void main(String[] args) {
         DatasetReader reader;
         PrintWriter writer;
-        //TODO: cappObl with k?
-
 
         for (int i = 0; i< datasets.length; i++) {
             String set = datasets[i];
             reader = readers[i];
             try {
                 //Create a dataset reader
-                readers[i].setFile(inFolderOriginals+set);
+                if (reader instanceof HiggsReader) {
+                    readers[i].setFile(inFolderOriginals+set);
+                } else {
+                    readers[i].setFile(inFolderRandomized + set);
+                }
                 //Create a results writer
                 writer = new PrintWriter(outFolder+outFiles[i]);
 
@@ -81,20 +85,26 @@ public class Main {
     //updateTime;queryTime;radius;independence;memory
     private static void testAlgorithms(DatasetReader reader, int[] kiSet, double min, double max, PrintWriter writer) {
 
-        String header = "Update Time;Query Time;Radius;Independence;Memory";
-
-        writer.println(header);
-
         //Testing LinkedList, contains all the window
         LinkedList<Point> window = new LinkedList<>();
 
-        //Initialize the algorithm
-        CHEN chen = new CHEN(kiSet);
-        KCHEN kchen = new KCHEN(kiSet);
-        CAPP capp = new CAPP(kiSet, epsilon, beta, min, max);
-        KCAPP kcapp = new KCAPP(kiSet, epsilon, beta, min, max);
-        CAPPObl cappObl = new CAPPObl(beta, epsilon, kiSet);
-        KCAPPObl kCappObl = new KCAPPObl(beta, epsilon, kiSet);
+        //Initialize the algorithms
+        Algorithm[] algorithms = new Algorithm[6];
+        algorithms[0] = new CHEN(kiSet);
+        algorithms[1] = new KCHEN(kiSet);
+        algorithms[2] = new CAPP(kiSet, epsilon, beta, min, max);
+        algorithms[3] = new KCAPP(kiSet, epsilon, beta, min, max);
+        algorithms[4] = new CAPPObl(beta, epsilon, kiSet);
+        algorithms[5] = new KCAPPObl(beta, epsilon, kiSet);
+        writer.println("CHEN;;;;;;KCHEN;;;;;;CAPP;;;;;;KCAPP;;;;;;CAPPOBL;;;;;;KCAPPOBL;;");
+
+        String header = "Update Time;Query Time;Radius;Independence;Memory";
+        for (int i = 0; i<algorithms.length; i++) {
+            writer.print(header);
+            writer.print(";;");
+        }
+        writer.println();
+
 
         for (int time = 1; time <= wSize+stride && reader.hasNext(); time++) {
 
@@ -113,12 +123,9 @@ public class Main {
             //If window is not full, we don't query
             if (time <= wSize) {
                 window.addLast(p);
-                chen.update(p, time);
-                kchen.update(p, time);
-                capp.update(p, time);
-                kcapp.update(p, time);
-                cappObl.update(p, time);
-                kCappObl.update(p, time);
+                for (Algorithm alg : algorithms) {
+                    alg.update(p, time);
+                }
                 continue;
             }
 
@@ -127,44 +134,20 @@ public class Main {
             window.removeFirst();
 
             //Tests
-            //CHEN
-            calcUpdateTime(chen, p, time, writer);
-            calcQuery(chen, writer, window, kiSet);
-            calcMemory(chen, writer);
-            writer.print(";;");
+            ArrayList<Point>[] centers = new ArrayList[algorithms.length];
 
-            //KCHEN
-            calcUpdateTime(kchen, p, time, writer);
-            calcQuery(kchen, writer, window, kiSet);
-            calcMemory(kchen, writer);
-            writer.print(";;");
+            for (int i = 0; i<algorithms.length; i++) {
+                calcUpdateTime(algorithms[i], p, time, writer);
+                ArrayList<Point> cent = calcQuery(algorithms[i], writer, window, kiSet);
+                centers[i] = cent;
+                calcMemory(algorithms[i], writer);
+                writer.print(";;");
+            }
+            writer.println();
 
-            //CAPP
-            calcUpdateTime(capp, p, time, writer);
-            ArrayList<Point> centCapp = calcQuery(capp, writer, window, kiSet);
-            calcMemory(capp, writer);
-            writer.print(";;");
-
-            //KCAPP
-            calcUpdateTime(kcapp, p, time, writer);
-            ArrayList<Point> centKCapp =calcQuery(kcapp, writer, window, kiSet);
-            calcMemory(kcapp, writer);
-            writer.print(";;");
-
-            //CAPPOBL
-            calcUpdateTime(cappObl, p, time, writer);
-            ArrayList<Point> centCappObl = calcQuery(cappObl, writer, window, kiSet);
-            calcMemory(cappObl, writer);
-            writer.print(";;");
-
-            //KCAPPOBL
-            calcUpdateTime(kCappObl, p, time, writer);
-            ArrayList<Point> centKCappObl = calcQuery(kCappObl, writer, window, kiSet);
-            calcMemory(kCappObl, writer);
-            writer.println(";");
-
-            assert centCappObl.equals(centCapp);
-            assert centKCappObl.equals(centKCapp);
+            if (!centers[2].equals(centers[4]) || !centers[3].equals(centers[5])) {
+                throw new RuntimeException();
+            }
         }
     }
 

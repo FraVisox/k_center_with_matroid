@@ -1,6 +1,7 @@
 package it.unidp.dei.CAPPELLOTTO;
 
 import it.unidp.dei.Algorithm;
+import it.unidp.dei.CHENETAL.CHEN;
 import it.unidp.dei.Point;
 
 import java.util.ArrayList;
@@ -9,11 +10,11 @@ import java.util.TreeMap;
 
 public class KCAPPObl implements Algorithm
 {
-
     public KCAPPObl(double _beta, double _eps, int[] _ki)
     {
         beta = _beta;
-        delta = _eps/(1+beta);
+        double epsilon1 = _eps/(1+2*CHEN.alfa);
+        delta = epsilon1/(1+_beta);
         ki = _ki;
         int tmp = 0;
         for (int kj : _ki) {
