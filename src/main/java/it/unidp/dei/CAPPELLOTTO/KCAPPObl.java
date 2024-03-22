@@ -10,8 +10,7 @@ import java.util.TreeMap;
 
 public class KCAPPObl implements Algorithm
 {
-    public KCAPPObl(double _beta, double _eps, int[] _ki)
-    {
+    public KCAPPObl(double _beta, double _eps, int[] _ki) {
         beta = _beta;
         double epsilon1 = _eps/(1+2*CHEN.alfa);
         delta = epsilon1/(1+_beta);
@@ -82,7 +81,7 @@ public class KCAPPObl implements Algorithm
 
         //UPDATE DI R_T E M_T. Per questo serve diameter
         double r_t = minPairwiseDistance(last_points);
-        double m_t = 3 * (1 + beta) * diameter.query();
+        double m_t = diameter.getDiameter();
         // end updating
 
 

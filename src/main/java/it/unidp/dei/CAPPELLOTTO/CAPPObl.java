@@ -80,7 +80,7 @@ public class CAPPObl implements Algorithm
 
         //UPDATE DI R_T E M_T. Per questo serve diameter
         double r_t = minPairwiseDistance(last_points);
-        double m_t = 3 * (1 + beta) * diameter.query();
+        double m_t = diameter.getDiameter();
         // end updating
 
 

@@ -5,188 +5,175 @@ import it.unidp.dei.Point;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-
-//E' QUELLO CON K = 1, quindi al massimo ha 2 punti in AV
+//This algorithm is the one presented in Cohen-Addad's paper
 public class DiameterEstimation
 {
-    public DiameterEstimation(double _eps)
-    {
+    public DiameterEstimation(double _eps) {
         eps = _eps;
-        //MAPPE DI INTEGER, POINT
-        cold = new TreeMap<>();
-        cnew = new TreeMap<>();
-        q = new TreeMap<>();
-        r = new TreeMap<>();
     }
 
-    public double query()
+    public double getDiameter()
     {
-        //Se non ho nulla in CNEW, cioè non ho punti, ritorno 0
-        if(cnew.isEmpty()) {
-            return 0;
-        }
-
-        //Altrimenti, ritorno (1+eps)^(i-1) per il primo i presente in cnew che non ha punti associati (il suo value è null)
-        for(int i=cnew.firstKey(); i<=cnew.lastKey(); i++){
-            if(cnew.get(i) == null) {
-                return Math.pow(1 + eps, i - 1); // r < OPT < 3*r*(1+eps)
+        if(!cnew.isEmpty()) {
+            //For the first point that has cnew == null, we return 3 times the corresponding guess
+            for (int i = cnew.firstKey(); i <= cnew.lastKey(); i++) {
+                if (cnew.get(i) == null) {
+                    return 3 * Math.pow(1 + eps, i);
+                }
             }
         }
 
-        //Se hanno tutti un punto associato, ritorno -1
-        return -1;
+        //If the number of points is not enough to have guesses:
+        if (last != null) {
+            return last.getDistance(secondLast);
+        }
+        return 0;
     }
 
     public void update(Point p, int time)
     {
-        //Se non c'è nessun pt2 e nessuno pt1 si mettono (pt2 e' il piu' vecchio)
-        if(pt2 == null){
-            pt2 = p;
+        //The first point is pt2 and the second one is pt1
+        if(secondLast == null){
+            secondLast = p;
             return;
         }
-		if(pt1 == null){
-			pt1 = p;
+		if(last == null){
+			last = p;
 			return;
 		}
 
-        //r_t è la distanza di pt1 dal nuovo punto
-        double r_t = pt1.getDistance(p);
-        if (r_t == 0) { //TODO: FIX
-            r_t = 1e-9;
+        //r is the minimum guess of the diameter. If the guess is zero, we substitute it with the minimum (as the log(0) is undefined)
+        double rt = last.getDistance(p);
+        if (rt == 0) {
+            rt = minimum;
         }
-        // update lower bound
-        // Q contiene le gammas
+
+        //Copy the possible guesses
         ArrayList<Integer> gams = new ArrayList<>(q.keySet());
 
-        //Rimuovo le gammas minori di log(r_t) da tutti gli insiemi
-        double minDist = Math.floor(Math.log(r_t) / Math.log(1 + eps));
+        //Delete the guesses less than r from the possible guesses
+        int minIndex = (int) Math.floor(Math.log(rt) / Math.log(1 + eps));
         for(Integer gam : gams){
-            if(gam < minDist){
-                cold.remove(gam);
-                cnew.remove(gam);
-                q.remove(gam);
-                r.remove(gam);
-            } else {
+            if (gam >= minIndex) {
                 break;
             }
+            remove(gam);
         }
 
-        //Se a questo punto q non è vuoto
+        //If we have guesses, and if the current minIndex is lower than the lower existing guess
         if(!q.isEmpty()){
-            //Metto nelle gammas >= di log(r_t) pt2 per cold, r e q, mentre in cnew metto pt1
             int low = q.firstKey() -1;
-            while(low >= (int) minDist){
-                cold.put(low, pt2);
-                r.put(low, pt2);
-                q.put(low, pt2);
-                cnew.put(low, pt1);
+            while(low >= minIndex){
+                insert(low, secondLast, last);
                 low--;
             }
         }
-        // ended updating lower bound
 
-        //ORA HO FINITO UPDATE DEL LOWER BOUND
+        //Add the new point p for each guess
 
-        // add p for each gamma
+        //First guess of M, it will be updated
+        double Mt = 3*(1+eps)*rt;
+        //Initial index
+        int i = minIndex;
 
-        //Per ogni gamma
-        int i = (int) minDist;
+        for(double gamma = Math.pow(1+eps, i); gamma <= Mt; gamma *= (1+eps)){
 
-        //Questo e' M_t, se ci vado sopra tolgo le altre. Equivale a 6*(1+beta)*rt/2. E' un valore iniziale, che viene poi updated nell'algoritmo
-        double M_t = 3*(1+eps)*r_t;
-        while(true){
-            double gamma = Math.pow(1+eps, i);
-            // reached upper bound, cleanup and exit
-            if(gamma > M_t){
-                for(int j = i; j <= q.lastKey(); j++){
-                    cold.remove(j);
-                    cnew.remove(j);
-                    r.remove(j);
-                    q.remove(j);
-                }
-                break;
-            }
-
-            // need to rebuild if implicitly stored. Metto in quelli vecchi pt2, in quelli nuovi null
+            //If there isn't a guess with this value (we are over the previous M), add it
             if(q.isEmpty() || i > q.lastKey()){
-                cold.put(i, pt2);
-                r.put(i, pt2);
-                q.put(i, pt2);
-                cnew.put(i, null);
+                insert(i, secondLast, null);
             }
 
-            // delete old points. Se e' espirato il cold corrispondente
+            //Delete expired points
             if(cold.get(i).hasExpired(time)){
-
-                //Se non ci sono punti in cnew
                 if(cnew.get(i) != null){
-                    if(cold.get(i) == q.get(i)){
+                    cnew.put(i, null);
+                    if(cold.get(i).equals(q.get(i))){
                         cold.put(i, r.get(i));
-                        cnew.put(i, null);
-                    }
-                    else{
+                    } else{
                         cold.put(i, q.get(i));
-                        cnew.put(i, null);
                     }
-                }
-                else{
+                } else{
                     cold.put(i, r.get(i));
                 }
             }
-            // insert p
+
+            //Insert p
             if(cnew.get(i) == null){
                 if(p.getDistance(r.get(i)) > gamma){
                     cold.put(i, r.get(i));
                     q.put(i, r.get(i));
                     cnew.put(i, p);
-                }
-                else if(p.getDistance(cold.get(i)) > gamma){
+                } else if(p.getDistance(cold.get(i)) > gamma){
                     q.put(i, r.get(i));
                     cnew.put(i, p);
                 }
-            }
-            else{
+            } else {
                 if(p.getDistance(r.get(i)) > gamma){
                     cold.put(i, r.get(i));
                     q.put(i, r.get(i));
                     cnew.put(i, p);
-                }
-                else if(p.getDistance(cnew.get(i)) > gamma){
+                } else if(p.getDistance(cnew.get(i)) > gamma){
                     cold.put(i, cnew.get(i));
                     q.put(i, r.get(i));
                     cnew.put(i, p);
-                }
-                else if(p.getDistance(q.get(i)) > gamma){
-                    if(cold.get(i) == q.get(i)){
-                        cold.put(i, q.get(i));
+                } else if(p.getDistance(q.get(i)) > gamma){
+                    if(cold.get(i).equals(q.get(i))){
                         q.put(i, r.get(i));
                         cnew.put(i, p);
                     }
                 }
             }
 
-            // update r
+            //update r
             r.put(i, p);
 
-            if(cnew.get(i) != null){ // diameter <= 3*gamma
-                M_t = 3*gamma*(1+eps);
+            //If diameter <= 3*gamma
+            if(cnew.get(i) != null){
+                Mt = 3*gamma*(1+eps);
             }
 
             i++;
         }
 
-        pt2 = pt1;
-		pt1 = p;
+        //Reached upper bound, clean all the remaining guesses
+        while(i <= q.lastKey()){
+            remove(i);
+            i++;
+        }
+
+        //Update pt2 and pt1
+        secondLast = last;
+		last = p;
+    }
+
+    private void remove(Integer gam) {
+        cold.remove(gam);
+        cnew.remove(gam);
+        q.remove(gam);
+        r.remove(gam);
+    }
+
+    private void insert(Integer i, Point _cold, Point _cnew) {
+        cold.put(i, _cold);
+        r.put(i, _cold);
+        q.put(i, _cold);
+        cnew.put(i, _cnew);
     }
 
     public int getSize() {
-        int size = cold.size()+cnew.size()+q.size()+r.size();
-        size += 2;
-        return size;
+        return cold.size()+cnew.size()+q.size()+r.size()+2;
     }
 
+    //The minimum, if the distance is 0. It's empirical.
+    public static final double minimum = 1e-9;
 
-    private final TreeMap<Integer, Point> cold, cnew, q, r;
-    private Point pt2, pt1;
+    //For every guess, we keep one cold, one cnew, one q and one r points.
+    private final TreeMap<Integer, Point> cold = new TreeMap<>();
+    private final TreeMap<Integer, Point> cnew = new TreeMap<>();
+    private final TreeMap<Integer, Point> q = new TreeMap<>();
+    private final TreeMap<Integer, Point> r = new TreeMap<>();
+    private Point secondLast;
+    private Point last;
+    //The epsilon used in this algorithm is the beta of the main algorithm
     private final double eps;
 }
