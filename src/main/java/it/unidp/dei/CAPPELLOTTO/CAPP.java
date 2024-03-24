@@ -16,31 +16,38 @@ public class CAPP implements Algorithm {
         //Initiate the guesses array. We don't use the definition, but an equivalent form
         int number_of_guesses = (int)Math.ceil(Math.log(_maxDist/_minDist)/Math.log(1+_beta))+1;
 
-        /* This is how to use the definition
-
+        /* This is how to use the definition to obtain the number of guesses
         int last_i = (int)Math.ceil(Math.log(maxDist)/Math.log(1+_beta));
         int number_of_guesses = last_i-first_i+1;
-
          */
         guesses = new Guess[number_of_guesses];
 
         int first_i = (int)Math.floor(Math.log(_minDist)/Math.log(1+_beta));
 
-        //TODO: e se gamma parte da minDist? Come fa Pellizzoni
+        //We use the definition: we start from (1+beta)^first_i, and don't start from minDist
         double gamma = Math.pow((1+_beta), first_i);
 
-        for (int i = 0; i<number_of_guesses; i++) {
+        int i;
+        for (i = 0; i<number_of_guesses; i++) {
             guesses[i] = new Guess(gamma, delta, _ki);
             gamma *= (1+_beta);
         }
+
+        //Check
+        int last_i = (int)Math.ceil(Math.log(_maxDist)/Math.log(1+_beta));
+        if (i+1 < last_i) {
+            throw new RuntimeException("Error in the initialization of guesses of CAPP");
+        }
     }
 
+    @Override
     public void update(Point p, int time) {
         for (Guess g : guesses) {
             g.update(p, time);
         }
     }
 
+    @Override
     public ArrayList<Point> query() {
         //Binary search on guesses
         int valid = binarySearchGuess();
@@ -52,6 +59,7 @@ public class CAPP implements Algorithm {
         return guesses[valid].query();
     }
 
+    @Override
     public int getSize() {
         int size = 0;
         for (Guess g : guesses) {

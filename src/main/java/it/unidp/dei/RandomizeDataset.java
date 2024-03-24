@@ -39,14 +39,11 @@ public class RandomizeDataset {
             }
 
             String p = reader.getLine();
-            int j = 0;
             while (p != null) {
-                j++;
                 strings.add(p);
                 p = reader.getLine();
             }
-            System.out.println(j);
-            
+
             reader.close();
 
             Collections.shuffle(strings);

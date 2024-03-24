@@ -1,5 +1,6 @@
 package it.unidp.dei.CAPPELLOTTO;
 
+import it.unidp.dei.Algorithm;
 import it.unidp.dei.CHENETAL.CHEN;
 import it.unidp.dei.Point;
 
@@ -11,11 +12,7 @@ public class Guess {
         gamma = _gamma;
         delta = _delta;
         ki = _ki;
-        int tmp = 0;
-        for (int kj : _ki) {
-            tmp += kj;
-        }
-        k = tmp;
+        k = Algorithm.calcK(_ki);
         RV = new TreeMap<>();
         R = new TreeMap<>();
     }
@@ -24,17 +21,12 @@ public class Guess {
         gamma = _gamma;
         delta = _delta;
         ki = _ki;
-        int tmp = 0;
-        for (int kj : _ki) {
-            tmp += kj;
-        }
-        k = tmp;
+        k = Algorithm.calcK(_ki);
         RV = _RV;
         R = _R;
     }
 
     public void update(Point p, int time) {
-        //TODO: removeFirst non funziona in Linux?
         //Removes expired points
         if (!RV.isEmpty() && RV.firstKey().hasExpired(time)) {
             OV.add(RV.remove(RV.firstKey()));
@@ -80,7 +72,6 @@ public class Guess {
                 Point vOld = RV.firstKey();
                 List<Point> ptsToDelete = new ArrayList<>();
 
-                //TODO: è >= o solo > ? Sembra funzionare allo stesso modo, da vedere in COHEN
                 for (Point a : R.keySet()) {
                     if (a.compareTo(vOld) >= 0) {
                         break;
@@ -138,6 +129,7 @@ public class Guess {
         }
     }
 
+    //To be used only after the call to isCorrect()
     public ArrayList<Point> query() {
         LinkedList<Point> union = new LinkedList<>(O);
         for (LinkedList<Point>[] list : R.values()) {
@@ -180,9 +172,9 @@ public class Guess {
     private final double gamma;
     private final double delta;
     private final int k;
-    private final int[] ki;
-    private final TreeSet<Point> O = new TreeSet<>();
+    protected final int[] ki;
+    protected final TreeSet<Point> O = new TreeSet<>();
     private final TreeSet<Point> OV = new TreeSet<>();
     private final TreeMap<Point, Point> RV;
-    private final TreeMap<Point, LinkedList<Point>[]> R;
+    protected final TreeMap<Point, LinkedList<Point>[]> R;
 }

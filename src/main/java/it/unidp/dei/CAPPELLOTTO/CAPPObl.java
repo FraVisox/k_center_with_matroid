@@ -16,11 +16,7 @@ public class CAPPObl implements Algorithm
         double epsilon1 = _eps/(1+2*CHEN.alfa);
         delta = epsilon1/(1+_beta);
         ki = _ki;
-        int tmp = 0;
-        for (int kj : _ki) {
-            tmp += kj;
-        }
-        k = tmp;
+        k = Algorithm.calcK(_ki);
         diameter = new DiameterEstimation(beta);
     }
 
@@ -187,6 +183,5 @@ public class CAPPObl implements Algorithm
     private final double beta;
     private final double delta;
     private final int[] ki;
-
 }
 

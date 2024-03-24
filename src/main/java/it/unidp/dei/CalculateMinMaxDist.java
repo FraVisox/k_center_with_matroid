@@ -3,25 +3,30 @@ package it.unidp.dei;
 import it.unidp.dei.datasetReaders.*;
 
 import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 public class CalculateMinMaxDist {
     private static final String[] datasets = {"covtype.dat", "HIGGS.csv", "Phones_accelerometer.csv"};
+    private static final String[] outFiles = {"distCovtype.txt", "distHIGGS.csv", "distPhones_accelerometer.csv"};
     private static final DatasetReader[] readers = { new CovertypeReader(), new HiggsReader(), new PhonesReader()};
     private static final double INFINITE = 10e20;
     private static final int outputTime = 10000;
     public static void main(String[] args) {
         DatasetReader reader;
+        PrintWriter writer;
+
         for (int i = 0; i<datasets.length; i++) {
             String set = datasets[i];
             try {
-                //Create a file reader
+                //Create a file reader. We use the randomized datasets
                 reader = readers[i];
                 if (!set.equals("HIGGS.csv")) {
                     reader.setFile(Main.inFolderRandomized + set);
                 } else {
                     reader.setFile(Main.inFolderOriginals + set);
                 }
+                writer = new PrintWriter(Main.outFolder+outFiles[i]);
             } catch (FileNotFoundException e) {
                 System.out.println("File " + set + " not found, skipping to next dataset");
                 continue;
@@ -40,14 +45,15 @@ public class CalculateMinMaxDist {
                 minD = Math.min(minD, p.getMinDistanceWithoutZeroes(window, INFINITE));
 
                 if (time % outputTime == 0) {
-                    System.out.println(set+": at time: " + time);
-                    System.out.println("Min distance: " + minD);
-                    System.out.println("Max distance: " + maxD + "\n");
+                    System.out.println(set+": at time: " + time+"\nMin distance: " + minD+"\nMax distance: " + maxD + "\n");
+                    writer.println("At time: " + time+"\nMin distance: " + minD+"\nMax distance: " + maxD + "\n");
                 }
             }
-            System.out.println("FINAL DISTANCES at time: " + time);
-            System.out.println("Min distance: " + minD);
-            System.out.println("Max distance: " + maxD + "\n");
+            System.out.println("FINAL DISTANCES at time: " + time+"\nMin distance: " + minD+"\nMax distance: " + maxD + "\n");
+            writer.println("FINAL DISTANCES at time: " + time+"\nMin distance: " + minD+"\nMax distance: " + maxD + "\n");
+
+            writer.flush();
+            writer.close();
         }
     }
 }

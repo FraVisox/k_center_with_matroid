@@ -2,16 +2,12 @@ package it.unidp.dei.CHENETAL;
 
 import it.unidp.dei.Algorithm;
 import it.unidp.dei.Point;
-import org.jgrapht.Graphs;
 import org.jgrapht.alg.flow.PushRelabelMFImpl;
 import org.jgrapht.alg.util.Triple;
-import org.jgrapht.graph.DefaultDirectedWeightedGraph;
-import org.jgrapht.graph.DefaultWeightedEdge;
 
 import java.util.*;
 import org.jgrapht.opt.graph.sparse.SparseIntDirectedWeightedGraph;
 
-//TODO: improvements
 public class CHEN implements Algorithm {
 
     //Approximation of sequential algorithm. In our case, CHEN gives a 3-approximation
@@ -20,23 +16,16 @@ public class CHEN implements Algorithm {
     public CHEN(int[] _ki) {
         pts = new LinkedList<>();
         ki = _ki;
-        int tmp = 0;
-        for (int kj : ki) {
-            tmp += kj;
-        }
-        k = tmp;
+        k = Algorithm.calcK(_ki);
     }
 
     public CHEN (LinkedList<Point> p, int[] _ki) {
         pts = p;
         ki = _ki;
-        int tmp = 0;
-        for (int kj : ki) {
-            tmp += kj;
-        }
-        k = tmp;
+        k = Algorithm.calcK(_ki);
     }
 
+    @Override
     public void update(Point p, int time) {
         if (!pts.isEmpty() && pts.getFirst().hasExpired(time)) {
             pts.removeFirst();
@@ -44,6 +33,7 @@ public class CHEN implements Algorithm {
         pts.addLast(p);
     }
 
+    @Override
     public ArrayList<Point> query() {
 
         //First we create all the distances and put them in an array
@@ -93,8 +83,13 @@ public class CHEN implements Algorithm {
         return sol;
     }
 
+    @Override
     public int getSize() {
         return pts.size();
+    }
+
+    public LinkedList<Point> getPoints() {
+        return pts;
     }
 
     //It returns null if the distance is not suitable to create a k-center clustering
@@ -134,11 +129,84 @@ public class CHEN implements Algorithm {
         }
 
         //Then we resolve the partition matroid intersection
-        //TODO: meglio sparse o no?
         return sparsePartitionMatroidIntersection(partition);
     }
 
-    //The idea is taken from CHIPLUNKAR ET AL.
+    //We use a sparse graph, as the graph isn't changed after its creation, but only used to compute the maximum flow
+    private ArrayList<Point> sparsePartitionMatroidIntersection(TreeMap<Point, ArrayList<Point>> partition) {
+
+        List<Triple<Integer, Integer, Double>> edges = new ArrayList<>(partition.size());
+        //MAPPING OF NODES TO INTEGER (essential for the sparse graph):
+        // node 0 is the source
+        // nodes 1 to group.size() are the group nodes
+        // node with the last number is the sink
+        // all the nodes in the middle are both partition pivots and partition points:
+        //      for every partition, the first point is the pivot, while all the remaining are points inside the partition
+
+        //This is how edges are created: there is an edge between:
+        //  source and pivots
+        //  pivots and points in their partition
+        //  points and their group
+        //  groups and the sink
+        int i = ki.length + 1;
+        for (Point pivot : partition.keySet()) {
+            edges.add(new Triple<>(0, i, (double) 1));
+            int i_pivot = i;
+            i++;
+            for (Point p : partition.get(pivot)) {
+                edges.add(new Triple<>(i_pivot, i, (double) 1));
+                edges.add(new Triple<>(i, p.getGroup() + 1, (double) 1));
+                i++;
+            }
+        }
+        //Now i is the number of the sink
+        for (int j = 0; j < ki.length; j++) {
+            edges.add(new Triple<>(j + 1, i, (double) ki[j]));
+        }
+
+        //Create graph
+        SparseIntDirectedWeightedGraph graph = new SparseIntDirectedWeightedGraph(i + 1, edges);
+
+        //Use the PushRelabel algorithm to calculate the flow from source to sink. It's the most efficient algorithm
+        PushRelabelMFImpl<Integer, Integer> alg = new PushRelabelMFImpl<>(graph);
+        double flow = alg.calculateMaximumFlow(0, i);
+
+        //If the flow is less than the number of partitions, it's a failure
+        if (flow != partition.keySet().size()) {
+            return null;
+        }
+
+        //Get the values of flow through each edge
+        Map<Integer, Double> flows = alg.getFlowMap();
+        ArrayList<Point> centers = new ArrayList<>((int) flow);
+
+        //For every point of the partition if the flow value of the edge that connects it to its group is 1, we add it to the centers
+        //The points of the partition are not all the points that are in pts
+        int new_i = ki.length + 1;
+        for (Point pivot : partition.keySet()) {
+            new_i++;
+            ArrayList<Point> thisPartition = partition.get(pivot);
+            for (int z = 0; z < thisPartition.size(); z++) {
+                Point p = thisPartition.get(z);
+                Integer edge = graph.getEdge(new_i, p.getGroup() + 1);
+                if (flows.get(edge) == 1) {
+                    centers.add(p);
+                    new_i += thisPartition.size() - z;
+                    break;
+                }
+                new_i++;
+            }
+        }
+        return centers;
+    }
+    private final LinkedList<Point> pts;
+    private final int[] ki;
+    private final int k;
+}
+
+/*
+ALTERNATIVE to the sparse matroid intersection that uses a default graph
+
     private ArrayList<Point> partitionMatroidIntersection(TreeMap<Point, ArrayList<Point>> partition) {
 
         //Create a directed weighted graph
@@ -186,66 +254,4 @@ public class CHEN implements Algorithm {
         }
         return centers;
     }
-
-    private ArrayList<Point> sparsePartitionMatroidIntersection(TreeMap<Point, ArrayList<Point>> partition) {
-
-        List<Triple<Integer, Integer, Double>> edges = new ArrayList<>(partition.size());
-        //Node 0 is the source, node 1 to group.size() are the group nodes, nodes partition.size()+1 to
-        int i = ki.length+1;
-        for (Point pivot : partition.keySet()) {
-            edges.add(new Triple<>(0, i, (double)1));
-            int i_pivot = i;
-            i++;
-            for (Point p : partition.get(pivot)) {
-                edges.add(new Triple<>(i_pivot, i, (double)1));
-                edges.add(new Triple<>(i, p.getGroup()+1, (double)1));
-                i++;
-            }
-        }
-        //Now i is the number of the sink
-        for (int j = 0; j<ki.length; j++) {
-            edges.add(new Triple<>(j+1, i, (double)ki[j]));
-        }
-
-        SparseIntDirectedWeightedGraph graph = new SparseIntDirectedWeightedGraph(i+1, edges);
-
-        //Use the PushRelabel algorithm to calculate the flow from source to sink. It's the most efficient algorithm
-        PushRelabelMFImpl<Integer, Integer> alg = new PushRelabelMFImpl<>(graph);
-        double flow = alg.calculateMaximumFlow(0, i);
-
-        //If the flow is less than the number of partitions, it's a failure
-        if (flow != partition.keySet().size()) {
-            return null;
-        }
-
-        //Get the values of flow through each edge
-        Map<Integer, Double> flows = alg.getFlowMap();
-
-        ArrayList<Point> centers = new ArrayList<>((int)flow);
-
-        //For every point of the partition if the flow value of the edge that connects it to its group is 1, we add it to the centers
-        //The points of the partition are not all the points that are in pts
-        int new_i = ki.length+1;
-        for (Point pivot : partition.keySet()) {
-            new_i++;
-            ArrayList<Point> thisPartition = partition.get(pivot);
-            for (int z = 0; z<thisPartition.size(); z++) {
-                Point p = thisPartition.get(z);
-                Integer edge = graph.getEdge(new_i, p.getGroup()+1);
-                if (flows.get(edge) == 1) {
-                    centers.add(p);
-
-                    //TODO: testa se è corretto
-                    new_i += thisPartition.size()-z;
-                    break;
-                }
-                new_i++;
-            }
-        }
-        return centers;
-    }
-
-    private final LinkedList<Point> pts;
-    private final int[] ki;
-    private final int k;
-}
+     */

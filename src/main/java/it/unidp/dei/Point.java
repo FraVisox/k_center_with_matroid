@@ -10,14 +10,15 @@ public class Point implements Comparable<Point> {
         group = _group;
     }
 
-    public boolean hasExpired(int currentTime) {
-        return exitTime <= currentTime;
-    }
-
     public int getGroup() {
         return group;
     }
 
+    public boolean hasExpired(int currentTime) {
+        return exitTime <= currentTime;
+    }
+
+    //It returns the distance of this point from the other point passed.
     public double getDistance(Point p) {
         double quad_dist = 0;
         for (int i = 0; i<coords.length; i++) {
@@ -27,6 +28,7 @@ public class Point implements Comparable<Point> {
         return Math.sqrt(quad_dist);
     }
 
+    //It returns the minimum distance of this point from a Collection of points.
     public double getMinDistance(Collection<Point> set) {
         double mind = Main.INF;
         for(Point q : set) {
@@ -58,6 +60,7 @@ public class Point implements Comparable<Point> {
         return mind;
     }
 
+    //It returns the maximum distance of this point from a Collection of points.
     public double getMaxDistance(Collection<Point> set) {
         double maxd = 0;
         for(Point q : set) {

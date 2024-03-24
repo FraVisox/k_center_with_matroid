@@ -3,8 +3,8 @@ package it.unidp.dei.datasetReaders;
 import java.io.*;
 import java.util.StringTokenizer;
 
+//This entire class is similar to the one in Pellizzoni code, for reference see the paper
 public class InputFileReader {
-
     public InputFileReader(String fileName) throws FileNotFoundException {
         reader = new BufferedReader(new java.io.FileReader(fileName));
     }
@@ -19,10 +19,6 @@ public class InputFileReader {
 
     public double getDouble() {
         return Double.parseDouble(nextToken());
-    }
-
-    public long getLong() {
-        return Long.parseLong(nextToken());
     }
 
     public String getWord() {

@@ -17,17 +17,17 @@ import java.util.*;
 
 public class Main {
     //Some parameters that are the same for every dataset
-    private static final double epsilon = 0.1;
-    private static final double beta = 1;
-    private static final int wSize = 1000;
+    private static final double epsilon = 0.2;
+    private static final double beta = 2;
+    private static final int wSize = 10000;
     public static final double INF = 14000;
     //It tells how many times we will query the algorithms after having a complete window
-    private static final int stride = 20;
+    private static final int stride = 200;
 
     //Folders of input and output files
     public static final String inFolderOriginals = "src/main/java/it/unidp/dei/data/originals/";
     public static final String inFolderRandomized = "src/main/java/it/unidp/dei/data/randomized/";
-    private static final String outFolder = "out/";
+    public static final String outFolder = "out/";
 
     //For every dataset we save the name of the input file, the name of the output file, ki, minDist, maxDist and the object to read the file
     private static final String[] datasets = {"Phones_accelerometer.csv", "covtype.dat", "HIGGS.csv"};
@@ -37,7 +37,7 @@ public class Main {
 
     //VALUES OF MAX AND MIN DISTANCES:
     //  PHONES: maxD = 53 and minD = 8e-5 (tested for 840000 points and 530000 randomized, and there are 13062475)
-    //  COVTYPE: maxD = 13244 and minD = 4.8 (tested for 510000 points and there are 581012). Pellizzoni used 10000 and 0.1 TODO: ritestalo
+    //  COVTYPE: maxD = 13244 and minD = 4.8 (tested for 510000 points and there are 581012). Pellizzoni used 10000 and 0.1
     //  HIGGS: maxD = 29 and minD = 0.008 (tested for 620000 points and there are 11000000). Pellizzoni used 100 and 0.01
     private static final double[] minDist = {8e-5, 4.8, 0.008};
     private static final double[] maxDist = {53, 13244, 29};
@@ -284,7 +284,7 @@ public class Main {
     }
 
 
-    //In every line of the output file we will have an header:
+    //In every line of the output file we will have a header:
     //updateTime;queryTime;radius;independence;memory
     private static void testAlgorithms(DatasetReader reader, PrintWriter writer, double min, double max, int[] kiSet, int wSize, double epsilon, double beta) {
 

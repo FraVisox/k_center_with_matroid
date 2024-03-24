@@ -2,22 +2,10 @@ package it.unidp.dei.datasetReaders;
 
 import it.unidp.dei.Point;
 
-import java.io.FileNotFoundException;
-
-public class PhonesReader implements DatasetReader {
-    private InputFileReader reader;
-    public static final int dimension = 3;
-    public static final int firstIgnored = 3;
-    public static final int secondIgnored = 3;
-    private boolean first = true;
-
-    public void setFile(String fileName) throws FileNotFoundException {
-        if (reader == null) {
-            reader = new InputFileReader(fileName);
-        }
-    }
-
+public class PhonesReader extends DatasetReader {
+    @Override
     public Point nextPoint(int time, int wSize) {
+        //Skip the first line, as it has the header
         if (first) {
             reader.skipFirstLine();
             first = false;
@@ -48,15 +36,6 @@ public class PhonesReader implements DatasetReader {
         return new Point(coords, time, wSize, category);
     }
 
-    @Override
-    public boolean hasNext() {
-        return reader.hasMoreTokens();
-    }
-
-    public void close() {
-        reader.close();
-    }
-
     //The activities are: bike, sit, stand, walk, stairsup, stairsdown and null
     private static int getCategory(String s) {
         return switch (s) {
@@ -70,5 +49,8 @@ public class PhonesReader implements DatasetReader {
             default -> -1;
         };
     }
-
+    public static final int dimension = 3;
+    public static final int firstIgnored = 3;
+    public static final int secondIgnored = 3;
+    private boolean first = true;
 }

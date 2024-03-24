@@ -165,7 +165,13 @@ public class DiameterEstimation
     }
 
     public int getSize() {
-        return cold.size()+cnew.size()+q.size()+r.size()+2;
+        int size = cold.size()+q.size()+r.size()+2;
+        for (Point p : cnew.values()) {
+            if (p != null) {
+                size++;
+            }
+        }
+        return size;
     }
 
     //The minimum, if the distance is 0. It's empirical.
