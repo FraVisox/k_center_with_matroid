@@ -47,6 +47,17 @@ public class Point implements Comparable<Point> {
         return mind;
     }
 
+    //It returns the minimum distance of this point from a Collection of points, excluding itself
+    public double getMinDistanceWithoutItself(Collection<Point> set, double INF) {
+        double mind = INF;
+        for(Point q : set) {
+            if (!this.equals(q)) {
+                mind = Math.min(mind, this.getDistance(q));
+            }
+        }
+        return mind;
+    }
+
     public double getMaxDistance(Collection<Point> set) {
         double maxd = 0;
         for(Point q : set) {

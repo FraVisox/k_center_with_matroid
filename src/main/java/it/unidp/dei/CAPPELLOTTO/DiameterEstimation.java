@@ -18,6 +18,7 @@ public class DiameterEstimation
             //For the first point that has cnew == null, we return 3 times the corresponding guess
             for (int i = cnew.firstKey(); i <= cnew.lastKey(); i++) {
                 if (cnew.get(i) == null) {
+                    //The diameter is at most 3*gamma
                     return 3 * Math.pow(1 + eps, i);
                 }
             }
@@ -76,6 +77,7 @@ public class DiameterEstimation
         //Initial index
         int i = minIndex;
 
+        //This is the algorithm described in Cohen-Addad
         for(double gamma = Math.pow(1+eps, i); gamma <= Mt; gamma *= (1+eps)){
 
             //If there isn't a guess with this value (we are over the previous M), add it
@@ -98,7 +100,11 @@ public class DiameterEstimation
             }
 
             //Insert p
-            if(cnew.get(i) == null){
+            if(p.getDistance(r.get(i)) > gamma){
+                cold.put(i, r.get(i));
+                q.put(i, r.get(i));
+                cnew.put(i, p);
+            } else if(cnew.get(i) == null){
                 if(p.getDistance(r.get(i)) > gamma){
                     cold.put(i, r.get(i));
                     q.put(i, r.get(i));
@@ -108,26 +114,24 @@ public class DiameterEstimation
                     cnew.put(i, p);
                 }
             } else {
-                if(p.getDistance(r.get(i)) > gamma){
-                    cold.put(i, r.get(i));
-                    q.put(i, r.get(i));
-                    cnew.put(i, p);
-                } else if(p.getDistance(cnew.get(i)) > gamma){
+                 if(p.getDistance(cnew.get(i)) > gamma){
                     cold.put(i, cnew.get(i));
                     q.put(i, r.get(i));
                     cnew.put(i, p);
                 } else if(p.getDistance(q.get(i)) > gamma){
-                    if(cold.get(i).equals(q.get(i))){
+                    if(!cold.get(i).equals(q.get(i))){
+                        cold.put(i, q.get(i));
                         q.put(i, r.get(i));
                         cnew.put(i, p);
                     }
                 }
             }
 
-            //update r
+            //Update r
             r.put(i, p);
 
-            //If diameter <= 3*gamma
+            //If 3*gamma <= diameter, then Mt must be at least 3*next_gamma.
+            //This is done only for the first guesses, so Mt is not updated infinitely
             if(cnew.get(i) != null){
                 Mt = 3*gamma*(1+eps);
             }
