@@ -6,8 +6,8 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 public class CalculateMinMaxDist {
-    private static final String[] datasets = {"Phones_accelerometer.csv", "covtype.dat", "HIGGS.csv"};
-    private static final DatasetReader[] readers = {new PhonesReader(), new CovertypeReader(), new HiggsReader()};
+    private static final String[] datasets = {"covtype.dat", "HIGGS.csv", "Phones_accelerometer.csv"};
+    private static final DatasetReader[] readers = { new CovertypeReader(), new HiggsReader(), new PhonesReader()};
     private static final double INFINITE = 10e20;
     private static final int outputTime = 10000;
     public static void main(String[] args) {
