@@ -6,10 +6,7 @@ import it.unidp.dei.CAPPELLOTTO.KCAPP;
 import it.unidp.dei.CAPPELLOTTO.KCAPPObl;
 import it.unidp.dei.CHENETAL.CHEN;
 import it.unidp.dei.CHENETAL.KCHEN;
-import it.unidp.dei.datasetReaders.CovertypeReader;
-import it.unidp.dei.datasetReaders.DatasetReader;
-import it.unidp.dei.datasetReaders.HiggsReader;
-import it.unidp.dei.datasetReaders.PhonesReader;
+import it.unidp.dei.datasetReaders.*;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -17,12 +14,12 @@ import java.util.*;
 
 public class Main {
     //Some parameters that are the same for every dataset
-    private static final double epsilon = 0.2;
-    private static final double beta = 2;
-    private static final int wSize = 10000;
+    private static final double epsilon = 0.9;
+    private static final double beta = 20;
+    public static final int wSize = 20000;
     public static final double INF = 14000;
     //It tells how many times we will query the algorithms after having a complete window
-    private static final int stride = 200;
+    private static final int stride = 20;
 
     //Folders of input and output files
     public static final String inFolderOriginals = "src/main/java/it/unidp/dei/data/originals/";
@@ -30,17 +27,17 @@ public class Main {
     public static final String outFolder = "out/";
 
     //For every dataset we save the name of the input file, the name of the output file, ki, minDist, maxDist and the object to read the file
-    private static final String[] datasets = {"Phones_accelerometer.csv", "covtype.dat", "HIGGS.csv"};
-    private static final String[] outFiles = {"testPhones.csv", "testCovtype.csv", "testHiggs.csv"};
-    private static final DatasetReader[] readers = {new PhonesReader(), new CovertypeReader(), new HiggsReader()};
-    private static final int[][] ki = {{5, 5, 5, 5, 5, 5, 5}, {10, 10, 10, 10, 10, 10, 10}, {10, 10}};
+    private static final String[] datasets = {"Phones_accelerometer.csv", "covtype.dat", "HIGGS.csv", "random20.csv"};
+    private static final String[] outFiles = {"testPhones.csv", "testCovtype.csv", "testHiggs.csv", "testRandom20.csv"};
+    private static final DatasetReader[] readers = {new PhonesReader(), new CovertypeReader(), new HiggsReader(), new RandomReader()};
+    private static final int[][] ki = {{1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1}, {1, 1}, {1, 1, 1, 1, 1, 1, 1}};
 
     //VALUES OF MAX AND MIN DISTANCES:
     //  PHONES: maxD = 53 and minD = 8e-5 (tested for 840000 points and 530000 randomized, and there are 13062475)
     //  COVTYPE: maxD = 13244 and minD = 4.8 (tested for 510000 points and there are 581012). Pellizzoni used 10000 and 0.1
     //  HIGGS: maxD = 29 and minD = 0.008 (tested for 620000 points and there are 11000000). Pellizzoni used 100 and 0.01
-    private static final double[] minDist = {8e-5, 4.8, 0.008};
-    private static final double[] maxDist = {53, 13244, 29};
+    private static final double[] minDist = {8e-5, 4.8, 0.008, 1e-5};
+    private static final double[] maxDist = {53, 13244, 29, Math.sqrt(RandomReader.doublingDimension)};
 
     public static void main(String[] args) {
         testRandomized();
@@ -92,7 +89,11 @@ public class Main {
             reader = readers[i];
             try {
                 //Create a dataset reader
-                readers[i].setFile(inFolderOriginals+set);
+                if (reader instanceof RandomReader) {
+                    readers[i].setFile(inFolderRandomized+set);
+                } else {
+                    readers[i].setFile(inFolderOriginals + set);
+                }
                 //Create a results writer
                 writer = new PrintWriter(outFolder+outFiles[i]);
 
@@ -245,7 +246,7 @@ public class Main {
 
     //Test with different wSize, with ki, epsilon and beta standard
     private static void testWSize() {
-        int[] wSize = {10, 100, 1000, 10000, 100000};
+        int[] wSize = {10, 100, 500, 1000, 5000, 10000, 20000, 50000, 100000};
 
         DatasetReader reader;
         PrintWriter writer;
@@ -312,7 +313,7 @@ public class Main {
         for (int time = 1; time <= wSize+stride && reader.hasNext(); time++) {
 
             //Check of passing of time, only used for debug purposes
-            if (time > wSize) {
+            if (time % (wSize/10) == 0) {
                 System.out.println(time);
             }
 
@@ -345,11 +346,12 @@ public class Main {
                 centers[i] = cent;
                 calcMemory(algorithms[i], writer);
                 writer.print(";;");
+                System.out.println("ALGORITHM "+i+" done");
             }
             writer.println();
 
             if (!centers[2].equals(centers[4]) || !centers[3].equals(centers[5])) {
-                throw new RuntimeException();
+                throw new RuntimeException("Capp and CappObl have not the same result");
             }
         }
     }

@@ -35,49 +35,74 @@ public class CHEN implements Algorithm {
 
     @Override
     public ArrayList<Point> query() {
+        ArrayList<Point> sol = new ArrayList<>(pts);
 
-        //First we create all the distances and put them in an array
-        int length = pts.size()*pts.size()-pts.size();
-        if (pts.size() <= k) {
-            length++;
-        }
-        double[] distances = new double[length];
-        int i = 0;
-        for (Point p : pts) {
-            for (Point q : pts) {
-                //By doing this, we delete all the distances of one point from itself (that are zeroes)
-                if (!q.equals(p)) {
-                    distances[i] = p.getDistance(q);
-                    i++;
+        //We won't go in overflow
+        if (pts.size() <= Math.sqrt(Integer.MAX_VALUE)) {
+            //First we create all the distances and put them in an array
+            int length = pts.size() * pts.size() - pts.size()+1;
+            if (pts.size() <= k) {
+                length++;
+            }
+            double[] distances = new double[length];
+            int i = 0;
+            for (Point p : pts) {
+                for (Point q : pts) {
+                    //By doing this, we delete all the distances of one point from itself (that are zeroes)
+                    if (!q.equals(p)) {
+                        distances[i] = p.getDistance(q);
+                        i++;
+                    }
                 }
             }
-        }
-        if (pts.size() <= k) {
-            distances[i] = 0;
-        }
-
-        //Then we sort all the distances, so that they are in non decreasing order
-        Arrays.sort(distances);
-
-        //Then we perform a binary search on the distances to search the best answer
-        ArrayList<Point> sol = new ArrayList<>(pts);
-        int low = 0;
-        int high = distances.length-1;
-        while (low <= high) {
-            int mid = (high + low) / 2;
-
-            //Distance 0 is optimal only if we have less than k points
-            if (distances[mid] == 0 && pts.size() > k) {
-                low = mid + 1;
+            if (pts.size() <= k) {
+                distances[i] = 0;
             }
 
-            //We try to obtain k centers with that distance as the radius
-            ArrayList<Point> thisSol = queryDist(distances[mid]);
-            if (thisSol != null) {
-                sol = thisSol;
-                high = mid - 1;
-            } else  {
-                low = mid + 1;
+            //Then we sort all the distances, so that they are in non decreasing order
+            Arrays.sort(distances);
+
+            //Then we perform a binary search on the distances to search the best answer
+            int low = 0;
+            int high = distances.length-1;
+            while (low <= high) {
+                int mid = (high + low) / 2;
+
+                //Distance 0 is optimal only if we have less than k points
+                if (distances[mid] == 0 && pts.size() > k) {
+                    low = mid + 1;
+                }
+
+                //We try to obtain k centers with that distance as the radius
+                ArrayList<Point> thisSol = queryDist(distances[mid]);
+                if (thisSol != null) {
+                    sol = thisSol;
+                    high = mid - 1;
+                } else  {
+                    low = mid + 1;
+                }
+            }
+        } else {
+            TreeSet<Double> distances = new TreeSet<>();
+            for (Point p : pts) {
+                for (Point q : pts) {
+                    //By doing this, we delete all the distances of one point from itself (that are zeroes)
+                    if (!q.equals(p)) {
+                        distances.add(p.getDistance(q));
+                    }
+                }
+            }
+            if (pts.size() <= k) {
+                distances.add((double) 0);
+            }
+
+
+            //Then we perform a linear search on the distances to search the best answer
+            for (Double dist : distances) {
+                ArrayList<Point> thisSol = queryDist(dist);
+                if (thisSol != null) {
+                    return thisSol;
+                }
             }
         }
         return sol;

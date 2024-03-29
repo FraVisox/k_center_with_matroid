@@ -43,8 +43,6 @@ public class CAPPObl implements Algorithm
         //while M_t is a guess of the diameter.
         double r_t = minPairwiseDistance(last_points, p);
         double M_t = diameter.getDiameter();
-        // end updating
-
 
         //Create first and last indexes
         int firstIndex = (int) Math.floor(Math.log(r_t / 2) / Math.log(1 + beta));

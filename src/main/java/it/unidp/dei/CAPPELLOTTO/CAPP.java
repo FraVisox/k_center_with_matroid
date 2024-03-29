@@ -13,16 +13,12 @@ public class CAPP implements Algorithm {
         double epsilon1 = _epsilon/(1+2*CHEN.alfa);
         double delta = epsilon1/(1+_beta);
 
-        //Initiate the guesses array. We don't use the definition, but an equivalent form
-        int number_of_guesses = (int)Math.ceil(Math.log(_maxDist/_minDist)/Math.log(1+_beta))+1;
-
-        /* This is how to use the definition to obtain the number of guesses
-        int last_i = (int)Math.ceil(Math.log(maxDist)/Math.log(1+_beta));
+        //We use the definition to obtain the number of guesses
+        int last_i = (int)Math.ceil(Math.log(_maxDist)/Math.log(1+_beta));
+        int first_i = (int)Math.floor(Math.log(_minDist)/Math.log(1+_beta));
         int number_of_guesses = last_i-first_i+1;
-         */
         guesses = new Guess[number_of_guesses];
 
-        int first_i = (int)Math.floor(Math.log(_minDist)/Math.log(1+_beta));
 
         //We use the definition: we start from (1+beta)^first_i, and don't start from minDist
         double gamma = Math.pow((1+_beta), first_i);
@@ -33,11 +29,6 @@ public class CAPP implements Algorithm {
             gamma *= (1+_beta);
         }
 
-        //Check
-        int last_i = (int)Math.ceil(Math.log(_maxDist)/Math.log(1+_beta));
-        if (i+1 < last_i) {
-            throw new RuntimeException("Error in the initialization of guesses of CAPP");
-        }
     }
 
     @Override
