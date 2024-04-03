@@ -38,7 +38,8 @@ public class Point implements Comparable<Point> {
     }
 
     //It returns the minimum distance of this point from a Collection of points.
-    //If that distance is zero, it is returned the second minimum distance
+    //If that distance is zero, it is returned the second minimum distance.
+    //USED IN CalculateMinMaxDist
     public double getMinDistanceWithoutZeroes(Collection<Point> set, double INF) {
         double mind = INF;
         for(Point q : set) {
@@ -50,6 +51,7 @@ public class Point implements Comparable<Point> {
     }
 
     //It returns the minimum distance of this point from a Collection of points, excluding itself
+    //USED IN CAPPObl and KCAPPObl
     public double getMinDistanceWithoutItself(Collection<Point> set, double INF) {
         double mind = INF;
         for(Point q : set) {

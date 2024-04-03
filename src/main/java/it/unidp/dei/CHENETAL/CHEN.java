@@ -35,7 +35,7 @@ public class CHEN implements Algorithm {
 
     @Override
     public ArrayList<Point> query() {
-        ArrayList<Point> sol = new ArrayList<>(pts);
+        ArrayList<Point> sol = null;
 
         //We won't go in overflow
         if (pts.size() <= Math.sqrt(Integer.MAX_VALUE)) {
@@ -59,7 +59,7 @@ public class CHEN implements Algorithm {
                 distances[i] = 0;
             }
 
-            //Then we sort all the distances, so that they are in non decreasing order
+            //Then we sort all the distances, so that they are in non-decreasing order
             Arrays.sort(distances);
 
             //Then we perform a binary search on the distances to search the best answer
@@ -71,6 +71,7 @@ public class CHEN implements Algorithm {
                 //Distance 0 is optimal only if we have less than k points
                 if (distances[mid] == 0 && pts.size() > k) {
                     low = mid + 1;
+                    continue;
                 }
 
                 //We try to obtain k centers with that distance as the radius
@@ -175,8 +176,8 @@ public class CHEN implements Algorithm {
         //  groups and the sink
         int i = ki.length + 1;
         for (Point pivot : partition.keySet()) {
-            edges.add(new Triple<>(0, i, (double) 1));
             int i_pivot = i;
+            edges.add(new Triple<>(0, i_pivot, (double) 1));
             i++;
             for (Point p : partition.get(pivot)) {
                 edges.add(new Triple<>(i_pivot, i, (double) 1));
@@ -196,7 +197,8 @@ public class CHEN implements Algorithm {
         PushRelabelMFImpl<Integer, Integer> alg = new PushRelabelMFImpl<>(graph);
         double flow = alg.calculateMaximumFlow(0, i);
 
-        //If the flow is less than the number of partitions, it's a failure
+        //If the flow is less than the number of partitions, it's a failure. Note that the flow can't be more than this number,
+        //as the sum of the weight of the edges that connect the source is partition.keySet().size()
         if (flow != partition.keySet().size()) {
             return null;
         }

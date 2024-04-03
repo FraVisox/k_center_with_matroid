@@ -14,21 +14,17 @@ public class CAPP implements Algorithm {
         double delta = epsilon1/(1+_beta);
 
         //We use the definition to obtain the number of guesses
-        int last_i = (int)Math.ceil(Math.log(_maxDist)/Math.log(1+_beta));
         int first_i = (int)Math.floor(Math.log(_minDist)/Math.log(1+_beta));
+        int last_i = (int)Math.ceil(Math.log(_maxDist)/Math.log(1+_beta));
         int number_of_guesses = last_i-first_i+1;
         guesses = new Guess[number_of_guesses];
 
-
-        //We use the definition: we start from (1+beta)^first_i, and don't start from minDist
+        //We use the definition: we start from (1+beta)^first_i, and don't start from minDist as in Pellizzoni
         double gamma = Math.pow((1+_beta), first_i);
-
-        int i;
-        for (i = 0; i<number_of_guesses; i++) {
+        for (int i = 0; i<number_of_guesses; i++) {
             guesses[i] = new Guess(gamma, delta, _ki);
             gamma *= (1+_beta);
         }
-
     }
 
     @Override
@@ -43,9 +39,9 @@ public class CAPP implements Algorithm {
         //Binary search on guesses
         int valid = binarySearchGuess();
 
-        //If there isn't a valid guess, it returns an empty ArrayList
+        //If there isn't a valid guess, it returns null
         if (valid == -1) {
-            return new ArrayList<>();
+            return null;
         }
         return guesses[valid].query();
     }

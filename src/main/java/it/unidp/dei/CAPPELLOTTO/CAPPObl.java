@@ -2,7 +2,6 @@ package it.unidp.dei.CAPPELLOTTO;
 
 import it.unidp.dei.Algorithm;
 import it.unidp.dei.CHENETAL.CHEN;
-import it.unidp.dei.Main;
 import it.unidp.dei.Point;
 
 import java.util.ArrayList;
@@ -17,7 +16,7 @@ public class CAPPObl implements Algorithm
         delta = epsilon1/(1+_beta);
         ki = _ki;
         k = Algorithm.calcK(_ki);
-        diameter = new DiameterEstimation(beta);
+        diameter = new COHENDiameter(beta);
     }
 
     @Override
@@ -39,9 +38,9 @@ public class CAPPObl implements Algorithm
             oldest = last_points.removeFirst();
         }
 
-        //UPDATE DI r_t and M_t: r_t is the minimum distance between the last t+k+1 points,
-        //while M_t is a guess of the diameter.
-        double r_t = minPairwiseDistance(last_points, p);
+        //UPDATE of r_t and M_t: r_t is the minimum distance between the last k+1 points,
+        //while M_t is a guess of the diameter of the entire window.
+        double r_t = Algorithm.minPairwiseDistance(last_points, p);
         double M_t = diameter.getDiameter();
 
         //Create first and last indexes
@@ -49,8 +48,7 @@ public class CAPPObl implements Algorithm
         int lastIndex = (int) Math.ceil(Math.log(2 * M_t / delta) / Math.log(1 + beta));
 
         if (guesses.isEmpty()) {
-            int i = firstIndex;
-            while (i <= lastIndex) {
+            for (int i = firstIndex; i <= lastIndex; i++) {
                 //RV and R only contain the point t-1
                 TreeMap<Point, Point> RV = new TreeMap<>();
                 RV.put(last_points.getLast(), last_points.getLast());
@@ -58,20 +56,18 @@ public class CAPPObl implements Algorithm
                 R.put(last_points.getLast(), createR(last_points.getLast()));
 
                 guesses.put(i, new Guess(Math.pow((1 + beta), i), delta, ki, RV, R));
-                i++;
             }
         } else {
-            // Delete the sets that are under the first index or over the last
-            for(int i = guesses.firstKey(); i<=guesses.lastKey() && i<firstIndex; i++){
+            // Delete the sets that are under the first index or over the last. TODO: corretto? si puo' fare remove?
+            for(int i = guesses.firstKey(); i <= guesses.lastKey() && i < firstIndex; i++){
                 guesses.remove(i);
             }
-            for(int i = guesses.firstKey(); i<=guesses.lastKey() && i > lastIndex; i++){
+            for(int i = guesses.lastKey(); i >= guesses.firstKey() && i > lastIndex; i--){
                 guesses.remove(i);
             }
 
             //Creates the new guesses
-            int i = guesses.firstKey() - 1;
-            while(i >= firstIndex){
+            for(int i = guesses.firstKey() - 1; i >= firstIndex; i--){
                 //RV and R contain all the last points (even oldest, if present)
                 TreeMap<Point, Point> RV = new TreeMap<>();
                 for(Point pp : last_points){
@@ -87,11 +83,10 @@ public class CAPPObl implements Algorithm
                 }
 
                 guesses.put(i, new Guess(Math.pow((1+beta), i), delta, ki, RV, R));
-                i--;
             }
 
-            i = guesses.lastKey() + 1;
-            while(i <= lastIndex){
+
+            for(int i = guesses.lastKey() + 1; i <= lastIndex; i++){
                 //RV and R contain only the last point
                 TreeMap<Point, Point> RV = new TreeMap<>();
                 RV.put(last_points.getLast(), last_points.getLast());
@@ -99,7 +94,6 @@ public class CAPPObl implements Algorithm
                 R.put(last_points.getLast(), createR(last_points.getLast()));
 
                 guesses.put(i, new Guess(Math.pow((1+beta), i), delta, ki, RV, R));
-                i++;
             }
         }
         //Insert the point p in the last points
@@ -118,9 +112,9 @@ public class CAPPObl implements Algorithm
         //Binary search on guesses
         Integer valid = binarySearchGuess();
 
-        //If there isn't a valid guess, it returns an empty ArrayList
+        //If there isn't a valid guess, it returns null
         if (valid == null) {
-            return new ArrayList<>();
+            return null;
         }
         return guesses.get(valid).query();
     }
@@ -134,17 +128,6 @@ public class CAPPObl implements Algorithm
         return size;
     }
 
-    private double minPairwiseDistance(LinkedList<Point> points, Point p){
-        double ans = p.getMinDistanceWithoutItself(points, Main.INF);
-        for(Point p1 : points){
-            ans = p1.getMinDistanceWithoutItself(points, ans);
-        }
-        if (ans == 0) {
-            ans = DiameterEstimation.minimum;
-        }
-        return ans;
-    }
-
     private LinkedList<Point>[] createR(Point p) {
         LinkedList<Point>[] list = new LinkedList[ki.length];
         for (int j = 0; j < ki.length; j++) {
@@ -154,7 +137,7 @@ public class CAPPObl implements Algorithm
         return list;
     }
 
-    //Binary search on guesses, as in CAPP
+    //Binary search on guesses, as in CAPP. It returns null if there aren't correct guesses (as -1 is a valid return value)
     private Integer binarySearchGuess() {
         Integer valid = null;
         int low = guesses.firstKey();
@@ -174,7 +157,7 @@ public class CAPPObl implements Algorithm
     //Guesses, the key is the exponent to give to (1+beta) to get that guess
     private final TreeMap<Integer, Guess> guesses = new TreeMap<>();
     //Used to estimate the diameter
-    private final DiameterEstimation diameter;
+    private final COHENDiameter diameter;
     //Last k+1 points
     private final LinkedList<Point> last_points = new LinkedList<>();
     private final int k;

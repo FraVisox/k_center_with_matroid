@@ -37,7 +37,7 @@ public class Guess {
                 O.addAll(l);
             }
         }
-        if (!OV.isEmpty() && OV.first().hasExpired(time)) {
+        if (!OV.isEmpty() && OV.first().hasExpired(time)) { //TODO: while o if?
             OV.remove(OV.first());
         }
         if (!O.isEmpty() && O.first().hasExpired(time)) {
@@ -52,9 +52,9 @@ public class Guess {
             }
         }
         ArrayList<Point> E = new ArrayList<>();
-        for (Point v : R.keySet()) {
-            if (p.getDistance(v) <= delta*gamma/2) {
-                E.add(v);
+        for (Point c : R.keySet()) {
+            if (p.getDistance(c) <= delta*gamma/2) {
+                E.add(c);
             }
         }
 
@@ -70,8 +70,8 @@ public class Guess {
             //If the size is greater than k, remove points older than the oldest of AV from A, OV and O
             if (RV.size() > k) {
                 Point vOld = RV.firstKey();
-                List<Point> ptsToDelete = new ArrayList<>();
 
+                List<Point> ptsToDelete = new ArrayList<>();
                 for (Point a : R.keySet()) {
                     if (a.compareTo(vOld) >= 0) {
                         break;
@@ -110,8 +110,7 @@ public class Guess {
             }
             ptsGroups[p.getGroup()].add(p);
             R.put(p, ptsGroups);
-        }
-        else {
+        } else {
             //If there is a tie, the first point inserted in E gets this point as a representative
             int pGroup = p.getGroup();
             Point aAdd = E.get(0);
@@ -129,7 +128,7 @@ public class Guess {
         }
     }
 
-    //To be used only after the call to isCorrect()
+    //To be used only after the call to isCorrect() returns true
     public ArrayList<Point> query() {
         LinkedList<Point> union = new LinkedList<>(O);
         for (LinkedList<Point>[] list : R.values()) {
@@ -160,7 +159,7 @@ public class Guess {
     }
 
     public int getSize() {
-        int size = O.size()+OV.size()+2*RV.size()+R.keySet().size();
+        int size = O.size()+OV.size()+2*RV.keySet().size()+R.keySet().size();
         for (LinkedList<Point>[] list : R.values()) {
             for (LinkedList<Point> l : list) {
                 size += l.size();

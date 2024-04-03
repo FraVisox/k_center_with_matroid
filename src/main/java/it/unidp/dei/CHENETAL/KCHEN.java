@@ -5,6 +5,7 @@ import it.unidp.dei.Point;
 
 import java.util.*;
 
+//This is only a wrapper of the CHEN class, that tries to return a set of centers of the maximum size possible (k, if possible)
 public class KCHEN implements Algorithm {
     public KCHEN(int[] _ki) {
         realAlg = new CHEN(_ki);
@@ -28,9 +29,9 @@ public class KCHEN implements Algorithm {
         ArrayList<Point> centers = realAlg.query();
 
         //Now we can have less than k centers. Update if needed
-        boolean end = false;
-        while (centers.size()<k && !end) {
-            end = insertPointAtMaxDistanceBetweenSets(realAlg.getPoints(), centers);
+        LinkedList<Point> pts = realAlg.getPoints();
+        while (centers.size() < k && !insertPointAtMaxDistanceBetweenSets(pts, centers)) {
+            //The loop updates the centers, but this is done in the condition
         }
         return centers;
     }
@@ -40,7 +41,7 @@ public class KCHEN implements Algorithm {
     }
 
     //CHIPLUNKAR uses an algorithm that only inserts a casual point in the set of centers,
-    //while we use an algorithm that inserts the most distant point in the set of centers
+    //while we use an algorithm that inserts the most distant point of the points in memory in the set of centers.
     private boolean insertPointAtMaxDistanceBetweenSets(Collection<Point> set, ArrayList<Point> centers){
         int[] kj = ki.clone();
         for (Point p : set) {

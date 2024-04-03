@@ -1,9 +1,6 @@
 package it.unidp.dei;
 
-import it.unidp.dei.CAPPELLOTTO.CAPP;
-import it.unidp.dei.CAPPELLOTTO.CAPPObl;
-import it.unidp.dei.CAPPELLOTTO.KCAPP;
-import it.unidp.dei.CAPPELLOTTO.KCAPPObl;
+import it.unidp.dei.CAPPELLOTTO.*;
 import it.unidp.dei.CHENETAL.CHEN;
 import it.unidp.dei.CHENETAL.KCHEN;
 import it.unidp.dei.datasetReaders.*;
@@ -13,37 +10,45 @@ import java.io.PrintWriter;
 import java.util.*;
 
 public class Main {
-    //Some parameters that are the same for every dataset
-    private static final double epsilon = 0.9;
-    private static final double beta = 20;
-    public static final int wSize = 20000;
-    public static final double INF = 14000;
-    //It tells how many times we will query the algorithms after having a complete window
-    private static final int stride = 20;
-
     //Folders of input and output files
     public static final String inFolderOriginals = "src/main/java/it/unidp/dei/data/originals/";
     public static final String inFolderRandomized = "src/main/java/it/unidp/dei/data/randomized/";
     public static final String outFolder = "out/";
 
+    //Some parameters that are the same for every dataset
+    private static final double epsilon = 0.9;
+    private static final double beta = 20;
+    public static final int wSize = 1000;
+    public static final double INF = 9000;
+    //It tells how many times we will query the algorithms after having a complete window
+    private static final int stride = 10;
+
     //For every dataset we save the name of the input file, the name of the output file, ki, minDist, maxDist and the object to read the file
     private static final String[] datasets = {"Phones_accelerometer.csv", "covtype.dat", "HIGGS.csv", "random20.csv"};
-    private static final String[] outFiles = {"testPhones.csv", "testCovtype.csv", "testHiggs.csv", "testRandom20.csv"};
+    private static final String[] outFiles = {"TestPhones.csv", "TestCovtype.csv", "TestHiggs.csv", "TestRandom20.csv"};
     private static final DatasetReader[] readers = {new PhonesReader(), new CovertypeReader(), new HiggsReader(), new RandomReader()};
     private static final int[][] ki = {{1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1}, {1, 1}, {1, 1, 1, 1, 1, 1, 1}};
 
     //VALUES OF MAX AND MIN DISTANCES:
     //  PHONES: maxD = 53 and minD = 8e-5 (tested for 840000 points and 530000 randomized, and there are 13062475)
-    //  COVTYPE: maxD = 13244 and minD = 4.8 (tested for 510000 points and there are 581012). Pellizzoni used 10000 and 0.1
+    //  COVTYPE: maxD = 13244 and minD = 3.87 (tested for 510000 points and there are 581012). Pellizzoni used 10000 and 0.1
     //  HIGGS: maxD = 29 and minD = 0.008 (tested for 620000 points and there are 11000000). Pellizzoni used 100 and 0.01
-    private static final double[] minDist = {8e-5, 4.8, 0.008, 1e-5};
-    private static final double[] maxDist = {53, 13244, 29, Math.sqrt(RandomReader.doublingDimension)};
+    //  RANDOM: maxD = 3.32 and minD = 0.35 (tested for 410000 points and there are 1000000)
+
+    //VALUES OF MAX AND MIN DISTANCES for randomized till time 100000
+    //  PHONES: maxD = 47.6 and minD = 1.2e-4
+    //  COVTYPE: maxD = 8834.2 and minD = 3.9
+    //  HIGGS: maxD = 22.9 and minD = 0.011
+    //  RANDOM: maxD = 3.22 and minD = 0.42
+    private static final double[] minDist = {1.2e-4, 3.9, 0.011, 0.42};
+    private static final double[] maxDist = {47.6, 8834.2, 22.9, 3.22};
 
     public static void main(String[] args) {
+        //Tests to run
         testRandomized();
     }
 
-    //Test of algorithms on standard ki, wSize, epsilon and beta
+    //Test of algorithms on standard ki, wSize, epsilon and beta. The datasets used are the randomized ones
     private static void testRandomized() {
         DatasetReader reader;
         PrintWriter writer;
@@ -59,7 +64,7 @@ public class Main {
                     readers[i].setFile(inFolderRandomized + set);
                 }
                 //Create a results writer
-                writer = new PrintWriter(outFolder+outFiles[i]);
+                writer = new PrintWriter(outFolder+"rand"+outFiles[i]);
 
             } catch (FileNotFoundException e) {
                 System.out.println("File " + set + " not found, skipping to next dataset");
@@ -69,9 +74,7 @@ public class Main {
             //TEST THINGS
             testAlgorithms(reader, writer, minDist[i], maxDist[i], ki[i], wSize, epsilon, beta);
 
-            //FLUSH AND CLOSE
-            writer.flush();
-
+            //CLOSE
             writer.close();
 
             reader.close();
@@ -79,7 +82,7 @@ public class Main {
         }
     }
 
-    //Test of algorithms on standard ki, wSize, epsilon and beta
+    //Test of algorithms on standard ki, wSize, epsilon and beta. The datasets used are the originals
     private static void testOriginals() {
         DatasetReader reader;
         PrintWriter writer;
@@ -95,7 +98,7 @@ public class Main {
                     readers[i].setFile(inFolderOriginals + set);
                 }
                 //Create a results writer
-                writer = new PrintWriter(outFolder+outFiles[i]);
+                writer = new PrintWriter(outFolder+"orig"+outFiles[i]);
 
             } catch (FileNotFoundException e) {
                 System.out.println("File " + set + " not found, skipping to next dataset");
@@ -105,9 +108,7 @@ public class Main {
             //TEST THINGS
             testAlgorithms(reader, writer, minDist[i], maxDist[i], ki[i], wSize, epsilon, beta);
 
-            //FLUSH AND CLOSE
-            writer.flush();
-
+            //CLOSE
             writer.close();
 
             reader.close();
@@ -118,14 +119,16 @@ public class Main {
     //Test with different ki, with wSize, epsilon and beta standard
     private static void testKi() {
         int[][][] ki = {
-                {{5, 5, 5, 5, 5, 5, 5}, {5, 5, 5, 5, 5, 5, 5}, {10, 10}},
-                {{10, 10, 10, 10, 10, 10, 10}, {10, 10, 10, 10, 10, 10, 10}, {15, 15}},
-                {{15, 15, 15, 15, 15, 15, 15}, {15, 15, 15, 15, 15, 15, 15}, {20, 20}},
-                {{20, 20, 20, 20, 20, 20, 20}, {20, 20, 20, 20, 20, 20, 20}, {25, 25}},
-                {{25, 25, 25, 25, 25, 25, 25}, {25, 25, 25, 25, 25, 25, 25}, {30, 30}},
-                {{50, 50, 50, 50, 50, 50, 50}, {50, 50, 50, 50, 50, 50, 50}, {50, 50}},
-                {{100, 100, 100, 100, 100, 100, 100}, {100, 100, 100, 100, 100, 100, 100}, {100, 100}},
-                {{500, 500, 500, 500, 500, 500, 500}, {500, 500, 500, 500, 500, 500, 500}, {500, 500}}
+                {{1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1}, {1, 1}, {1, 1, 1, 1, 1, 1, 1}},
+                {{2, 2, 2, 2, 2, 2, 2}, {2, 2, 2, 2, 2, 2, 2}, {5, 5}, {2, 2, 2, 2, 2, 2, 2}},
+                {{5, 5, 5, 5, 5, 5, 5}, {5, 5, 5, 5, 5, 5, 5}, {10, 10}, {5, 5, 5, 5, 5, 5, 5}},
+                {{10, 10, 10, 10, 10, 10, 10}, {10, 10, 10, 10, 10, 10, 10}, {15, 15}, {10, 10, 10, 10, 10, 10, 10}},
+                {{15, 15, 15, 15, 15, 15, 15}, {15, 15, 15, 15, 15, 15, 15}, {20, 20}, {15, 15, 15, 15, 15, 15, 15}},
+                {{20, 20, 20, 20, 20, 20, 20}, {20, 20, 20, 20, 20, 20, 20}, {25, 25}, {20, 20, 20, 20, 20, 20, 20}},
+                {{25, 25, 25, 25, 25, 25, 25}, {25, 25, 25, 25, 25, 25, 25}, {30, 30}, {25, 25, 25, 25, 25, 25, 25}},
+                {{50, 50, 50, 50, 50, 50, 50}, {50, 50, 50, 50, 50, 50, 50}, {50, 50}, {50, 50, 50, 50, 50, 50, 50}},
+                {{100, 100, 100, 100, 100, 100, 100}, {100, 100, 100, 100, 100, 100, 100}, {100, 100}, {100, 100, 100, 100, 100, 100, 100}},
+                {{500, 500, 500, 500, 500, 500, 500}, {500, 500, 500, 500, 500, 500, 500}, {500, 500}, {500, 500, 500, 500, 500, 500, 500}}
         };
 
         DatasetReader reader;
@@ -143,7 +146,7 @@ public class Main {
                         readers[i].setFile(inFolderRandomized + set);
                     }
                     //Create a results writer
-                    writer = new PrintWriter(outFolder + ki[j][i][0] + outFiles[i]);
+                    writer = new PrintWriter(outFolder + "k" + ki[j][i][0] + outFiles[i]);
 
                 } catch (FileNotFoundException e) {
                     System.out.println("File " + set + " not found, skipping to next dataset");
@@ -153,9 +156,7 @@ public class Main {
                 //TEST THINGS
                 testAlgorithms(reader, writer, minDist[i], maxDist[i], ki[j][i], wSize, epsilon, beta);
 
-                //FLUSH AND CLOSE
-                writer.flush();
-
+                //CLOSE
                 writer.close();
 
                 reader.close();
@@ -183,7 +184,7 @@ public class Main {
                         readers[i].setFile(inFolderRandomized + set);
                     }
                     //Create a results writer
-                    writer = new PrintWriter(outFolder + epsilon[j] + outFiles[i]);
+                    writer = new PrintWriter(outFolder + "epsilon" + epsilon[j] + outFiles[i]);
 
                 } catch (FileNotFoundException e) {
                     System.out.println("File " + set + " not found, skipping to next dataset");
@@ -193,9 +194,7 @@ public class Main {
                 //TEST THINGS
                 testAlgorithms(reader, writer, minDist[i], maxDist[i], ki[i], wSize, epsilon[j], beta);
 
-                //FLUSH AND CLOSE
-                writer.flush();
-
+                //CLOSE
                 writer.close();
 
                 reader.close();
@@ -206,7 +205,7 @@ public class Main {
 
     //Test with different beta, with ki, epsilon and wSize standard
     private static void testBeta() {
-        double[] beta = {0.1, 0.2, 0.5, 0.8, 1, 1.1, 1.2, 1.5, 1.8, 2, 2.1, 2.2, 2.5, 2.8, 3, 3.2, 3.5, 3.8, 4, 4.5, 5, 6, 6.5, 7};
+        double[] beta = {0.1, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 8, 10, 15, 20, 30, 40, 50, 70, 100, 200, 500, 1000};
 
         DatasetReader reader;
         PrintWriter writer;
@@ -223,7 +222,7 @@ public class Main {
                         readers[i].setFile(inFolderRandomized + set);
                     }
                     //Create a results writer
-                    writer = new PrintWriter(outFolder + beta[j] + outFiles[i]);
+                    writer = new PrintWriter(outFolder + "beta" + beta[j] + outFiles[i]);
 
                 } catch (FileNotFoundException e) {
                     System.out.println("File " + set + " not found, skipping to next dataset");
@@ -233,9 +232,7 @@ public class Main {
                 //TEST THINGS
                 testAlgorithms(reader, writer, minDist[i], maxDist[i], ki[i], wSize, epsilon, beta[j]);
 
-                //FLUSH AND CLOSE
-                writer.flush();
-
+                //CLOSE
                 writer.close();
 
                 reader.close();
@@ -263,7 +260,7 @@ public class Main {
                         readers[i].setFile(inFolderRandomized + set);
                     }
                     //Create a results writer
-                    writer = new PrintWriter(outFolder + wSize[j] + outFiles[i]);
+                    writer = new PrintWriter(outFolder + "wSize" + wSize[j] + outFiles[i]);
 
                 } catch (FileNotFoundException e) {
                     System.out.println("File " + set + " not found, skipping to next dataset");
@@ -273,9 +270,7 @@ public class Main {
                 //TEST THINGS
                 testAlgorithms(reader, writer, minDist[i], maxDist[i], ki[i], wSize[j], epsilon, beta);
 
-                //FLUSH AND CLOSE
-                writer.flush();
-
+                //CLOSE
                 writer.close();
 
                 reader.close();
@@ -293,14 +288,16 @@ public class Main {
         LinkedList<Point> window = new LinkedList<>();
 
         //Initialize the algorithms
-        Algorithm[] algorithms = new Algorithm[6];
+        Algorithm[] algorithms = new Algorithm[8];
         algorithms[0] = new CHEN(kiSet);
         algorithms[1] = new KCHEN(kiSet);
         algorithms[2] = new CAPP(kiSet, epsilon, beta, min, max);
         algorithms[3] = new KCAPP(kiSet, epsilon, beta, min, max);
         algorithms[4] = new CAPPObl(beta, epsilon, kiSet);
         algorithms[5] = new KCAPPObl(beta, epsilon, kiSet);
-        writer.println("CHEN;;;;;;KCHEN;;;;;;CAPP;;;;;;KCAPP;;;;;;CAPPOBL;;;;;;KCAPPOBL;;");
+        algorithms[6] = new MyPELLCAPPObl(beta, epsilon, kiSet);
+        algorithms[7] = new PELLCAPPObl(beta, epsilon, kiSet);
+        writer.println("CHEN;;;;;;KCHEN;;;;;;CAPP;;;;;;KCAPP;;;;;;CAPPOBL;;;;;;KCAPPOBL;;;;;;PELLCAPPOBL;;;;;;MyPELLCAPPOBL;;");
 
         String header = "Update Time;Query Time;Radius;Independence;Memory";
         for (int i = 0; i<algorithms.length; i++) {
@@ -313,7 +310,7 @@ public class Main {
         for (int time = 1; time <= wSize+stride && reader.hasNext(); time++) {
 
             //Check of passing of time, only used for debug purposes
-            if (time % (wSize/10) == 0) {
+            if (wSize > 10 && time % (wSize/10) == 0) {
                 System.out.println(time);
             }
 
@@ -350,8 +347,15 @@ public class Main {
             }
             writer.println();
 
+            //FLUSH
+            writer.flush();
+
+            //CHECK
             if (!centers[2].equals(centers[4]) || !centers[3].equals(centers[5])) {
                 throw new RuntimeException("Capp and CappObl have not the same result");
+            }
+            if (!centers[6].equals(centers[7]) || !centers[5].equals(centers[7])) {
+                throw new RuntimeException("NON HAI FATTO LE COSE BENE");
             }
         }
     }
@@ -380,7 +384,7 @@ public class Main {
         endTime = System.nanoTime();
         writer.print((endTime-startTime)+";");
 
-        if (centers.isEmpty()) {
+        if (centers == null) {
             System.out.println("Max or min distances are not correct. There isn't a valid guess");
             throw new IllegalArgumentException();
         }

@@ -8,35 +8,22 @@ import java.util.ArrayList;
 
 public class KCAPP implements Algorithm {
 
-    public KCAPP(int[] _ki, double _epsilon, double _beta, double minDist, double maxDist) {
+    public KCAPP(int[] _ki, double _epsilon, double _beta, double _minDist, double _maxDist) {
         //Calculate epsilon1 and then delta
         double epsilon1 = _epsilon/(1+2*CHEN.alfa);
         double delta = epsilon1/(1+_beta);
 
-        //Initiate the guesses array. We don't use the definition, but an equivalent form
-        int number_of_guesses = (int)Math.ceil(Math.log(maxDist/minDist)/Math.log(1+_beta))+1;
-
-        /* This is how to use the definition to obtain the number of guesses
-        int last_i = (int)Math.ceil(Math.log(maxDist)/Math.log(1+_beta));
+        //We use the definition to obtain the number of guesses
+        int first_i = (int)Math.floor(Math.log(_minDist)/Math.log(1+_beta));
+        int last_i = (int)Math.ceil(Math.log(_maxDist)/Math.log(1+_beta));
         int number_of_guesses = last_i-first_i+1;
-         */
         guesses = new KGuess[number_of_guesses];
 
-        int first_i = (int)Math.floor(Math.log(minDist)/Math.log(1+_beta));
-
-        //We use the definition: we start from (1+beta)^first_i, and don't start from minDist
+        //We use the definition: we start from (1+beta)^first_i, and don't start from minDist as in Pellizzoni
         double gamma = Math.pow((1+_beta), first_i);
-
-        int i;
-        for (i = 0; i<number_of_guesses; i++) {
+        for (int i = 0; i<number_of_guesses; i++) {
             guesses[i] = new KGuess(gamma, delta, _ki);
             gamma *= (1+_beta);
-        }
-
-        //Check
-        int last_i = (int)Math.ceil(Math.log(maxDist)/Math.log(1+_beta));
-        if (i+1 < last_i) {
-            throw new RuntimeException("Error in the initialization of guesses of CAPP");
         }
     }
 
@@ -52,9 +39,9 @@ public class KCAPP implements Algorithm {
         //Binary search on guesses
         int valid = binarySearchGuess();
 
-        //If there isn't a valid guess, it returns an empty ArrayList
+        //If there isn't a valid guess, it returns null
         if (valid == -1) {
-            return new ArrayList<>();
+            return null;
         }
         return guesses[valid].query();
     }
