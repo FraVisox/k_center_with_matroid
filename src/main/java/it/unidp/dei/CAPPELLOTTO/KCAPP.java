@@ -1,6 +1,7 @@
 package it.unidp.dei.CAPPELLOTTO;
 
 import it.unidp.dei.Algorithm;
+import it.unidp.dei.CAPPELLOTTO.Guess.KGuess;
 import it.unidp.dei.CHENETAL.CHEN;
 import it.unidp.dei.Point;
 

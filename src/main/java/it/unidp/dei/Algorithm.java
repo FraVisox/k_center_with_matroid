@@ -1,6 +1,6 @@
 package it.unidp.dei;
 
-import it.unidp.dei.CAPPELLOTTO.Diameter;
+import it.unidp.dei.CAPPELLOTTO.Diameter.Diameter;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

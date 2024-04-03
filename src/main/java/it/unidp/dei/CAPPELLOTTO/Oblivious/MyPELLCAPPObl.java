@@ -1,6 +1,8 @@
-package it.unidp.dei.CAPPELLOTTO;
+package it.unidp.dei.CAPPELLOTTO.Oblivious;
 
 import it.unidp.dei.Algorithm;
+import it.unidp.dei.CAPPELLOTTO.Diameter.Diameter;
+import it.unidp.dei.CAPPELLOTTO.Guess.Guess;
 import it.unidp.dei.CHENETAL.CHEN;
 import it.unidp.dei.Main;
 import it.unidp.dei.Point;
@@ -9,15 +11,15 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.TreeMap;
 
-public class KCAPPObl implements Algorithm
+public class MyPELLCAPPObl implements Algorithm
 {
-    public KCAPPObl(double _beta, double _eps, int[] _ki) {
+    public MyPELLCAPPObl(double _beta, double _eps, int[] _ki) {
         beta = _beta;
         double epsilon1 = _eps/(1+2*CHEN.alfa);
         delta = epsilon1/(1+_beta);
         ki = _ki;
         k = Algorithm.calcK(_ki);
-        diameter = new COHENDiameter(beta);
+        diameter = new MyPELLDiameter(beta);
     }
 
     @Override
@@ -56,7 +58,7 @@ public class KCAPPObl implements Algorithm
                 TreeMap<Point, LinkedList<Point>[]> R = new TreeMap<>();
                 R.put(last_points.getLast(), createR(last_points.getLast()));
 
-                guesses.put(i, new KGuess(Math.pow((1 + beta), i), delta, ki, RV, R));
+                guesses.put(i, new Guess(Math.pow((1 + beta), i), delta, ki, RV, R));
             }
         } else {
             // Delete the sets that are under the first index or over the last. TODO: corretto? si puo' fare remove?
@@ -83,7 +85,7 @@ public class KCAPPObl implements Algorithm
                     R.put(oldest, createR(oldest));
                 }
 
-                guesses.put(i, new KGuess(Math.pow((1+beta), i), delta, ki, RV, R));
+                guesses.put(i, new Guess(Math.pow((1+beta), i), delta, ki, RV, R));
             }
 
 
@@ -94,7 +96,7 @@ public class KCAPPObl implements Algorithm
                 TreeMap<Point, LinkedList<Point>[]> R = new TreeMap<>();
                 R.put(last_points.getLast(), createR(last_points.getLast()));
 
-                guesses.put(i, new KGuess(Math.pow((1+beta), i), delta, ki, RV, R));
+                guesses.put(i, new Guess(Math.pow((1+beta), i), delta, ki, RV, R));
             }
         }
         //Insert the point p in the last points
@@ -167,9 +169,9 @@ public class KCAPPObl implements Algorithm
     }
 
     //Guesses, the key is the exponent to give to (1+beta) to get that guess
-    private final TreeMap<Integer, KGuess> guesses = new TreeMap<>();
+    private final TreeMap<Integer, Guess> guesses = new TreeMap<>();
     //Used to estimate the diameter
-    private final COHENDiameter diameter;
+    private final MyPELLDiameter diameter;
     //Last k+1 points
     private final LinkedList<Point> last_points = new LinkedList<>();
     private final int k;
