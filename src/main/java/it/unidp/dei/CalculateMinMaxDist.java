@@ -16,7 +16,7 @@ public class CalculateMinMaxDist {
         DatasetReader reader;
         PrintWriter writer;
 
-        for (int i = 0; i<datasets.length; i++) {
+        for (int i = 3; i<datasets.length; i++) {
             String set = datasets[i];
             try {
                 //Create a file reader. We use the randomized datasets

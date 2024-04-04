@@ -5,7 +5,7 @@ import it.unidp.dei.Point;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-//This algorithm is the one presented in Cohen-Addad's paper. TODO: check e guarda l'altro fatto da Pellizzoni
+//This algorithm is the one presented in Cohen-Addad's paper
 public class COHENDiameter extends Diameter
 {
     public COHENDiameter(double _eps) {
@@ -52,8 +52,7 @@ public class COHENDiameter extends Diameter
         }
 
         //Delete the guesses less than minIndex from the possible guesses
-        int minIndex = (int) Math.floor(Math.log(rt / 2) / Math.log(1 + eps));
-        //TODO: e' /2 o no?
+        int minIndex = (int) Math.floor(Math.log(rt) / Math.log(1 + eps));
 
         ArrayList<Integer> toRemove = new ArrayList<>();
         for(Integer gam : q.keySet()){

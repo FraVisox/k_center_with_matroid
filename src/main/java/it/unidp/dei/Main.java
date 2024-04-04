@@ -1,9 +1,9 @@
 package it.unidp.dei;
 
 import it.unidp.dei.CAPPELLOTTO.*;
-import it.unidp.dei.CAPPELLOTTO.Oblivious.CAPPObl;
-import it.unidp.dei.CAPPELLOTTO.Oblivious.KCAPPObl;
-import it.unidp.dei.CAPPELLOTTO.Oblivious.MyPELLCAPPObl;
+import it.unidp.dei.CAPPELLOTTO.Oblivious.COHENCAPPObl;
+import it.unidp.dei.CAPPELLOTTO.Oblivious.KCOHENCAPPObl;
+import it.unidp.dei.CAPPELLOTTO.Oblivious.KPELLCAPPObl;
 import it.unidp.dei.CAPPELLOTTO.Oblivious.PELLCAPPObl;
 import it.unidp.dei.CHENETAL.CHEN;
 import it.unidp.dei.CHENETAL.KCHEN;
@@ -297,11 +297,11 @@ public class Main {
         algorithms[1] = new KCHEN(kiSet);
         algorithms[2] = new CAPP(kiSet, epsilon, beta, min, max);
         algorithms[3] = new KCAPP(kiSet, epsilon, beta, min, max);
-        algorithms[4] = new CAPPObl(beta, epsilon, kiSet);
-        algorithms[5] = new KCAPPObl(beta, epsilon, kiSet);
-        algorithms[6] = new MyPELLCAPPObl(beta, epsilon, kiSet);
-        algorithms[7] = new PELLCAPPObl(beta, epsilon, kiSet);
-        writer.println("CHEN;;;;;;KCHEN;;;;;;CAPP;;;;;;KCAPP;;;;;;CAPPOBL;;;;;;KCAPPOBL;;;;;;PELLCAPPOBL;;;;;;MyPELLCAPPOBL;;");
+        algorithms[4] = new COHENCAPPObl(beta, epsilon, kiSet);
+        algorithms[5] = new KCOHENCAPPObl(beta, epsilon, kiSet);
+        algorithms[6] = new PELLCAPPObl(beta, epsilon, kiSet);
+        algorithms[7] = new KPELLCAPPObl(beta, epsilon, kiSet);
+        writer.println("CHEN;;;;;;KCHEN;;;;;;CAPP;;;;;;KCAPP;;;;;;CAPPOBL;;;;;;KCAPPOBL;;;;;;PELLCAPPOBL;;;;;;KPELLCAPPOBL;;");
 
         String header = "Update Time;Query Time;Radius;Independence;Memory";
         for (int i = 0; i<algorithms.length; i++) {
@@ -358,8 +358,8 @@ public class Main {
             if (!centers[2].equals(centers[4]) || !centers[3].equals(centers[5])) {
                 throw new RuntimeException("Capp and CappObl have not the same result");
             }
-            if (!centers[6].equals(centers[7]) || !centers[5].equals(centers[7])) {
-                throw new RuntimeException("NON HAI FATTO LE COSE BENE");
+            if (!centers[4].equals(centers[6]) || !centers[5].equals(centers[7])) {
+                throw new RuntimeException("The two implementations of CappObl have not the same result");
             }
         }
     }

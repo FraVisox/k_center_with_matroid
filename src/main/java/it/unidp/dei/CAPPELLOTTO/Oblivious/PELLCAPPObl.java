@@ -36,7 +36,7 @@ public class PELLCAPPObl implements Algorithm
         }
 
         //If this is not the first point, update last_points:
-        //it removes the last point if it has expired or the size is major than k+1
+        //it removes the last point if it has expired or the size is major than k
         Point oldest = null;
         if(last_points.size() > k || last_points.getFirst().hasExpired(time)){
             oldest = last_points.removeFirst();
