@@ -1,4 +1,4 @@
-package it.unidp.dei.CAPPELLOTTO.Diameter;
+package it.unidp.dei.CAPPELLOTTO.Utils.Diameter;
 
 import it.unidp.dei.Point;
 

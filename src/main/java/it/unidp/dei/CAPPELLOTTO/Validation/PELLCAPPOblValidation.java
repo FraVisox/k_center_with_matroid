@@ -1,10 +1,9 @@
 package it.unidp.dei.CAPPELLOTTO.Validation;
 
 import it.unidp.dei.Algorithm;
-import it.unidp.dei.CAPPELLOTTO.Diameter.Diameter;
-import it.unidp.dei.CAPPELLOTTO.Diameter.PELLDiameter;
-import it.unidp.dei.CAPPELLOTTO.Guess.Guess;
-import it.unidp.dei.CAPPELLOTTO.Guess.GuessValidation;
+import it.unidp.dei.CAPPELLOTTO.Utils.Diameter.Diameter;
+import it.unidp.dei.CAPPELLOTTO.Utils.Diameter.PELLDiameter;
+import it.unidp.dei.CAPPELLOTTO.Utils.Guess.GuessValidation;
 import it.unidp.dei.CHENETAL.CHEN;
 import it.unidp.dei.Main;
 import it.unidp.dei.Point;

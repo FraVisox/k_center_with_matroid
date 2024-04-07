@@ -1,24 +1,26 @@
-package it.unidp.dei.CAPPELLOTTO.Oblivious;
+package it.unidp.dei.CAPPELLOTTO.Originals;
 
 import it.unidp.dei.Algorithm;
-import it.unidp.dei.CAPPELLOTTO.Diameter.COHENDiameter;
-import it.unidp.dei.CAPPELLOTTO.Guess.Guess;
+import it.unidp.dei.CAPPELLOTTO.Utils.Diameter.Diameter;
+import it.unidp.dei.CAPPELLOTTO.Utils.Diameter.PELLDiameter;
+import it.unidp.dei.CAPPELLOTTO.Utils.Guess.Guess;
 import it.unidp.dei.CHENETAL.CHEN;
+import it.unidp.dei.Main;
 import it.unidp.dei.Point;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.TreeMap;
 
-public class COHENCAPPObl implements Algorithm
+public class PELLCAPPObl implements Algorithm
 {
-    public COHENCAPPObl(double _beta, double _eps, int[] _ki) {
+    public PELLCAPPObl(double _beta, double _eps, int[] _ki) {
         beta = _beta;
         double epsilon1 = _eps/(1+2*CHEN.alfa);
         delta = epsilon1/(1+_beta);
         ki = _ki;
         k = Algorithm.calcK(_ki);
-        diameter = new COHENDiameter(beta);
+        diameter = new PELLDiameter(beta);
     }
 
     @Override
@@ -42,7 +44,7 @@ public class COHENCAPPObl implements Algorithm
 
         //UPDATE of r_t and M_t: r_t is the minimum distance between the last k+1 points,
         //while M_t is a guess of the diameter of the entire window.
-        double r_t = Algorithm.minPairwiseDistance(last_points, p);
+        double r_t = minPairwiseDistance(last_points, p);
         double M_t = diameter.getDiameter();
 
         //Create first and last indexes
@@ -60,7 +62,7 @@ public class COHENCAPPObl implements Algorithm
                 guesses.put(i, new Guess(Math.pow((1 + beta), i), delta, ki, RV, R));
             }
         } else {
-            // Delete the sets that are under the first index or over the last. TODO: corretto? si puo' fare remove?
+            // Delete the sets that are under the first index or over the last.
             for(int i = guesses.firstKey(); i <= guesses.lastKey() && i < firstIndex; i++){
                 guesses.remove(i);
             }
@@ -130,6 +132,17 @@ public class COHENCAPPObl implements Algorithm
         return size;
     }
 
+    private double minPairwiseDistance(LinkedList<Point> points, Point p){
+        double ans = p.getMinDistanceWithoutItself(points, Main.INF);
+        for(Point p1 : points){
+            ans = p1.getMinDistanceWithoutItself(points, ans);
+        }
+        if (ans == 0) {
+            ans = Diameter.minimum;
+        }
+        return ans;
+    }
+
     private LinkedList<Point>[] createR(Point p) {
         LinkedList<Point>[] list = new LinkedList[ki.length];
         for (int j = 0; j < ki.length; j++) {
@@ -159,7 +172,7 @@ public class COHENCAPPObl implements Algorithm
     //Guesses, the key is the exponent to give to (1+beta) to get that guess
     private final TreeMap<Integer, Guess> guesses = new TreeMap<>();
     //Used to estimate the diameter
-    private final COHENDiameter diameter;
+    private final PELLDiameter diameter;
     //Last k+1 points
     private final LinkedList<Point> last_points = new LinkedList<>();
     private final int k;

@@ -1,4 +1,4 @@
-package it.unidp.dei.CAPPELLOTTO.Guess;
+package it.unidp.dei.CAPPELLOTTO.Utils.Guess;
 
 import it.unidp.dei.Algorithm;
 import it.unidp.dei.CHENETAL.CHEN;
@@ -131,6 +131,6 @@ public class GuessValidation {
     private final double gamma;
     private final int k;
     protected final int[] ki;
-    private final TreeSet<Point> OV = new TreeSet<>();
+    protected final TreeSet<Point> OV = new TreeSet<>();
     protected final TreeMap<Point, LinkedList<Point>[]> RV;
 }

@@ -3,6 +3,7 @@ package it.unidp.dei.CAPPELLOTTO.Validation;
 import it.unidp.dei.Algorithm;
 import it.unidp.dei.CAPPELLOTTO.Utils.Diameter.COHENDiameter;
 import it.unidp.dei.CAPPELLOTTO.Utils.Guess.GuessValidation;
+import it.unidp.dei.CAPPELLOTTO.Utils.Guess.KGuessValidation;
 import it.unidp.dei.CHENETAL.CHEN;
 import it.unidp.dei.Point;
 
@@ -10,9 +11,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.TreeMap;
 
-public class COHENCAPPOblValidation implements Algorithm
+public class KCOHENCAPPOblValidation implements Algorithm
 {
-    public COHENCAPPOblValidation(double _beta, double _eps, int[] _ki) {
+    public KCOHENCAPPOblValidation(double _beta, double _eps, int[] _ki) {
         beta = _beta;
         double epsilon1 = _eps/(1+2*CHEN.alfa);
         delta = epsilon1/(1+_beta);
@@ -55,7 +56,7 @@ public class COHENCAPPOblValidation implements Algorithm
                 TreeMap<Point, LinkedList<Point>[]> RV = new TreeMap<>();
                 RV.put(last_points.getLast(), createR(last_points.getLast()));
 
-                guesses.put(i, new GuessValidation(Math.pow((1 + beta), i), ki, RV));
+                guesses.put(i, new KGuessValidation(Math.pow((1 + beta), i), ki, RV));
             }
         } else {
             // Delete the sets that are under the first index or over the last.
@@ -77,7 +78,7 @@ public class COHENCAPPOblValidation implements Algorithm
                     RV.put(oldest, createR(oldest));
                 }
 
-                guesses.put(i, new GuessValidation(Math.pow((1 + beta), i), ki, RV));
+                guesses.put(i, new KGuessValidation(Math.pow((1 + beta), i), ki, RV));
             }
 
 
@@ -86,7 +87,7 @@ public class COHENCAPPOblValidation implements Algorithm
                 TreeMap<Point, LinkedList<Point>[]> RV = new TreeMap<>();
                 RV.put(last_points.getLast(), createR(last_points.getLast()));
 
-                guesses.put(i, new GuessValidation(Math.pow((1+beta), i), ki, RV));
+                guesses.put(i, new KGuessValidation(Math.pow((1+beta), i), ki, RV));
             }
         }
         //Insert the point p in the last points
@@ -148,7 +149,7 @@ public class COHENCAPPOblValidation implements Algorithm
     }
 
     //Guesses, the key is the exponent to give to (1+beta) to get that guess
-    private final TreeMap<Integer, GuessValidation> guesses = new TreeMap<>();
+    private final TreeMap<Integer, KGuessValidation> guesses = new TreeMap<>();
     //Used to estimate the diameter
     private final COHENDiameter diameter;
     //Last k+1 points

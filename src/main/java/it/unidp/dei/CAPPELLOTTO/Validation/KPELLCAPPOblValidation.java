@@ -1,10 +1,10 @@
-package it.unidp.dei.CAPPELLOTTO.Oblivious;
+package it.unidp.dei.CAPPELLOTTO.Validation;
 
 import it.unidp.dei.Algorithm;
-import it.unidp.dei.CAPPELLOTTO.Diameter.Diameter;
-import it.unidp.dei.CAPPELLOTTO.Diameter.PELLDiameter;
-import it.unidp.dei.CAPPELLOTTO.Guess.Guess;
-import it.unidp.dei.CAPPELLOTTO.Guess.KGuess;
+import it.unidp.dei.CAPPELLOTTO.Utils.Diameter.Diameter;
+import it.unidp.dei.CAPPELLOTTO.Utils.Diameter.PELLDiameter;
+import it.unidp.dei.CAPPELLOTTO.Utils.Guess.GuessValidation;
+import it.unidp.dei.CAPPELLOTTO.Utils.Guess.KGuessValidation;
 import it.unidp.dei.CHENETAL.CHEN;
 import it.unidp.dei.Main;
 import it.unidp.dei.Point;
@@ -13,9 +13,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.TreeMap;
 
-public class KPELLCAPPObl implements Algorithm
+public class KPELLCAPPOblValidation implements Algorithm
 {
-    public KPELLCAPPObl(double _beta, double _eps, int[] _ki) {
+    public KPELLCAPPOblValidation(double _beta, double _eps, int[] _ki) {
         beta = _beta;
         double epsilon1 = _eps/(1+2*CHEN.alfa);
         delta = epsilon1/(1+_beta);
@@ -54,13 +54,11 @@ public class KPELLCAPPObl implements Algorithm
 
         if (guesses.isEmpty()) {
             for (int i = firstIndex; i <= lastIndex; i++) {
-                //RV and R only contain the point t-1
-                TreeMap<Point, Point> RV = new TreeMap<>();
-                RV.put(last_points.getLast(), last_points.getLast());
-                TreeMap<Point, LinkedList<Point>[]> R = new TreeMap<>();
-                R.put(last_points.getLast(), createR(last_points.getLast()));
+                //RV only contains the point t-1
+                TreeMap<Point, LinkedList<Point>[]> RV = new TreeMap<>();
+                RV.put(last_points.getLast(), createR(last_points.getLast()));
 
-                guesses.put(i, new KGuess(Math.pow((1 + beta), i), delta, ki, RV, R));
+                guesses.put(i, new KGuessValidation(Math.pow((1 + beta), i), ki, RV));
             }
         } else {
             // Delete the sets that are under the first index or over the last.
@@ -73,39 +71,32 @@ public class KPELLCAPPObl implements Algorithm
 
             //Creates the new guesses
             for(int i = guesses.firstKey() - 1; i >= firstIndex; i--){
-                //RV and R contain all the last points (even oldest, if present)
-                TreeMap<Point, Point> RV = new TreeMap<>();
-                for(Point pp : last_points){
-                    RV.put(pp, pp);
-                }
-                TreeMap<Point, LinkedList<Point>[]> R = new TreeMap<>();
+                //RV contains all the last points (even oldest, if present)
+                TreeMap<Point, LinkedList<Point>[]> RV = new TreeMap<>();
                 for (Point pp : last_points) {
-                    R.put(pp, createR(pp));
+                    RV.put(pp, createR(pp));
                 }
                 if (oldest != null) {
-                    RV.put(oldest, oldest);
-                    R.put(oldest, createR(oldest));
+                    RV.put(oldest, createR(oldest));
                 }
 
-                guesses.put(i, new KGuess(Math.pow((1+beta), i), delta, ki, RV, R));
+                guesses.put(i, new KGuessValidation(Math.pow((1+beta), i), ki, RV));
             }
 
 
             for(int i = guesses.lastKey() + 1; i <= lastIndex; i++){
                 //RV and R contain only the last point
-                TreeMap<Point, Point> RV = new TreeMap<>();
-                RV.put(last_points.getLast(), last_points.getLast());
-                TreeMap<Point, LinkedList<Point>[]> R = new TreeMap<>();
-                R.put(last_points.getLast(), createR(last_points.getLast()));
+                TreeMap<Point, LinkedList<Point>[]> RV = new TreeMap<>();
+                RV.put(last_points.getLast(), createR(last_points.getLast()));
 
-                guesses.put(i, new KGuess(Math.pow((1+beta), i), delta, ki, RV, R));
+                guesses.put(i, new KGuessValidation(Math.pow((1+beta), i), ki, RV));
             }
         }
         //Insert the point p in the last points
         last_points.add(p);
 
         //Update all the guesses
-        for(KGuess g : guesses.values()) {
+        for(GuessValidation g : guesses.values()) {
             g.update(p, time);
         }
     }
@@ -127,7 +118,7 @@ public class KPELLCAPPObl implements Algorithm
     @Override
     public int getSize() {
         int size = diameter.getSize()+last_points.size();
-        for (Guess g : guesses.values()) {
+        for (GuessValidation g : guesses.values()) {
             size += g.getSize();
         }
         return size;
@@ -171,7 +162,7 @@ public class KPELLCAPPObl implements Algorithm
     }
 
     //Guesses, the key is the exponent to give to (1+beta) to get that guess
-    private final TreeMap<Integer, KGuess> guesses = new TreeMap<>();
+    private final TreeMap<Integer, KGuessValidation> guesses = new TreeMap<>();
     //Used to estimate the diameter
     private final PELLDiameter diameter;
     //Last k+1 points

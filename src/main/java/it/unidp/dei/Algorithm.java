@@ -1,6 +1,6 @@
 package it.unidp.dei;
 
-import it.unidp.dei.CAPPELLOTTO.Diameter.Diameter;
+import it.unidp.dei.CAPPELLOTTO.Utils.Diameter.Diameter;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -22,8 +22,10 @@ public interface Algorithm {
     //Utility function to calculate the minimum distance between all the points in points and p:
     static double minPairwiseDistance(LinkedList<Point> points, Point p){
         double ans = p.getMinDistanceWithoutItself(points, Main.INF);
+        LinkedList<Point> thesePts = (LinkedList<Point>)points.clone();
         for(Point q : points){
-            ans = q.getMinDistanceWithoutItself(points, ans); //TODO: e' migliorabile se conto solo la minima distanza da quelli successivi
+            thesePts.remove(q);
+            ans = q.getMinDistanceWithoutItself(thesePts, ans);
         }
         if (ans == 0) {
             ans = Diameter.minimum;

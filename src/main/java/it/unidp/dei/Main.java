@@ -1,11 +1,11 @@
 package it.unidp.dei;
 
-import it.unidp.dei.CAPPELLOTTO.*;
-import it.unidp.dei.CAPPELLOTTO.Delta.CAPPChooseDelta;
-import it.unidp.dei.CAPPELLOTTO.Delta.COHENCAPPOblChooseDelta;
-import it.unidp.dei.CAPPELLOTTO.Delta.PELLCAPPOblChooseDelta;
-import it.unidp.dei.CAPPELLOTTO.Oblivious.COHENCAPPObl;
-import it.unidp.dei.CAPPELLOTTO.Oblivious.PELLCAPPObl;
+import it.unidp.dei.CAPPELLOTTO.Delta.CAPPDelta;
+import it.unidp.dei.CAPPELLOTTO.Delta.COHENCAPPOblDelta;
+import it.unidp.dei.CAPPELLOTTO.Delta.PELLCAPPOblDelta;
+import it.unidp.dei.CAPPELLOTTO.Originals.CAPP;
+import it.unidp.dei.CAPPELLOTTO.Originals.COHENCAPPObl;
+import it.unidp.dei.CAPPELLOTTO.Originals.PELLCAPPObl;
 import it.unidp.dei.CAPPELLOTTO.Validation.CAPPValidation;
 import it.unidp.dei.CAPPELLOTTO.Validation.COHENCAPPOblValidation;
 import it.unidp.dei.CAPPELLOTTO.Validation.PELLCAPPOblValidation;
@@ -329,9 +329,9 @@ public class Main {
         algorithms[1] = new CAPP(kiSet, epsilon, beta, min, max);
         algorithms[2] = new COHENCAPPObl(beta, epsilon, kiSet);
         algorithms[3] = new PELLCAPPObl(beta, epsilon, kiSet);
-        algorithms[4] = new CAPPChooseDelta(kiSet, delta, beta, min, max);
-        algorithms[5] = new COHENCAPPOblChooseDelta(beta, delta, kiSet);
-        algorithms[6] = new PELLCAPPOblChooseDelta(beta, delta, kiSet);
+        algorithms[4] = new CAPPDelta(kiSet, delta, beta, min, max);
+        algorithms[5] = new COHENCAPPOblDelta(beta, delta, kiSet);
+        algorithms[6] = new PELLCAPPOblDelta(beta, delta, kiSet);
         algorithms[7] = new CAPPValidation(kiSet, beta, min, max);
         algorithms[8] = new COHENCAPPOblValidation(beta, delta, kiSet);
         algorithms[9] = new PELLCAPPOblValidation(beta, delta, kiSet);

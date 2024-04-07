@@ -1,32 +1,36 @@
-package it.unidp.dei.CAPPELLOTTO.Validation;
+package it.unidp.dei.CAPPELLOTTO.Originals;
 
 import it.unidp.dei.Algorithm;
-import it.unidp.dei.CAPPELLOTTO.Utils.Guess.GuessValidation;
+import it.unidp.dei.CAPPELLOTTO.Utils.Guess.KGuess;
+import it.unidp.dei.CHENETAL.CHEN;
 import it.unidp.dei.Point;
 
 import java.util.ArrayList;
 
-public class CAPPValidation implements Algorithm {
+public class KCAPP implements Algorithm {
 
-    public CAPPValidation(int[] _ki, double _beta, double _minDist, double _maxDist) {
+    public KCAPP(int[] _ki, double _epsilon, double _beta, double _minDist, double _maxDist) {
+        //Calculate epsilon1 and then delta
+        double epsilon1 = _epsilon/(1+2*CHEN.alfa);
+        double delta = epsilon1/(1+_beta);
 
         //We use the definition to obtain the number of guesses
         int first_i = (int)Math.floor(Math.log(_minDist)/Math.log(1+_beta));
         int last_i = (int)Math.ceil(Math.log(_maxDist)/Math.log(1+_beta));
         int number_of_guesses = last_i-first_i+1;
-        guesses = new GuessValidation[number_of_guesses];
+        guesses = new KGuess[number_of_guesses];
 
         //We use the definition: we start from (1+beta)^first_i, and don't start from minDist as in Pellizzoni
         double gamma = Math.pow((1+_beta), first_i);
         for (int i = 0; i<number_of_guesses; i++) {
-            guesses[i] = new GuessValidation(gamma, _ki);
+            guesses[i] = new KGuess(gamma, delta, _ki);
             gamma *= (1+_beta);
         }
     }
 
     @Override
     public void update(Point p, int time) {
-        for (GuessValidation g : guesses) {
+        for (KGuess g : guesses) {
             g.update(p, time);
         }
     }
@@ -46,7 +50,7 @@ public class CAPPValidation implements Algorithm {
     @Override
     public int getSize() {
         int size = 0;
-        for (GuessValidation g : guesses) {
+        for (KGuess g : guesses) {
             size += g.getSize();
         }
         return size;
@@ -69,5 +73,5 @@ public class CAPPValidation implements Algorithm {
     }
 
     //Array of guesses
-    private final GuessValidation[] guesses;
+    private final KGuess[] guesses;
 }

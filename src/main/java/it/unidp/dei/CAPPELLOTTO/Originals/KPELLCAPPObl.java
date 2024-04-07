@@ -1,10 +1,10 @@
-package it.unidp.dei.CAPPELLOTTO.Oblivious;
+package it.unidp.dei.CAPPELLOTTO.Originals;
 
 import it.unidp.dei.Algorithm;
-import it.unidp.dei.CAPPELLOTTO.Diameter.COHENDiameter;
-import it.unidp.dei.CAPPELLOTTO.Diameter.Diameter;
-import it.unidp.dei.CAPPELLOTTO.Guess.Guess;
-import it.unidp.dei.CAPPELLOTTO.Guess.KGuess;
+import it.unidp.dei.CAPPELLOTTO.Utils.Diameter.Diameter;
+import it.unidp.dei.CAPPELLOTTO.Utils.Diameter.PELLDiameter;
+import it.unidp.dei.CAPPELLOTTO.Utils.Guess.Guess;
+import it.unidp.dei.CAPPELLOTTO.Utils.Guess.KGuess;
 import it.unidp.dei.CHENETAL.CHEN;
 import it.unidp.dei.Main;
 import it.unidp.dei.Point;
@@ -13,15 +13,15 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.TreeMap;
 
-public class KCOHENCAPPObl implements Algorithm
+public class KPELLCAPPObl implements Algorithm
 {
-    public KCOHENCAPPObl(double _beta, double _eps, int[] _ki) {
+    public KPELLCAPPObl(double _beta, double _eps, int[] _ki) {
         beta = _beta;
         double epsilon1 = _eps/(1+2*CHEN.alfa);
         delta = epsilon1/(1+_beta);
         ki = _ki;
         k = Algorithm.calcK(_ki);
-        diameter = new COHENDiameter(beta);
+        diameter = new PELLDiameter(beta);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class KCOHENCAPPObl implements Algorithm
                 guesses.put(i, new KGuess(Math.pow((1 + beta), i), delta, ki, RV, R));
             }
         } else {
-            // Delete the sets that are under the first index or over the last. TODO: corretto? si puo' fare remove?
+            // Delete the sets that are under the first index or over the last.
             for(int i = guesses.firstKey(); i <= guesses.lastKey() && i < firstIndex; i++){
                 guesses.remove(i);
             }
@@ -105,7 +105,7 @@ public class KCOHENCAPPObl implements Algorithm
         last_points.add(p);
 
         //Update all the guesses
-        for(Guess g : guesses.values()) {
+        for(KGuess g : guesses.values()) {
             g.update(p, time);
         }
     }
@@ -173,7 +173,7 @@ public class KCOHENCAPPObl implements Algorithm
     //Guesses, the key is the exponent to give to (1+beta) to get that guess
     private final TreeMap<Integer, KGuess> guesses = new TreeMap<>();
     //Used to estimate the diameter
-    private final COHENDiameter diameter;
+    private final PELLDiameter diameter;
     //Last k+1 points
     private final LinkedList<Point> last_points = new LinkedList<>();
     private final int k;

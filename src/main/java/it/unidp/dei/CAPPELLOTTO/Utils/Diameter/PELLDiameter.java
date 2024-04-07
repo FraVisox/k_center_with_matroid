@@ -1,4 +1,4 @@
-package it.unidp.dei.CAPPELLOTTO.Diameter;
+package it.unidp.dei.CAPPELLOTTO.Utils.Diameter;
 
 import it.unidp.dei.Algorithm;
 import it.unidp.dei.Point;
@@ -88,7 +88,7 @@ public class PELLDiameter extends Diameter {
             if(!RV.get(i).isEmpty() && RV.get(i).firstKey().hasExpired(time)){
                 OV.get(i).add(RV.get(i).remove(RV.get(i).firstKey()));
             }
-            if(!OV.get(i).isEmpty() && OV.get(i).first().hasExpired(time)) { //TODO: while o if?
+            if(!OV.get(i).isEmpty() && OV.get(i).first().hasExpired(time)) {
                 OV.get(i).remove(OV.get(i).first());
             }
 
@@ -118,7 +118,7 @@ public class PELLDiameter extends Diameter {
 
             //Update Mt if it is a valid guess and it hasn't been updated
             if(Mt == -1 && RV.get(i).keySet().size() == k){
-                Point validation = RV.get(i).firstKey(); //TODO: it works?
+                Point validation = RV.get(i).firstKey();
                 if (validation.getMaxDistance(OV.get(i)) <= 2*gamma) {
                     Mt = 12 * gamma;
                 }

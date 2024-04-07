@@ -1,18 +1,21 @@
-package it.unidp.dei.CAPPELLOTTO.Validation;
+package it.unidp.dei.CAPPELLOTTO.Originals;
 
 import it.unidp.dei.Algorithm;
 import it.unidp.dei.CAPPELLOTTO.Utils.Diameter.COHENDiameter;
-import it.unidp.dei.CAPPELLOTTO.Utils.Guess.GuessValidation;
+import it.unidp.dei.CAPPELLOTTO.Utils.Diameter.Diameter;
+import it.unidp.dei.CAPPELLOTTO.Utils.Guess.Guess;
+import it.unidp.dei.CAPPELLOTTO.Utils.Guess.KGuess;
 import it.unidp.dei.CHENETAL.CHEN;
+import it.unidp.dei.Main;
 import it.unidp.dei.Point;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.TreeMap;
 
-public class COHENCAPPOblValidation implements Algorithm
+public class KCOHENCAPPObl implements Algorithm
 {
-    public COHENCAPPOblValidation(double _beta, double _eps, int[] _ki) {
+    public KCOHENCAPPObl(double _beta, double _eps, int[] _ki) {
         beta = _beta;
         double epsilon1 = _eps/(1+2*CHEN.alfa);
         delta = epsilon1/(1+_beta);
@@ -42,7 +45,7 @@ public class COHENCAPPOblValidation implements Algorithm
 
         //UPDATE of r_t and M_t: r_t is the minimum distance between the last k+1 points,
         //while M_t is a guess of the diameter of the entire window.
-        double r_t = Algorithm.minPairwiseDistance(last_points, p);
+        double r_t = minPairwiseDistance(last_points, p);
         double M_t = diameter.getDiameter();
 
         //Create first and last indexes
@@ -51,11 +54,13 @@ public class COHENCAPPOblValidation implements Algorithm
 
         if (guesses.isEmpty()) {
             for (int i = firstIndex; i <= lastIndex; i++) {
-                //RV only contains the point t-1
-                TreeMap<Point, LinkedList<Point>[]> RV = new TreeMap<>();
-                RV.put(last_points.getLast(), createR(last_points.getLast()));
+                //RV and R only contain the point t-1
+                TreeMap<Point, Point> RV = new TreeMap<>();
+                RV.put(last_points.getLast(), last_points.getLast());
+                TreeMap<Point, LinkedList<Point>[]> R = new TreeMap<>();
+                R.put(last_points.getLast(), createR(last_points.getLast()));
 
-                guesses.put(i, new GuessValidation(Math.pow((1 + beta), i), ki, RV));
+                guesses.put(i, new KGuess(Math.pow((1 + beta), i), delta, ki, RV, R));
             }
         } else {
             // Delete the sets that are under the first index or over the last.
@@ -68,32 +73,39 @@ public class COHENCAPPOblValidation implements Algorithm
 
             //Creates the new guesses
             for(int i = guesses.firstKey() - 1; i >= firstIndex; i--){
-                //RV contains all the last points (even oldest, if present)
-                TreeMap<Point, LinkedList<Point>[]> RV = new TreeMap<>();
+                //RV and R contain all the last points (even oldest, if present)
+                TreeMap<Point, Point> RV = new TreeMap<>();
+                for(Point pp : last_points){
+                    RV.put(pp, pp);
+                }
+                TreeMap<Point, LinkedList<Point>[]> R = new TreeMap<>();
                 for (Point pp : last_points) {
-                    RV.put(pp, createR(pp));
+                    R.put(pp, createR(pp));
                 }
                 if (oldest != null) {
-                    RV.put(oldest, createR(oldest));
+                    RV.put(oldest, oldest);
+                    R.put(oldest, createR(oldest));
                 }
 
-                guesses.put(i, new GuessValidation(Math.pow((1 + beta), i), ki, RV));
+                guesses.put(i, new KGuess(Math.pow((1+beta), i), delta, ki, RV, R));
             }
 
 
             for(int i = guesses.lastKey() + 1; i <= lastIndex; i++){
-                //RV contains only the last point
-                TreeMap<Point, LinkedList<Point>[]> RV = new TreeMap<>();
-                RV.put(last_points.getLast(), createR(last_points.getLast()));
+                //RV and R contain only the last point
+                TreeMap<Point, Point> RV = new TreeMap<>();
+                RV.put(last_points.getLast(), last_points.getLast());
+                TreeMap<Point, LinkedList<Point>[]> R = new TreeMap<>();
+                R.put(last_points.getLast(), createR(last_points.getLast()));
 
-                guesses.put(i, new GuessValidation(Math.pow((1+beta), i), ki, RV));
+                guesses.put(i, new KGuess(Math.pow((1+beta), i), delta, ki, RV, R));
             }
         }
         //Insert the point p in the last points
         last_points.add(p);
 
         //Update all the guesses
-        for(GuessValidation g : guesses.values()) {
+        for(Guess g : guesses.values()) {
             g.update(p, time);
         }
     }
@@ -115,10 +127,21 @@ public class COHENCAPPOblValidation implements Algorithm
     @Override
     public int getSize() {
         int size = diameter.getSize()+last_points.size();
-        for (GuessValidation g : guesses.values()) {
+        for (Guess g : guesses.values()) {
             size += g.getSize();
         }
         return size;
+    }
+
+    private double minPairwiseDistance(LinkedList<Point> points, Point p){
+        double ans = p.getMinDistanceWithoutItself(points, Main.INF);
+        for(Point p1 : points){
+            ans = p1.getMinDistanceWithoutItself(points, ans);
+        }
+        if (ans == 0) {
+            ans = Diameter.minimum;
+        }
+        return ans;
     }
 
     private LinkedList<Point>[] createR(Point p) {
@@ -148,7 +171,7 @@ public class COHENCAPPOblValidation implements Algorithm
     }
 
     //Guesses, the key is the exponent to give to (1+beta) to get that guess
-    private final TreeMap<Integer, GuessValidation> guesses = new TreeMap<>();
+    private final TreeMap<Integer, KGuess> guesses = new TreeMap<>();
     //Used to estimate the diameter
     private final COHENDiameter diameter;
     //Last k+1 points

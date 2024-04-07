@@ -1,4 +1,4 @@
-package it.unidp.dei.CAPPELLOTTO.Guess;
+package it.unidp.dei.CAPPELLOTTO.Utils.Guess;
 
 import it.unidp.dei.Algorithm;
 import it.unidp.dei.CHENETAL.CHEN;
