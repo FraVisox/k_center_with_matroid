@@ -1,12 +1,15 @@
 package it.unidp.dei;
 
 import it.unidp.dei.CAPPELLOTTO.*;
+import it.unidp.dei.CAPPELLOTTO.Delta.CAPPChooseDelta;
+import it.unidp.dei.CAPPELLOTTO.Delta.COHENCAPPOblChooseDelta;
+import it.unidp.dei.CAPPELLOTTO.Delta.PELLCAPPOblChooseDelta;
 import it.unidp.dei.CAPPELLOTTO.Oblivious.COHENCAPPObl;
-import it.unidp.dei.CAPPELLOTTO.Oblivious.KCOHENCAPPObl;
-import it.unidp.dei.CAPPELLOTTO.Oblivious.KPELLCAPPObl;
 import it.unidp.dei.CAPPELLOTTO.Oblivious.PELLCAPPObl;
+import it.unidp.dei.CAPPELLOTTO.Validation.CAPPValidation;
+import it.unidp.dei.CAPPELLOTTO.Validation.COHENCAPPOblValidation;
+import it.unidp.dei.CAPPELLOTTO.Validation.PELLCAPPOblValidation;
 import it.unidp.dei.CHENETAL.CHEN;
-import it.unidp.dei.CHENETAL.KCHEN;
 import it.unidp.dei.datasetReaders.*;
 
 import java.io.FileNotFoundException;
@@ -20,17 +23,18 @@ public class Main {
     public static final String outFolder = "out/";
 
     //Some parameters that are the same for every dataset
-    private static final double epsilon = 0.9;
+    private static final double epsilon = 1;
+    private static final double delta = 0.5;
     private static final double beta = 20;
-    public static final int wSize = 1000;
+    public static final int wSize = 5000;
     public static final double INF = 9000;
     //It tells how many times we will query the algorithms after having a complete window
-    private static final int stride = 10;
+    private static final int stride = 30;
 
     //For every dataset we save the name of the input file, the name of the output file, ki, minDist, maxDist and the object to read the file
     private static final String[] datasets = {"Phones_accelerometer.csv", "covtype.dat", "HIGGS.csv", "random20.csv"};
     private static final String[] outFiles = {"TestPhones.csv", "TestCovtype.csv", "TestHiggs.csv", "TestRandom20.csv"};
-    private static final DatasetReader[] readers = {new PhonesReader(), new CovertypeReader(), new HiggsReader(), new RandomReader()};
+    private static final Class[] readers = {PhonesReader.class, CovertypeReader.class, HiggsReader.class, RandomReader.class};
     private static final int[][] ki = {{1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1}, {1, 1}, {1, 1, 1, 1, 1, 1, 1}};
 
     //VALUES OF MAX AND MIN DISTANCES:
@@ -50,6 +54,16 @@ public class Main {
     public static void main(String[] args) {
         //Tests to run
         testRandomized();
+        /*
+        testWSize();
+        System.out.println("\n----------------------\nWSIZE TEST FINISHED\n----------------------\n");
+        testEpsilon();
+        System.out.println("\n----------------------\nEPSILON TEST FINISHED\n----------------------\n");
+        testBeta();
+        System.out.println("\n----------------------\nBETA TEST FINISHED\n----------------------\n");
+        testKi();
+        System.out.println("\n----------------------\nKI TEST FINISHED\n----------------------\n");
+        */
     }
 
     //Test of algorithms on standard ki, wSize, epsilon and beta. The datasets used are the randomized ones
@@ -59,19 +73,22 @@ public class Main {
 
         for (int i = 0; i< datasets.length; i++) {
             String set = datasets[i];
-            reader = readers[i];
             try {
                 //Create a dataset reader
+                reader = (DatasetReader) readers[i].newInstance();
                 if (reader instanceof HiggsReader) {
-                    readers[i].setFile(inFolderOriginals+set);
+                    reader.setFile(inFolderOriginals+set);
                 } else {
-                    readers[i].setFile(inFolderRandomized + set);
+                    reader.setFile(inFolderRandomized + set);
                 }
                 //Create a results writer
                 writer = new PrintWriter(outFolder+"rand"+outFiles[i]);
 
             } catch (FileNotFoundException e) {
                 System.out.println("File " + set + " not found, skipping to next dataset");
+                continue;
+            } catch (InstantiationException | IllegalAccessException e) {
+                System.out.println("Problem with the search of the right reader for the "+set+"dataset");
                 continue;
             }
 
@@ -93,19 +110,22 @@ public class Main {
 
         for (int i = 0; i< datasets.length; i++) {
             String set = datasets[i];
-            reader = readers[i];
             try {
                 //Create a dataset reader
+                reader = (DatasetReader) readers[i].newInstance();
                 if (reader instanceof RandomReader) {
-                    readers[i].setFile(inFolderRandomized+set);
+                    reader.setFile(inFolderRandomized+set);
                 } else {
-                    readers[i].setFile(inFolderOriginals + set);
+                    reader.setFile(inFolderOriginals + set);
                 }
                 //Create a results writer
                 writer = new PrintWriter(outFolder+"orig"+outFiles[i]);
 
             } catch (FileNotFoundException e) {
                 System.out.println("File " + set + " not found, skipping to next dataset");
+                continue;
+            } catch (InstantiationException | IllegalAccessException e) {
+                System.out.println("Problem with the search of the right reader for the "+set+"dataset");
                 continue;
             }
 
@@ -141,19 +161,22 @@ public class Main {
         for (int j = 0; j< ki.length; j++) {
             for (int i = 0; i < datasets.length; i++) {
                 String set = datasets[i];
-                reader = readers[i];
                 try {
                     //Create a dataset reader
+                    reader = (DatasetReader) readers[i].newInstance();
                     if (reader instanceof HiggsReader) {
-                        readers[i].setFile(inFolderOriginals + set);
+                        reader.setFile(inFolderOriginals + set);
                     } else {
-                        readers[i].setFile(inFolderRandomized + set);
+                        reader.setFile(inFolderRandomized + set);
                     }
                     //Create a results writer
                     writer = new PrintWriter(outFolder + "k" + ki[j][i][0] + outFiles[i]);
 
                 } catch (FileNotFoundException e) {
                     System.out.println("File " + set + " not found, skipping to next dataset");
+                    continue;
+                } catch (InstantiationException | IllegalAccessException e) {
+                    System.out.println("Problem with the search of the right reader for the "+set+"dataset");
                     continue;
                 }
 
@@ -179,19 +202,22 @@ public class Main {
         for (int j = 0; j< epsilon.length; j++) {
             for (int i = 0; i < datasets.length; i++) {
                 String set = datasets[i];
-                reader = readers[i];
                 try {
                     //Create a dataset reader
+                    reader = (DatasetReader) readers[i].newInstance();
                     if (reader instanceof HiggsReader) {
-                        readers[i].setFile(inFolderOriginals + set);
+                        reader.setFile(inFolderOriginals + set);
                     } else {
-                        readers[i].setFile(inFolderRandomized + set);
+                        reader.setFile(inFolderRandomized + set);
                     }
                     //Create a results writer
                     writer = new PrintWriter(outFolder + "epsilon" + epsilon[j] + outFiles[i]);
 
                 } catch (FileNotFoundException e) {
                     System.out.println("File " + set + " not found, skipping to next dataset");
+                    continue;
+                } catch (InstantiationException | IllegalAccessException e) {
+                    System.out.println("Problem with the search of the right reader for the "+set+"dataset");
                     continue;
                 }
 
@@ -217,19 +243,22 @@ public class Main {
         for (int j = 0; j< beta.length; j++) {
             for (int i = 0; i < datasets.length; i++) {
                 String set = datasets[i];
-                reader = readers[i];
                 try {
                     //Create a dataset reader
+                    reader = (DatasetReader) readers[i].newInstance();
                     if (reader instanceof HiggsReader) {
-                        readers[i].setFile(inFolderOriginals + set);
+                        reader.setFile(inFolderOriginals + set);
                     } else {
-                        readers[i].setFile(inFolderRandomized + set);
+                        reader.setFile(inFolderRandomized + set);
                     }
                     //Create a results writer
                     writer = new PrintWriter(outFolder + "beta" + beta[j] + outFiles[i]);
 
                 } catch (FileNotFoundException e) {
                     System.out.println("File " + set + " not found, skipping to next dataset");
+                    continue;
+                } catch (InstantiationException | IllegalAccessException e) {
+                    System.out.println("Problem with the search of the right reader for the "+set+"dataset");
                     continue;
                 }
 
@@ -247,7 +276,7 @@ public class Main {
 
     //Test with different wSize, with ki, epsilon and beta standard
     private static void testWSize() {
-        int[] wSize = {10, 100, 500, 1000, 5000, 10000, 20000, 50000, 100000};
+        int[] wSize = {10, 100, 500, 1000, 5000, 10000};
 
         DatasetReader reader;
         PrintWriter writer;
@@ -255,19 +284,22 @@ public class Main {
         for (int j = 0; j< wSize.length; j++) {
             for (int i = 0; i < datasets.length; i++) {
                 String set = datasets[i];
-                reader = readers[i];
                 try {
                     //Create a dataset reader
+                    reader = (DatasetReader) readers[i].newInstance();
                     if (reader instanceof HiggsReader) {
-                        readers[i].setFile(inFolderOriginals + set);
+                        reader.setFile(inFolderOriginals + set);
                     } else {
-                        readers[i].setFile(inFolderRandomized + set);
+                        reader.setFile(inFolderRandomized + set);
                     }
                     //Create a results writer
                     writer = new PrintWriter(outFolder + "wSize" + wSize[j] + outFiles[i]);
 
                 } catch (FileNotFoundException e) {
                     System.out.println("File " + set + " not found, skipping to next dataset");
+                    continue;
+                } catch (InstantiationException | IllegalAccessException e) {
+                    System.out.println("Problem with the search of the right reader for the "+set+"dataset");
                     continue;
                 }
 
@@ -292,16 +324,20 @@ public class Main {
         LinkedList<Point> window = new LinkedList<>();
 
         //Initialize the algorithms
-        Algorithm[] algorithms = new Algorithm[8];
+        Algorithm[] algorithms = new Algorithm[10];
         algorithms[0] = new CHEN(kiSet);
-        algorithms[1] = new KCHEN(kiSet);
-        algorithms[2] = new CAPP(kiSet, epsilon, beta, min, max);
-        algorithms[3] = new KCAPP(kiSet, epsilon, beta, min, max);
-        algorithms[4] = new COHENCAPPObl(beta, epsilon, kiSet);
-        algorithms[5] = new KCOHENCAPPObl(beta, epsilon, kiSet);
-        algorithms[6] = new PELLCAPPObl(beta, epsilon, kiSet);
-        algorithms[7] = new KPELLCAPPObl(beta, epsilon, kiSet);
-        writer.println("CHEN;;;;;;KCHEN;;;;;;CAPP;;;;;;KCAPP;;;;;;CAPPOBL;;;;;;KCAPPOBL;;;;;;PELLCAPPOBL;;;;;;KPELLCAPPOBL;;");
+        algorithms[1] = new CAPP(kiSet, epsilon, beta, min, max);
+        algorithms[2] = new COHENCAPPObl(beta, epsilon, kiSet);
+        algorithms[3] = new PELLCAPPObl(beta, epsilon, kiSet);
+        algorithms[4] = new CAPPChooseDelta(kiSet, delta, beta, min, max);
+        algorithms[5] = new COHENCAPPOblChooseDelta(beta, delta, kiSet);
+        algorithms[6] = new PELLCAPPOblChooseDelta(beta, delta, kiSet);
+        algorithms[7] = new CAPPValidation(kiSet, beta, min, max);
+        algorithms[8] = new COHENCAPPOblValidation(beta, delta, kiSet);
+        algorithms[9] = new PELLCAPPOblValidation(beta, delta, kiSet);
+
+
+        writer.println("CHEN;;;;;;CAPP;;;;;;COHENCAPPOBL;;;;;;PELLCAPPOBL;;;;;;CAPPDELTA;;;;;;COHENCAPPDELTA;;;;;;PELLCAPPDELTA;;;;;;CAPPVALIDATION;;;;;;COHENCAPPVALIDATION;;;;;;PELLCAPPVALIDATION;;");
 
         String header = "Update Time;Query Time;Radius;Independence;Memory";
         for (int i = 0; i<algorithms.length; i++) {
@@ -312,12 +348,6 @@ public class Main {
 
 
         for (int time = 1; time <= wSize+stride && reader.hasNext(); time++) {
-
-            //Check of passing of time, only used for debug purposes
-            if (wSize > 10 && time % (wSize/10) == 0) {
-                System.out.println(time);
-            }
-
             Point p = reader.nextPoint(time, wSize);
 
             if (p == null) {
@@ -334,33 +364,25 @@ public class Main {
                 continue;
             }
 
+            //Check of passing of time
+            System.out.println(time);
+
             //Update the window
             window.addLast(p);
             window.removeFirst();
 
             //Tests
-            ArrayList<Point>[] centers = new ArrayList[algorithms.length];
-
             for (int i = 0; i<algorithms.length; i++) {
                 calcUpdateTime(algorithms[i], p, time, writer);
-                ArrayList<Point> cent = calcQuery(algorithms[i], writer, window, kiSet);
-                centers[i] = cent;
+                calcQuery(algorithms[i], writer, window, kiSet);
                 calcMemory(algorithms[i], writer);
                 writer.print(";;");
-                System.out.println("ALGORITHM "+i+" done");
             }
             writer.println();
 
             //FLUSH
             writer.flush();
 
-            //CHECK
-            if (!centers[2].equals(centers[4]) || !centers[3].equals(centers[5])) {
-                throw new RuntimeException("Capp and CappObl have not the same result");
-            }
-            if (!centers[4].equals(centers[6]) || !centers[5].equals(centers[7])) {
-                throw new RuntimeException("The two implementations of CappObl have not the same result");
-            }
         }
     }
 
@@ -376,7 +398,7 @@ public class Main {
         writer.print((endTime-startTime)+";");
     }
 
-    private static ArrayList<Point> calcQuery(Algorithm alg, PrintWriter writer, LinkedList<Point> window, int[] kiSet) {
+    private static void calcQuery(Algorithm alg, PrintWriter writer, LinkedList<Point> window, int[] kiSet) {
         ArrayList<Point> centers;
         long startTime, endTime;
 
@@ -393,11 +415,14 @@ public class Main {
             throw new IllegalArgumentException();
         }
 
+        //5002, 5004, 5207, 5295, 5176
+
         //2. QUALITY TEST: Check of the radius of the centers returned and the independence of the set
         double radius = maxDistanceBetweenSets(window, centers);
-        boolean independence = isIndependent(centers, kiSet);
-        writer.print(String.format(Locale.ITALIAN, "%.16f", radius)+";"+(independence ? "T": "F")+";");
-        return centers;
+        if (!isIndependent(centers, kiSet)) {
+            throw new RuntimeException(alg.getClass()+" did not solve the problem correctly");
+        }
+        writer.print(String.format(Locale.ITALIAN, "%.16f", radius)+";");
     }
 
     private static void calcMemory(Algorithm alg, PrintWriter writer) {

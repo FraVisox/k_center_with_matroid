@@ -62,7 +62,7 @@ public class PELLCAPPObl implements Algorithm
                 guesses.put(i, new Guess(Math.pow((1 + beta), i), delta, ki, RV, R));
             }
         } else {
-            // Delete the sets that are under the first index or over the last. TODO: corretto? si puo' fare remove?
+            // Delete the sets that are under the first index or over the last.
             for(int i = guesses.firstKey(); i <= guesses.lastKey() && i < firstIndex; i++){
                 guesses.remove(i);
             }

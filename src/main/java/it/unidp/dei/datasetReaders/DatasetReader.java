@@ -6,9 +6,7 @@ import java.io.FileNotFoundException;
 
 public abstract class DatasetReader {
     public void setFile(String fileName) throws FileNotFoundException {
-        if (reader == null) {
-            reader = new InputFileReader(fileName);
-        }
+        reader = new InputFileReader(fileName);
     }
     public abstract Point nextPoint(int time, int wSize);
     public boolean hasNext() {
@@ -18,6 +16,7 @@ public abstract class DatasetReader {
         if (reader != null) {
             reader.close();
         }
+        reader = null;
     }
     protected InputFileReader reader = null;
 }

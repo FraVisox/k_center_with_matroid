@@ -27,7 +27,7 @@ public class Guess {
     }
 
     public void update(Point p, int time) {
-        //Removes expired points
+        //Removes expired points: only one point per time can be expired
         if (!RV.isEmpty() && RV.firstKey().hasExpired(time)) {
             OV.add(RV.remove(RV.firstKey()));
         }
@@ -37,7 +37,12 @@ public class Guess {
                 O.addAll(l);
             }
         }
-        if (!OV.isEmpty() && OV.first().hasExpired(time)) { //TODO: while o if?
+
+        //Removes the expired points from OV and O: even here, only one point can be expired per time.
+        //In fact, when we add the representatives of expired attraction points, these representative
+        //could contain only points of exitTime >= the attraction point that has just expired, thus only
+        //one could be expired.
+        if (!OV.isEmpty() && OV.first().hasExpired(time)) {
             OV.remove(OV.first());
         }
         if (!O.isEmpty() && O.first().hasExpired(time)) {
@@ -49,12 +54,6 @@ public class Guess {
         for (Point v : RV.keySet()) {
             if (p.getDistance(v) <= 2*gamma) {
                 EV.add(v);
-            }
-        }
-        ArrayList<Point> E = new ArrayList<>();
-        for (Point c : R.keySet()) {
-            if (p.getDistance(c) <= delta*gamma/2) {
-                E.add(c);
             }
         }
 
@@ -98,6 +97,13 @@ public class Guess {
             //Else add this point as a representative in RV
             for (Point v : EV) {
                 RV.put(v, p);
+            }
+        }
+
+        ArrayList<Point> E = new ArrayList<>();
+        for (Point c : R.keySet()) {
+            if (p.getDistance(c) <= delta*gamma/2) {
+                E.add(c);
             }
         }
 
