@@ -18,15 +18,15 @@ import java.util.*;
 
 public class Main {
     //Folders of input and output files
-    public static final String inFolderOriginals = "src/main/java/it/unidp/dei/data/originals/";
-    public static final String inFolderRandomized = "src/main/java/it/unidp/dei/data/randomized/";
+    public static final String inFolderOriginals = "originals/";
+    public static final String inFolderRandomized = "randomized/";
     public static final String outFolder = "out/";
 
     //Some parameters that are the same for every dataset
     private static final double epsilon = 1;
     private static final double delta = 0.5;
     private static final double beta = 20;
-    public static final int wSize = 5000;
+    public static final int wSize = 10000;
     public static final double INF = 9000;
     //It tells how many times we will query the algorithms after having a complete window
     private static final int stride = 30;
@@ -53,17 +53,36 @@ public class Main {
 
     public static void main(String[] args) {
         //Tests to run
-        testRandomized();
-        /*
-        testWSize();
-        System.out.println("\n----------------------\nWSIZE TEST FINISHED\n----------------------\n");
-        testEpsilon();
-        System.out.println("\n----------------------\nEPSILON TEST FINISHED\n----------------------\n");
-        testBeta();
-        System.out.println("\n----------------------\nBETA TEST FINISHED\n----------------------\n");
-        testKi();
-        System.out.println("\n----------------------\nKI TEST FINISHED\n----------------------\n");
-        */
+        if (Arrays.binarySearch(args, "r") >= 0) {
+            System.out.println("\n----------------------\nSTART OF TEST OF RANDOMIZED DATASETS\n----------------------\n");
+            testRandomized();
+            System.out.println("\n----------------------\nTEST OF RANDOMIZED DATASETS FINISHED\n----------------------\n");
+        }
+        if (Arrays.binarySearch(args, "o") >= 0) {
+            System.out.println("\n----------------------\nSTART OF TEST OF ORIGINAL DATASETS\n----------------------\n");
+            testOriginals();
+            System.out.println("\n----------------------\nTEST OF ORIGINAL DATASETS FINISHED\n----------------------\n");
+        }
+        if (Arrays.binarySearch(args, "w") >= 0) {
+            System.out.println("\n----------------------\nSTART OF TEST OF WSIZE\n----------------------\n");
+            testWSize();
+            System.out.println("\n----------------------\nWSIZE TEST FINISHED\n----------------------\n");
+        }
+        if (Arrays.binarySearch(args, "e") >= 0) {
+            System.out.println("\n----------------------\nSTART OF TEST OF EPSILON\n----------------------\n");
+            testEpsilon();
+            System.out.println("\n----------------------\nEPSILON TEST FINISHED\n----------------------\n");
+        }
+        if (Arrays.binarySearch(args, "b") >= 0) {
+            System.out.println("\n----------------------\nSTART OF TEST OF BETA\n----------------------\n");
+            testBeta();
+            System.out.println("\n----------------------\nBETA TEST FINISHED\n----------------------\n");
+        }
+        if (Arrays.binarySearch(args, "k") >= 0) {
+            System.out.println("\n----------------------\nSTART OF TEST OF KI\n----------------------\n");
+            testKi();
+            System.out.println("\n----------------------\nKI TEST FINISHED\n----------------------\n");
+        }
     }
 
     //Test of algorithms on standard ki, wSize, epsilon and beta. The datasets used are the randomized ones
@@ -336,10 +355,9 @@ public class Main {
         algorithms[8] = new COHENCAPPOblValidation(beta, delta, kiSet);
         algorithms[9] = new PELLCAPPOblValidation(beta, delta, kiSet);
 
+        writer.println("CHEN;;;;;CAPP;;;;;COHENCAPPOBL;;;;;PELLCAPPOBL;;;;;CAPPDELTA;;;;;COHENCAPPDELTA;;;;;PELLCAPPDELTA;;;;;CAPPVALIDATION;;;;;COHENCAPPVALIDATION;;;;;PELLCAPPVALIDATION;");
 
-        writer.println("CHEN;;;;;;CAPP;;;;;;COHENCAPPOBL;;;;;;PELLCAPPOBL;;;;;;CAPPDELTA;;;;;;COHENCAPPDELTA;;;;;;PELLCAPPDELTA;;;;;;CAPPVALIDATION;;;;;;COHENCAPPVALIDATION;;;;;;PELLCAPPVALIDATION;;");
-
-        String header = "Update Time;Query Time;Radius;Independence;Memory";
+        String header = "Update Time;Query Time;Radius;Memory";
         for (int i = 0; i<algorithms.length; i++) {
             writer.print(header);
             writer.print(";;");
@@ -371,10 +389,11 @@ public class Main {
             window.addLast(p);
             window.removeFirst();
 
+            ArrayList<Point>[] centers = new ArrayList[algorithms.length];
             //Tests
             for (int i = 0; i<algorithms.length; i++) {
                 calcUpdateTime(algorithms[i], p, time, writer);
-                calcQuery(algorithms[i], writer, window, kiSet);
+                centers[i] = calcQuery(algorithms[i], writer, window, kiSet);
                 calcMemory(algorithms[i], writer);
                 writer.print(";;");
             }
@@ -383,6 +402,10 @@ public class Main {
             //FLUSH
             writer.flush();
 
+            //TESTS REGARDING CENTERS
+            if (!centers[1].equals(centers[2]) || !centers[1].equals(centers[3]) || !centers[4].equals(centers[5]) || !centers[4].equals(centers[6]) || !centers[7].equals(centers[8]) || !centers[7].equals(centers[9])) {
+                throw new RuntimeException("Error in the implementation of the oblivious versions");
+            }
         }
     }
 
@@ -398,7 +421,7 @@ public class Main {
         writer.print((endTime-startTime)+";");
     }
 
-    private static void calcQuery(Algorithm alg, PrintWriter writer, LinkedList<Point> window, int[] kiSet) {
+    private static ArrayList<Point> calcQuery(Algorithm alg, PrintWriter writer, LinkedList<Point> window, int[] kiSet) {
         ArrayList<Point> centers;
         long startTime, endTime;
 
@@ -415,14 +438,13 @@ public class Main {
             throw new IllegalArgumentException();
         }
 
-        //5002, 5004, 5207, 5295, 5176
-
         //2. QUALITY TEST: Check of the radius of the centers returned and the independence of the set
         double radius = maxDistanceBetweenSets(window, centers);
         if (!isIndependent(centers, kiSet)) {
             throw new RuntimeException(alg.getClass()+" did not solve the problem correctly");
         }
         writer.print(String.format(Locale.ITALIAN, "%.16f", radius)+";");
+        return centers;
     }
 
     private static void calcMemory(Algorithm alg, PrintWriter writer) {
