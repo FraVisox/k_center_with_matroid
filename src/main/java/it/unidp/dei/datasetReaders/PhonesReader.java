@@ -38,16 +38,16 @@ public class PhonesReader extends DatasetReader {
 
     //The activities are: bike, sit, stand, walk, stairsup, stairsdown and null
     private static int getCategory(String s) {
-        return switch (s) {
-            case "bike" -> 0;
-            case "sit" -> 1;
-            case "stand" -> 2;
-            case "walk" -> 3;
-            case "stairsup" -> 4;
-            case "stairsdown" -> 5;
-            case "null" -> 6;
-            default -> -1;
-        };
+        switch (s) {
+            case "bike": return 0;
+            case "sit": return 1;
+            case "stand": return 2;
+            case "walk": return 3;
+            case "stairsup": return 4;
+            case "stairsdown": return 5;
+            case "null": return 6;
+            default: return -1;
+        }
     }
     public static final int dimension = 3;
     public static final int firstIgnored = 3;

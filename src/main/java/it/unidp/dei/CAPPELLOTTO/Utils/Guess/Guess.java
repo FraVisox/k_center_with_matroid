@@ -85,11 +85,11 @@ public class Guess {
                 }
 
                 while (!OV.isEmpty() && OV.first().compareTo(vOld) < 0) {
-                    OV.removeFirst();
+                    OV.remove(OV.first());
                 }
 
                 while (!O.isEmpty() && O.first().compareTo(vOld) < 0) {
-                    O.removeFirst();
+                    O.remove(O.first());
                 }
             }
         }

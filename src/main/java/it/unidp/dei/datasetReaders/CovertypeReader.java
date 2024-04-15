@@ -12,5 +12,5 @@ public class CovertypeReader extends DatasetReader {
 
         return new Point(coords, time, wSize, reader.getInt()-1);
     }
-    private static final int dimension = 54;
+    public static final int dimension = 54;
 }

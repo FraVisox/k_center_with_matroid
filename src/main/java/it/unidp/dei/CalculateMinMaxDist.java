@@ -7,22 +7,22 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 
 public class CalculateMinMaxDist {
-    private static final String[] datasets = {"random20.csv", "HIGGS.csv", "Phones_accelerometer.csv", "covtype.dat"};
-    private static final String[] outFiles = {"distRandom.txt", "distHIGGS.txt", "distPhones_accelerometer.txt", "distCovtype.txt"};
-    private static final DatasetReader[] readers = {new RandomReader(), new HiggsReader(), new PhonesReader(), new CovertypeReader()};
+    private static final String[] datasets = {"random20.csv", "HIGGS.csv", "Phones_accelerometer.csv", "covtype.dat", "normalizedcovtype.dat"};
+    private static final String[] outFiles = {"distRandom.txt", "distHIGGS.txt", "distPhones_accelerometer.txt", "distCovtype.txt", "distNormalizedCovtype.txt"};
+    private static final DatasetReader[] readers = {new RandomReader(), new HiggsReader(), new PhonesReader(), new CovertypeReader(), new CovertypeReader()};
     private static final double INFINITE = 10e20;
     private static final int outputTime = 10000;
     public static void main(String[] args) {
         DatasetReader reader;
         PrintWriter writer;
 
-        for (int i = 3; i<datasets.length; i++) {
+        for (int i = 4; i<datasets.length; i++) {
             String set = datasets[i];
             try {
                 //Create a file reader. We use the randomized datasets
                 reader = readers[i];
                 if (!set.equals("HIGGS.csv")) {
-                    reader.setFile(Main.inFolderRandomized + set);
+                    reader.setFile(Main.inFolderOriginals + set);
                 } else {
                     reader.setFile(Main.inFolderOriginals + set);
                 }

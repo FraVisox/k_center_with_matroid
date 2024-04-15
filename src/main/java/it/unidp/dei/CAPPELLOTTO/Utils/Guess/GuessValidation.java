@@ -67,7 +67,7 @@ public class GuessValidation {
             //If the size is greater than k, remove points older than the oldest of AV from A, OV and O
             if (RV.size() > k) {
                 while (!OV.isEmpty() && OV.first().compareTo(RV.firstKey()) < 0) {
-                    OV.removeFirst();
+                    OV.remove(OV.first());
                 }
             }
         } else {
