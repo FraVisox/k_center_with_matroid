@@ -8,6 +8,7 @@ import it.unidp.dei.CAPPELLOTTO.Utils.Guess.KGuessValidation;
 import it.unidp.dei.CHENETAL.CHEN;
 import it.unidp.dei.Main;
 import it.unidp.dei.Point;
+import it.unidp.dei.TestUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -125,7 +126,7 @@ public class KPELLCAPPOblValidation implements Algorithm
     }
 
     private double minPairwiseDistance(LinkedList<Point> points, Point p){
-        double ans = p.getMinDistanceWithoutItself(points, Main.INF);
+        double ans = p.getMinDistanceWithoutItself(points, TestUtils.INF);
         for(Point p1 : points){
             ans = p1.getMinDistanceWithoutItself(points, ans);
         }

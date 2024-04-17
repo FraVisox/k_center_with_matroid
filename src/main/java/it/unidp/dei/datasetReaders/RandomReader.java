@@ -6,17 +6,16 @@ import java.io.FileNotFoundException;
 import java.util.Random;
 
 public class RandomReader extends DatasetReader {
+    public RandomReader(int dimension) {
+        doublingDimension = dimension;
+    }
     @Override
     public Point nextPoint(int time, int wSize) {
         double[] coords = new double[doublingDimension];
-        for (int i = 0; i<notZeroes; i++) {
-            coords[i] = reader.getDouble();
-        }
-        for (int i = notZeroes; i<doublingDimension; i++) {
+        for (int i = 0; i<doublingDimension; i++) {
             reader.getWord();
         }
         return new Point(coords, time, wSize, reader.getInt());
     }
-    public static final int doublingDimension = 20;
-    public static final int notZeroes = 20;
+    public final int doublingDimension;
 }

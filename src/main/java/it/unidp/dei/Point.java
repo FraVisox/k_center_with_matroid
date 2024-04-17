@@ -30,7 +30,7 @@ public class Point implements Comparable<Point> {
 
     //It returns the minimum distance of this point from a Collection of points.
     public double getMinDistance(Collection<Point> set) {
-        double mind = Main.INF;
+        double mind = TestUtils.INF;
         for(Point q : set) {
             mind = Math.min(mind, this.getDistance(q));
         }

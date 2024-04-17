@@ -7,6 +7,7 @@ import it.unidp.dei.CAPPELLOTTO.Utils.Guess.Guess;
 import it.unidp.dei.CHENETAL.CHEN;
 import it.unidp.dei.Main;
 import it.unidp.dei.Point;
+import it.unidp.dei.TestUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -44,7 +45,7 @@ public class PELLCAPPObl implements Algorithm
 
         //UPDATE of r_t and M_t: r_t is the minimum distance between the last k+1 points,
         //while M_t is a guess of the diameter of the entire window.
-        double r_t = minPairwiseDistance(last_points, p);
+        double r_t = Algorithm.minPairwiseDistance(last_points, p);
         double M_t = diameter.getDiameter();
 
         //Create first and last indexes
@@ -130,17 +131,6 @@ public class PELLCAPPObl implements Algorithm
             size += g.getSize();
         }
         return size;
-    }
-
-    private double minPairwiseDistance(LinkedList<Point> points, Point p){
-        double ans = p.getMinDistanceWithoutItself(points, Main.INF);
-        for(Point p1 : points){
-            ans = p1.getMinDistanceWithoutItself(points, ans);
-        }
-        if (ans == 0) {
-            ans = Diameter.minimum;
-        }
-        return ans;
     }
 
     private LinkedList<Point>[] createR(Point p) {

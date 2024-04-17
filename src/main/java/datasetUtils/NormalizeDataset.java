@@ -1,7 +1,8 @@
-package it.unidp.dei;
+package datasetUtils;
 
 import it.unidp.dei.datasetReaders.CovertypeReader;
 import it.unidp.dei.datasetReaders.InputFileReader;
+import it.unidp.dei.*;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -10,8 +11,8 @@ import java.util.Arrays;
 
 //In this case, we only normalize covtype
 public class NormalizeDataset {
-    private static final String outFolder = Main.inFolderOriginals;
-    private static final String inFolder = Main.inFolderOriginals;
+    private static final String outFolder = TestUtils.inFolderOriginals;
+    private static final String inFolder = TestUtils.inFolderOriginals;
     private static final String dataset = "covtype.dat";
     public static void main(String[] args) {
         InputFileReader reader;

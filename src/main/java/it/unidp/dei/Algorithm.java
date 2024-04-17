@@ -21,7 +21,7 @@ public interface Algorithm {
 
     //Utility function to calculate the minimum distance between all the points in points and p:
     static double minPairwiseDistance(LinkedList<Point> points, Point p){
-        double ans = p.getMinDistanceWithoutItself(points, Main.INF);
+        double ans = p.getMinDistanceWithoutItself(points, TestUtils.INF);
         LinkedList<Point> thesePts = (LinkedList<Point>)points.clone();
         for(Point q : points){
             thesePts.remove(q);

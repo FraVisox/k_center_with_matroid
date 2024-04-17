@@ -1,6 +1,7 @@
-package it.unidp.dei;
+package datasetUtils;
 
 import it.unidp.dei.datasetReaders.InputFileReader;
+import it.unidp.dei.*;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -8,8 +9,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class RandomizeDataset {
-    private static final String outFolder = Main.inFolderRandomized;
-    private static final String inFolder = Main.inFolderOriginals;
+    private static final String outFolder = TestUtils.inFolderRandomized;
+    private static final String inFolder = TestUtils.inFolderOriginals;
 
     //HIGGS does not need to be randomized, as it is already randomized
     private static final String[] datasets = {"Phones_accelerometer.csv", "covtype.dat"};

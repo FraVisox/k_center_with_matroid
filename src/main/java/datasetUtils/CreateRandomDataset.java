@@ -1,4 +1,6 @@
-package it.unidp.dei;
+package datasetUtils;
+
+import it.unidp.dei.*;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -13,7 +15,7 @@ public class CreateRandomDataset {
     public static void main(String[] args) {
         PrintWriter writer;
         try {
-            writer = new PrintWriter(Main.inFolderRandomized+file);
+            writer = new PrintWriter(TestUtils.inFolderRandomized+file);
         } catch (FileNotFoundException e) {
             System.out.println("File can't be found");
             return;
