@@ -39,8 +39,8 @@ public class TestUtils {
     public static final double defaultEpsilon = 0.9;
     private static final double defaultDelta = 0.5;
     public static final double defaultBeta = 2;
-    public static int defaultWSize = 10000;
-    private static final int[][] defaultKi = {{1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1}, {1, 1}, {1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1}};
+    public static int defaultWSize = 30000;
+    private static final int[][] defaultKi = {{2, 2, 2, 2, 2, 2, 2}, {2, 2, 2, 2, 2, 2, 2}, {2, 2}, {2, 2, 2, 2, 2, 2, 2}, {2, 2, 2, 2, 2, 2, 2}};
     public static final double INF = 9000;
 
     //VALUES OF MAX AND MIN DISTANCES (measured with CalculateMinMaxDist):
@@ -129,27 +129,36 @@ public class TestUtils {
             try {
                 //Create a dataset reader
                 if (readers[i] == RandomReader.class) {
+                    //Dimension of random20
                     reader = new RandomReader(20);
                 } else {
                     reader = (DatasetReader) readers[i].newInstance();
                 }
+
                 if (rand) {
+
+                    //Instantiate the file
                     if (reader instanceof HiggsReader) {
                         reader.setFile(inFolderOriginals + set);
                     } else {
                         reader.setFile(inFolderRandomized + set);
                     }
+
                     //Create a results writer
                     if (name != null) {
                         writer = new PrintWriter(outFolder + "rand" + name + outFiles[i]);
                     } else {
                         writer = new PrintWriter(outFolder + "rand" + outFiles[i]);
                     }
+
                 } else {
+
+                    //Instantiate the file
                     if (reader instanceof RandomReader || reader instanceof HiggsReader) {
                         continue;
                     }
                     reader.setFile(inFolderOriginals + set);
+
                     //Create a results writer
                     if (name != null) {
                         writer = new PrintWriter(outFolder + "orig" + name + outFiles[i]);
@@ -208,11 +217,12 @@ public class TestUtils {
         }
         writer.println();
 
+        int thisQueryTime = queryTime;
         if (wSize > queryTime)  {
-            queryTime = wSize;
+            thisQueryTime = wSize;
         }
 
-        for (int time = 1; time <= queryTime+stride && reader.hasNext(); time++) {
+        for (int time = 1; time <= thisQueryTime+stride && reader.hasNext(); time++) {
             Point p = reader.nextPoint(time, wSize);
 
             if (p == null) {
@@ -221,7 +231,7 @@ public class TestUtils {
             }
 
             //If window is not full, we don't query
-            if (time <= queryTime) {
+            if (time <= thisQueryTime) {
                 window.addLast(p);
                 for (Algorithm alg : algorithms) {
                     alg.update(p, time);
@@ -278,11 +288,12 @@ public class TestUtils {
         }
         writer.println();
 
+        int thisQueryTime = queryTime;
         if (wSize > queryTime)  {
-            queryTime = wSize;
+            thisQueryTime = wSize;
         }
 
-        for (int time = 1; time <= queryTime+stride && reader.hasNext(); time++) {
+        for (int time = 1; time <= thisQueryTime+stride && reader.hasNext(); time++) {
             Point p = reader.nextPoint(time, wSize);
 
             if (p == null) {
@@ -291,7 +302,7 @@ public class TestUtils {
             }
 
             //If window is not full, we don't query
-            if (time <= queryTime) {
+            if (time <= thisQueryTime) {
                 window.addLast(p);
                 for (Algorithm alg : algorithms) {
                     alg.update(p, time);

@@ -4,8 +4,16 @@ package it.unidp.dei;
 public class Main {
     public static void main(String[] args) {
 
-        //Tests to run
-        if (args[0].equalsIgnoreCase("ro")) {
+        if (args.length != 1) {
+            System.out.println("TESTS TO RUN (r is randomized, o is originals):\n" +
+                    "- cambia qualcosa tra originals e randomized: ro\n"+
+                    "- cambiare il valore di wsize: w\n" +
+                    "- cambiare il delta con varie dimensioni di window per vedere la variazione dei parametri: wd\n" +
+                    "- aumento memoria/tempo in funzione di k: k\n" +
+                    "- aumento memoria/tempo in funzione di epsilon: e\n" +
+                    "- aumento memoria/tempo in funzione di beta: b\n"+
+                    "- aumento memoria/tempo in funzione di doubling dimension: dd\n");
+        } else if (args[0].equalsIgnoreCase("ro")) {
             System.out.println("\n----------------------\nSTART OF TEST OF RANDOMIZED DATASETS\n----------------------\n");
             TestUtils.testRandomized();
             System.out.println("\n----------------------\nTEST OF RANDOMIZED DATASETS FINISHED\n----------------------\n");
@@ -36,15 +44,6 @@ public class Main {
             System.out.println("\n----------------------\nSTART OF TEST OF BLOBS\n----------------------\n");
             BlobsTestUtils.testBlobs();
             System.out.println("\n----------------------\nBLOBS TEST FINISHED\n----------------------\n");
-        } else {
-            System.out.println("TESTS TO RUN (r is randomized, o is originals):\n" +
-                    "- cambia qualcosa tra originals e randomized: ro\n"+
-                    "- cambiare il valore di wsize: w\n" +
-                    "- cambiare il delta con varie dimensioni di window per vedere la variazione dei parametri: wd\n" +
-                    "- aumento memoria/tempo in funzione di k: k\n" +
-                    "- aumento memoria/tempo in funzione di epsilon: e\n" +
-                    "- aumento memoria/tempo in funzione di beta: b\n"+
-                    "- aumento memoria/tempo in funzione di doubling dimension: dd\n");
         }
     }
 }
