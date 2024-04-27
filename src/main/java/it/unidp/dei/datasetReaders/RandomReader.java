@@ -13,7 +13,7 @@ public class RandomReader extends DatasetReader {
     public Point nextPoint(int time, int wSize) {
         double[] coords = new double[doublingDimension];
         for (int i = 0; i<doublingDimension; i++) {
-            reader.getWord();
+            coords[i] = reader.getDouble();
         }
         return new Point(coords, time, wSize, reader.getInt());
     }
