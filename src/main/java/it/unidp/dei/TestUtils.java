@@ -44,20 +44,13 @@ public class TestUtils {
     public static final double INF = 9000;
 
     //VALUES OF MAX AND MIN DISTANCES (measured with CalculateMinMaxDist):
-    //  PHONES: maxD = 53 and minD = 8e-5 (tested for 840000 points and 530000 randomized, and there are 13062475)
-    //  COVTYPE: maxD = 13244 and minD = 3.87 (tested for 510000 points and there are 581012). Pellizzoni used 10000 and 0.1
-    //  HIGGS: maxD = 29 and minD = 0.008 (tested for 620000 points and there are 11000000). Pellizzoni used 100 and 0.01
-    //  RANDOM: maxD = 3.32 and minD = 0.35 (tested for 410000 points and there are 1000000)
-    //  COVTYPE NORMALIZED: maxD = 2.9 and minD = 5e-4 (tested for 210000 points)
-
-    //VALUES OF MAX AND MIN DISTANCES for randomized till time 100000
-    //  PHONES: maxD = 47.6 and minD = 1.2e-4
-    //  COVTYPE: maxD = 8834.2 and minD = 3.9
-    //  HIGGS: maxD = 22.9 and minD = 0.011
-    //  RANDOM: maxD = 3.22 and minD = 0.42
-    //  COVTYPE NORMALIZED: maxD = 2.9 and minD = 0.02
-    private static final double[] minDist = {1.2e-4, 3.9, 0.011, 0.42, 0.02};
-    private static final double[] maxDist = {47.6, 8834.2, 22.9, 3.22, 2.9};
+    //  PHONES: maxD = 52.6 and minD = 8.1e-5 (tested for 600000 points, and there are 13062475)
+    //  COVTYPE: maxD = 8853.4 and minD = 2.82 (tested for all 581012 points)
+    //  HIGGS: maxD = 26.7 and minD = 0.008 (tested for 600000 points and there are 11000000)
+    //  RANDOM: maxD = 3.32 and minD = 0.35 (tested for 600000 points and there are 1000000)
+    //  COVTYPE NORMALIZED: maxD = 2.9 and minD = 5.8e-4 (tested for all 581012 points)
+    private static final double[] minDist = {8.1e-5, 2.82, 0.008, 0.35, 5.8e-4};
+    private static final double[] maxDist = {52.6, 8853.4, 26.7, 3.32, 2.9};
 
     //Test of algorithms with standard parameters on randomized datasets
     public static void testRandomized() {
@@ -177,7 +170,7 @@ public class TestUtils {
             if (delta == null) {
                 testAlgorithms(reader, writer, minDist[i], maxDist[i], ki[i], wSize, epsilon, beta);
             } else {
-                testDeltasAlgorithms(reader, writer, minDist[i], maxDist[i], ki[i], wSize, epsilon, beta, delta);
+                testDeltasAlgorithms(reader, writer, ki[i], wSize, epsilon, beta, delta);
             }
 
             //CLOSE
@@ -265,7 +258,7 @@ public class TestUtils {
 
     //In every line of the output file we will have a header:
     //updateTime;queryTime;radius;independence;memory
-    private static void testDeltasAlgorithms(DatasetReader reader, PrintWriter writer, double min, double max, int[] kiSet, int wSize, double epsilon, double beta, double[] deltas) {
+    private static void testDeltasAlgorithms(DatasetReader reader, PrintWriter writer, int[] kiSet, int wSize, double epsilon, double beta, double[] deltas) {
 
         //Testing LinkedList, contains all the window
         LinkedList<Point> window = new LinkedList<>();

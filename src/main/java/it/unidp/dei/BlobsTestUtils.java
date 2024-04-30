@@ -18,10 +18,9 @@ public class BlobsTestUtils {
     //Ki of the blobs
     private static final int[] blobsKi = {3,3,3,3,3,3,3};
 
-    //VALUES OF MAX AND MIN DISTANCES (measured with CalculateMinMaxDist):
-    //TODO: change
-    private static final double[] blobsMinDist = {1.2e-4, 3.9, 0.011, 0.42, 0.02, 1};
-    private static final double[] blobsMaxDist = {1.2e-4, 3.9, 0.011, 0.42, 0.02, 1};
+    //VALUES OF MAX AND MIN DISTANCES (measured with CalculateMinMaxDist). The first two are:
+    private static final double[] blobsMinDist = {0.04, 0.65, 1.71, 2.81, 4, 8.9};
+    private static final double[] blobsMaxDist = {163.1, 208.7, 235.4, 276.9, 278.6, 365.5};
 
     //Test of blobs datasets
     public static void testBlobs() {

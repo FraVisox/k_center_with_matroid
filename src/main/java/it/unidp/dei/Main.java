@@ -5,7 +5,7 @@ public class Main {
     public static void main(String[] args) {
 
         if (args.length != 1) {
-            System.out.println("TESTS TO RUN (r is randomized, o is originals):\n" +
+            System.out.println("TESTS TO RUN:\n" +
                     "- cambia qualcosa tra originals e randomized: ro\n"+
                     "- cambiare il valore di wsize: w\n" +
                     "- cambiare il delta con varie dimensioni di window per vedere la variazione dei parametri: wd\n" +

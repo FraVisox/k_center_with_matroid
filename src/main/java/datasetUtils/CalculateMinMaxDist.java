@@ -13,6 +13,7 @@ public class CalculateMinMaxDist {
     private static final DatasetReader[] readers = {new RandomReader(5),new RandomReader(10),new RandomReader(15),new RandomReader(20),new RandomReader(25),new RandomReader(50),new RandomReader(20), new HiggsReader(), new PhonesReader(), new CovertypeReader(), new CovertypeReader()};
     private static final double INFINITE = 10e20;
     private static final int outputTime = 10000;
+    private static final int maxTime = 600000;
     public static void main(String[] args) {
         DatasetReader reader;
         PrintWriter writer;
@@ -36,7 +37,7 @@ public class CalculateMinMaxDist {
             double maxD = 0, minD = INFINITE;
             ArrayList<Point> window = new ArrayList<>();
             int time;
-            for (time = 0; reader.hasNext(); time++) {
+            for (time = 0; reader.hasNext() && time<maxTime; time++) {
                 Point p = reader.nextPoint(time, 0);
                 window.add(p);
 
