@@ -31,7 +31,7 @@ public class BlobsTestUtils {
             int dim = blobsDatasetsDimensions[i];
             try {
                 //Create a dataset reader
-                reader = new BlobsReader(dim);
+                reader = new RandomReader(dim);
                 reader.setFile(inFolder+"blobs"+dim+".csv");
                 //Create a results writer
                 writer = new PrintWriter(outFolder+"testBlobs"+dim+".csv");

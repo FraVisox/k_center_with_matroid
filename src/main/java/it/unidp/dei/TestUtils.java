@@ -110,7 +110,7 @@ public class TestUtils {
         int[] wSizes = {500, 1000, 5000, 10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000, 200000, 500000};
         double[] deltas = {0.025, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 2};
         for (int ww : wSizes) {
-            testDatasets(true, "deltas", defaultKi, ww, defaultEpsilon, defaultBeta, deltas);
+            testDatasets(true, "deltas"+ww, defaultKi, ww, defaultEpsilon, defaultBeta, deltas);
         }
     }
 

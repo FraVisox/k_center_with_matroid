@@ -18,7 +18,7 @@ with open('../../../../data/randomized/blobs'+str(n_dimensions)+'.csv', 'w') as 
     for sample in X:
         for i in sample:
             f.write(str(i)+";")
-        f.write(str(random.randint(0, 7)))
+        f.write(str(random.randint(0, 6)))
         f.write(";\n")
     print("Finished writing")
 
