@@ -2,12 +2,9 @@ package it.unidp.dei.datasetReaders;
 
 import it.unidp.dei.Point;
 
-import java.io.FileNotFoundException;
-import java.util.Random;
-
-public class RandomReader extends DatasetReader {
-    public RandomReader(int dimension) {
-        doublingDimension = dimension;
+public class BlobsReader extends RandomReader {
+    public BlobsReader(int dimension) {
+        super(dimension);
     }
     @Override
     public Point nextPoint(int time, int wSize) {
@@ -15,7 +12,6 @@ public class RandomReader extends DatasetReader {
         for (int i = 0; i<doublingDimension; i++) {
             coords[i] = reader.getDouble();
         }
-        return new Point(coords, time, wSize, reader.getInt());
+        return new Point(coords, time, wSize, reader.getInt()-1);
     }
-    protected final int doublingDimension;
 }

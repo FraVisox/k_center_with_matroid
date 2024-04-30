@@ -27,11 +27,11 @@ public class BlobsTestUtils {
         DatasetReader reader;
         PrintWriter writer;
 
-        for (int i = 0; i< blobsDatasetsDimensions.length; i++) {
+        for (int i = 0; i < blobsDatasetsDimensions.length; i++) {
             int dim = blobsDatasetsDimensions[i];
             try {
                 //Create a dataset reader
-                reader = new RandomReader(dim);
+                reader = new BlobsReader(dim);
                 reader.setFile(inFolder+"blobs"+dim+".csv");
                 //Create a results writer
                 writer = new PrintWriter(outFolder+"testBlobs"+dim+".csv");
