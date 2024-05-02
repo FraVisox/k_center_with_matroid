@@ -26,9 +26,7 @@ public class TestUtils {
     public static final String outFolder = "out/";
 
     //It tells how many times we will query the algorithms after queryTime
-    private static final int stride = 1000;
-    //It tells at what time we start querying the algorithms
-    public static int queryTime = 100000;
+    private static final int stride = 500;
 
     //Datasets: input files and output files, plus the DatasetReaders to read them
     private static final String[] datasets = {"Phones_accelerometer.csv", "covtype.dat", "HIGGS.csv", "random20.csv", "normalizedcovtype.dat"};
@@ -39,7 +37,7 @@ public class TestUtils {
     public static final double defaultEpsilon = 0.9;
     private static final double defaultDelta = 0.5;
     public static final double defaultBeta = 2;
-    public static int defaultWSize = 30000;
+    public static int defaultWSize = 10000;
     private static final int[][] defaultKi = {{2, 2, 2, 2, 2, 2, 2}, {2, 2, 2, 2, 2, 2, 2}, {2, 2}, {2, 2, 2, 2, 2, 2, 2}, {2, 2, 2, 2, 2, 2, 2}};
     public static final double INF = 9000;
 
@@ -210,12 +208,7 @@ public class TestUtils {
         }
         writer.println();
 
-        int thisQueryTime = queryTime;
-        if (wSize > queryTime)  {
-            thisQueryTime = wSize;
-        }
-
-        for (int time = 1; time <= thisQueryTime+stride && reader.hasNext(); time++) {
+        for (int time = 1; time <= wSize+stride && reader.hasNext(); time++) {
             Point p = reader.nextPoint(time, wSize);
 
             if (p == null) {
@@ -223,17 +216,17 @@ public class TestUtils {
                 continue;
             }
 
+            //Update the window
+            window.addLast(p);
+
             //If window is not full, we don't query
-            if (time <= thisQueryTime) {
-                window.addLast(p);
+            if (time <= wSize) {
                 for (Algorithm alg : algorithms) {
                     alg.update(p, time);
                 }
                 continue;
             }
 
-            //Update the window
-            window.addLast(p);
             window.removeFirst();
 
             ArrayList<Point>[] centers = new ArrayList[algorithms.length];
@@ -281,12 +274,7 @@ public class TestUtils {
         }
         writer.println();
 
-        int thisQueryTime = queryTime;
-        if (wSize > queryTime)  {
-            thisQueryTime = wSize;
-        }
-
-        for (int time = 1; time <= thisQueryTime+stride && reader.hasNext(); time++) {
+        for (int time = 1; time <= wSize+stride && reader.hasNext(); time++) {
             Point p = reader.nextPoint(time, wSize);
 
             if (p == null) {
@@ -295,7 +283,7 @@ public class TestUtils {
             }
 
             //If window is not full, we don't query
-            if (time <= thisQueryTime) {
+            if (time <= wSize) {
                 window.addLast(p);
                 for (Algorithm alg : algorithms) {
                     alg.update(p, time);
