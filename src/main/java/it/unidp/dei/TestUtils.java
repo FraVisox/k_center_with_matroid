@@ -25,7 +25,7 @@ public class TestUtils {
     public static final String inFolderRandomized = "data/randomized/";
     public static final String outFolder = "out/";
 
-    //It tells how many times we will query the algorithms after queryTime
+    //It tells how many times we will query the algorithms after wSize
     private static final int stride = 500;
 
     //Datasets: input files and output files, plus the DatasetReaders to read them
@@ -39,7 +39,7 @@ public class TestUtils {
     public static final double defaultBeta = 2;
     public static int defaultWSize = 10000;
     private static final int[][] defaultKi = {{2, 2, 2, 2, 2, 2, 2}, {2, 2, 2, 2, 2, 2, 2}, {2, 2}, {2, 2, 2, 2, 2, 2, 2}, {2, 2, 2, 2, 2, 2, 2}};
-    public static final double INF = 9000;
+    public static final double INF = 8900;
 
     //VALUES OF MAX AND MIN DISTANCES (measured with CalculateMinMaxDist):
     //  PHONES: maxD = 52.6 and minD = 8.1e-5 (tested for 600000 points, and there are 13062475)
@@ -227,6 +227,10 @@ public class TestUtils {
                 continue;
             }
 
+            if (time % 100 == 0) {
+                System.out.println(time);
+            }
+
             window.removeFirst();
 
             ArrayList<Point>[] centers = new ArrayList[algorithms.length];
@@ -289,6 +293,10 @@ public class TestUtils {
                     alg.update(p, time);
                 }
                 continue;
+            }
+
+            if (time % 100 == 0) {
+                System.out.println(time);
             }
 
             //Update the window
