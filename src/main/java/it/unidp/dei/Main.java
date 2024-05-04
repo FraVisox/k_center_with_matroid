@@ -12,6 +12,7 @@ public class Main {
                     "- aumento memoria/tempo in funzione di k: k\n" +
                     "- aumento memoria/tempo in funzione di epsilon: e\n" +
                     "- aumento memoria/tempo in funzione di beta: b\n"+
+                    "- differenze algoritmi con k centri o con meno: kalg\n"+
                     "- aumento memoria/tempo in funzione di doubling dimension: dd\n");
         } else if (args[0].equalsIgnoreCase("ro")) {
             System.out.println("\n----------------------\nSTART OF TEST OF RANDOMIZED DATASETS\n----------------------\n");
@@ -44,6 +45,10 @@ public class Main {
             System.out.println("\n----------------------\nSTART OF TEST OF BLOBS\n----------------------\n");
             BlobsTestUtils.testBlobs();
             System.out.println("\n----------------------\nBLOBS TEST FINISHED\n----------------------\n");
+        } else if (args[0].equalsIgnoreCase("kalg")) {
+            System.out.println("\n----------------------\nSTART OF TEST OF K ALGORITHMS\n----------------------\n");
+            TestUtils.testKAlg();
+            System.out.println("\n----------------------\nK ALGORITHMS TEST FINISHED\n----------------------\n");
         }
     }
 }

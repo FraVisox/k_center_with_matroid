@@ -1,15 +1,15 @@
 package it.unidp.dei;
 
-import it.unidp.dei.CAPPELLOTTO.Delta.CAPPDelta;
-import it.unidp.dei.CAPPELLOTTO.Delta.COHENCAPPOblDelta;
-import it.unidp.dei.CAPPELLOTTO.Delta.PELLCAPPOblDelta;
+import it.unidp.dei.CAPPELLOTTO.Delta.*;
 import it.unidp.dei.CAPPELLOTTO.Originals.CAPP;
 import it.unidp.dei.CAPPELLOTTO.Originals.COHENCAPPObl;
+import it.unidp.dei.CAPPELLOTTO.Originals.KCAPP;
 import it.unidp.dei.CAPPELLOTTO.Originals.PELLCAPPObl;
 import it.unidp.dei.CAPPELLOTTO.Validation.CAPPValidation;
 import it.unidp.dei.CAPPELLOTTO.Validation.COHENCAPPOblValidation;
 import it.unidp.dei.CAPPELLOTTO.Validation.PELLCAPPOblValidation;
 import it.unidp.dei.CHENETAL.CHEN;
+import it.unidp.dei.CHENETAL.KCHEN;
 import it.unidp.dei.datasetReaders.*;
 
 import java.io.FileNotFoundException;
@@ -26,7 +26,7 @@ public class TestUtils {
     public static final String outFolder = "out/";
 
     //It tells how many times we will query the algorithms after wSize
-    private static final int stride = 500;
+    private static final int stride = 200;
 
     //Datasets: input files and output files, plus the DatasetReaders to read them
     private static final String[] datasets = {"Phones_accelerometer.csv", "covtype.dat", "HIGGS.csv", "random20.csv", "normalizedcovtype.dat"};
@@ -64,7 +64,6 @@ public class TestUtils {
     public static void testKi() {
         int[][][] ki = {
                 {{1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1}, {1, 1}, {1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1}},
-                {{2, 2, 2, 2, 2, 2, 2}, {2, 2, 2, 2, 2, 2, 2}, {5, 5}, {2, 2, 2, 2, 2, 2, 2}, {2, 2, 2, 2, 2, 2, 2}},
                 {{5, 5, 5, 5, 5, 5, 5}, {5, 5, 5, 5, 5, 5, 5}, {10, 10}, {5, 5, 5, 5, 5, 5, 5}, {5, 5, 5, 5, 5, 5, 5}},
                 {{10, 10, 10, 10, 10, 10, 10}, {10, 10, 10, 10, 10, 10, 10}, {15, 15}, {10, 10, 10, 10, 10, 10, 10}, {10, 10, 10, 10, 10, 10, 10}},
                 {{15, 15, 15, 15, 15, 15, 15}, {15, 15, 15, 15, 15, 15, 15}, {20, 20}, {15, 15, 15, 15, 15, 15, 15}, {15, 15, 15, 15, 15, 15, 15}},
@@ -72,7 +71,6 @@ public class TestUtils {
                 {{25, 25, 25, 25, 25, 25, 25}, {25, 25, 25, 25, 25, 25, 25}, {30, 30}, {25, 25, 25, 25, 25, 25, 25}, {25, 25, 25, 25, 25, 25, 25}},
                 {{50, 50, 50, 50, 50, 50, 50}, {50, 50, 50, 50, 50, 50, 50}, {50, 50}, {50, 50, 50, 50, 50, 50, 50}, {50, 50, 50, 50, 50, 50, 50}},
                 {{100, 100, 100, 100, 100, 100, 100}, {100, 100, 100, 100, 100, 100, 100}, {100, 100}, {100, 100, 100, 100, 100, 100, 100}, {100, 100, 100, 100, 100, 100, 100}},
-                {{500, 500, 500, 500, 500, 500, 500}, {500, 500, 500, 500, 500, 500, 500}, {500, 500}, {500, 500, 500, 500, 500, 500, 500}, {500, 500, 500, 500, 500, 500, 500}}
         };
         for (int[][] ints : ki) {
             testDatasets(true, "k" + ints[0][0], ints, defaultWSize, defaultEpsilon, defaultBeta, null);
@@ -81,7 +79,7 @@ public class TestUtils {
 
     //Test with different epsilon on standard datasets
     public static void testEpsilon() {
-        double[] epsilon = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9};
+        double[] epsilon = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8};
         for (double e : epsilon) {
             testDatasets(true, "eps" + e, defaultKi, defaultWSize, e, defaultBeta, null);
         }
@@ -89,7 +87,7 @@ public class TestUtils {
 
     //Test with different beta on standard datasets
     public static void testBeta() {
-        double[] beta = {0.1, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 8, 10, 15, 20, 30, 40, 50, 70, 100, 200, 500, 1000};
+        double[] beta = {0.5, 1, 1.5, 2.5, 3, 3.5, 4, 5, 10, 15, 20, 30, 40, 50, 70, 100, 200, 500, 1000};
         for (double b : beta) {
             testDatasets(true, "beta" + b, defaultKi, defaultWSize, defaultEpsilon, b, null);
         }
@@ -97,10 +95,15 @@ public class TestUtils {
 
     //Test with different wSize on standard datasets
     public static void testWSize() {
-        int[] wSize = {500, 1000, 5000, 10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000, 200000, 500000};
+        int[] wSize = {500, 1000, 5000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000, 200000, 500000};
         for (int w : wSize) {
             testDatasets(true, "w" + w, defaultKi, w, defaultEpsilon, defaultBeta, null);
         }
+    }
+
+    //Test of K algorithms different wSize on standard datasets
+    public static void testKAlg() {
+        testDatasets(true, "kalg", defaultKi, defaultWSize, defaultEpsilon, defaultBeta, new double[] {});
     }
 
     //Test only some algorithms (CHEN, CAPP, DELTA) with different delta
@@ -167,6 +170,8 @@ public class TestUtils {
 
             if (delta == null) {
                 testAlgorithms(reader, writer, minDist[i], maxDist[i], ki[i], wSize, epsilon, beta);
+            } else if (delta.length == 0) {
+                testKAlgorithms(reader, writer, minDist[i], maxDist[i], ki[i], wSize, epsilon, beta);
             } else {
                 testDeltasAlgorithms(reader, writer, ki[i], wSize, epsilon, beta, delta);
             }
@@ -248,6 +253,78 @@ public class TestUtils {
 
             //TESTS REGARDING CENTERS
             if (!centers[1].equals(centers[2]) || !centers[1].equals(centers[3]) || !centers[4].equals(centers[5]) || !centers[4].equals(centers[6]) || !centers[7].equals(centers[8]) || !centers[7].equals(centers[9])) {
+                throw new RuntimeException("Error in the implementation of the oblivious versions");
+            }
+        }
+    }
+
+    //In every line of the output file we will have a header:
+    //updateTime;queryTime;radius;independence;memory
+    public static void testKAlgorithms(DatasetReader reader, PrintWriter writer, double min, double max, int[] kiSet, int wSize, double epsilon, double beta) {
+
+        //Testing LinkedList, contains all the window
+        LinkedList<Point> window = new LinkedList<>();
+
+        //Initialize the algorithms
+        Algorithm[] algorithms = new Algorithm[8];
+        algorithms[0] = new CHEN(kiSet);
+        algorithms[1] = new KCHEN(kiSet);
+        algorithms[2] = new CAPP(kiSet, epsilon, beta, min, max);
+        algorithms[3] = new KCAPP(kiSet, epsilon, beta, min, max);
+        algorithms[4] = new CAPPDelta(kiSet, defaultDelta, beta, min, max);
+        algorithms[5] = new KCAPPDelta(kiSet, defaultDelta, beta, min, max);
+        algorithms[6] = new PELLCAPPOblDelta(beta, defaultDelta, kiSet);
+        algorithms[7] = new KPELLCAPPOblDelta(beta, defaultDelta, kiSet);
+
+        writer.println("CHEN;;;;;KCHEN;;;;;CAPP;;;;;KCAPP;;;;;CAPPDELTA;;;;;KCAPPDELTA;;;;;PELLCAPPDELTA;;;;;KPELLCAPPDELTA;");
+
+        String header = "Update Time;Query Time;Radius;Memory";
+        for (int i = 0; i<algorithms.length; i++) {
+            writer.print(header);
+            writer.print(";;");
+        }
+        writer.println();
+
+        for (int time = 1; time <= wSize+stride && reader.hasNext(); time++) {
+            Point p = reader.nextPoint(time, wSize);
+
+            if (p == null) {
+                System.out.println("NULL POINT");
+                continue;
+            }
+
+            //Update the window
+            window.addLast(p);
+
+            //If window is not full, we don't query
+            if (time <= wSize) {
+                for (Algorithm alg : algorithms) {
+                    alg.update(p, time);
+                }
+                continue;
+            }
+
+            if (time % 100 == 0) {
+                System.out.println(time);
+            }
+
+            window.removeFirst();
+
+            ArrayList<Point>[] centers = new ArrayList[algorithms.length];
+            //Tests
+            for (int i = 0; i<algorithms.length; i++) {
+                calcUpdateTime(algorithms[i], p, time, writer);
+                centers[i] = calcQuery(algorithms[i], writer, window, kiSet);
+                calcMemory(algorithms[i], writer);
+                writer.print(";;");
+            }
+            writer.println();
+
+            //FLUSH
+            writer.flush();
+
+            //TESTS REGARDING CENTERS
+            if (!centers[4].equals(centers[6]) || !centers[5].equals(centers[7])) {
                 throw new RuntimeException("Error in the implementation of the oblivious versions");
             }
         }
