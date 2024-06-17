@@ -8,9 +8,9 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 
 public class CalculateMinMaxDist {
-    private static final String[] datasets = {"blobs5.csv", "blobs10.csv","blobs15.csv","blobs20.csv","blobs25.csv","blobs50.csv","random20.csv", "HIGGS.csv", "Phones_accelerometer.csv", "covtype.dat", "normalizedcovtype.dat"};
-    private static final String[] outFiles = {"distBlobs5.txt","distBlobs10.txt","distBlobs15.txt","distBlobs20.txt","distBlobs25.txt","distBlobs50.txt","distRandom.txt", "distHIGGS.txt", "distPhones_accelerometerORIGINAL.txt","distCovtypeORIGINAL.txt", "distNormalizedCovtypeORIGINAL.txt"};
-    private static final DatasetReader[] readers = {new RandomReader(5),new RandomReader(10),new RandomReader(15),new RandomReader(20),new RandomReader(25),new RandomReader(50),new RandomReader(20), new HiggsReader(), new PhonesReader(), new CovertypeReader(), new CovertypeReader()};
+    private static final String[] datasets = {"blobs5.csv", "blobs10.csv","blobs15.csv","blobs20.csv","blobs25.csv", "blobs30.csv", "blobs35.csv", "blobs40.csv", "blobs45.csv", "blobs50.csv","random20.csv", "HIGGS.csv", "Phones_accelerometer.csv", "covtype.dat", "normalizedcovtype.dat"};
+    private static final String[] outFiles = {"distBlobs5.txt","distBlobs10.txt","distBlobs15.txt","distBlobs20.txt","distBlobs25.txt", "distBlobs30.txt", "distBlobs35.txt", "distBlobs40.txt", "distBlobs45.txt", "distBlobs50.txt","distRandom.txt", "distHIGGS.txt", "distPhones_accelerometerORIGINAL.txt","distCovtypeORIGINAL.txt", "distNormalizedCovtypeORIGINAL.txt"};
+    private static final DatasetReader[] readers = {new RandomReader(5),new RandomReader(10),new RandomReader(15),new RandomReader(20),new RandomReader(25), new RandomReader(30),new RandomReader(35),new RandomReader(40),new RandomReader(45),new RandomReader(50),new RandomReader(20), new HiggsReader(), new PhonesReader(), new CovertypeReader(), new CovertypeReader()};
     private static final double INFINITE = 10e20;
     private static final int outputTime = 10000;
     private static final int maxTime = 600000;

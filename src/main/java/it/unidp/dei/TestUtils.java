@@ -38,7 +38,7 @@ public class TestUtils {
     private static final double defaultDelta = 0.5;
     public static final double defaultBeta = 2;
     public static int defaultWSize = 10000;
-    private static final int[][] defaultKi = {{2, 2, 2, 2, 2, 2, 2}, {2, 2, 2, 2, 2, 2, 2}, {2, 2}, {2, 2, 2, 2, 2, 2, 2}, {2, 2, 2, 2, 2, 2, 2}};
+    private static final int[][] defaultKi = {{2, 2, 2, 2, 2, 2, 2}, {2, 2, 2, 2, 2, 2, 2}, {2, 2}, {2, 2, 2, 2, 2, 2}, {2, 2, 2, 2, 2, 2, 2}};
     public static final double INF = 8900;
 
     //VALUES OF MAX AND MIN DISTANCES (measured with CalculateMinMaxDist):
@@ -64,6 +64,7 @@ public class TestUtils {
     public static void testKi() {
         int[][][] ki = {
                 {{1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1}, {1, 1}, {1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1}},
+                //{{2, 2, 2, 2, 2, 2, 2}, {2, 2, 2, 2, 2, 2, 2}, {2, 2}, {2, 2, 2, 2, 2, 2}, {2, 2, 2, 2, 2, 2, 2}}, DEFAULT ONES
                 {{5, 5, 5, 5, 5, 5, 5}, {5, 5, 5, 5, 5, 5, 5}, {10, 10}, {5, 5, 5, 5, 5, 5, 5}, {5, 5, 5, 5, 5, 5, 5}},
                 {{10, 10, 10, 10, 10, 10, 10}, {10, 10, 10, 10, 10, 10, 10}, {15, 15}, {10, 10, 10, 10, 10, 10, 10}, {10, 10, 10, 10, 10, 10, 10}},
                 {{15, 15, 15, 15, 15, 15, 15}, {15, 15, 15, 15, 15, 15, 15}, {20, 20}, {15, 15, 15, 15, 15, 15, 15}, {15, 15, 15, 15, 15, 15, 15}},
@@ -79,7 +80,7 @@ public class TestUtils {
 
     //Test with different epsilon on standard datasets
     public static void testEpsilon() {
-        double[] epsilon = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8};
+        double[] epsilon = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8 /*, 0.9 DEFAULT*/};
         for (double e : epsilon) {
             testDatasets(true, "eps" + e, defaultKi, defaultWSize, e, defaultBeta, null);
         }
@@ -87,7 +88,7 @@ public class TestUtils {
 
     //Test with different beta on standard datasets
     public static void testBeta() {
-        double[] beta = {0.5, 1, 1.5, 2.5, 3, 3.5, 4, 5, 10, 15, 20, 30, 40, 50, 70, 100, 200, 500, 1000};
+        double[] beta = {0.5, 1, 1.5, /*,2 DEFAULT*/ 2.5, 3, 3.5, 4, 5, 10, 15, 20, 30, 40, 50, 70, 100, 200, 500, 1000};
         for (double b : beta) {
             testDatasets(true, "beta" + b, defaultKi, defaultWSize, defaultEpsilon, b, null);
         }
@@ -95,9 +96,10 @@ public class TestUtils {
 
     //Test with different wSize on standard datasets
     public static void testWSize() {
-        int[] wSize = {500, 1000, 5000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000, 200000, 500000};
+        int[] wSize = {500, 1000, 5000, /*10000, DEFAULT*/ 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000, 200000, 500000};
         for (int w : wSize) {
             testDatasets(true, "w" + w, defaultKi, w, defaultEpsilon, defaultBeta, null);
+            System.gc();
         }
     }
 
@@ -106,15 +108,16 @@ public class TestUtils {
         testDatasets(true, "kalg", defaultKi, defaultWSize, defaultEpsilon, defaultBeta, new double[] {});
     }
 
-    //Test only some algorithms (CHEN, CAPP, DELTA) with different delta
+    //Test only some algorithms (CHEN, CAPPOBL, DELTA) with different delta
     public static void testDeltaW() {
         int[] wSizes = {500, 1000, 5000, 10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000, 200000, 500000};
-        double[] deltas = {0.025, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 2};
+        double[] deltas = {0.025, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 2.0};
         for (int ww : wSizes) {
             testDatasets(true, "deltas"+ww, defaultKi, ww, defaultEpsilon, defaultBeta, deltas);
         }
     }
 
+    //TEST DATASETS, called in every test with different parameters
     private static void testDatasets(boolean rand, String name, int[][] ki, int wSize, double epsilon, double beta, double[] delta) {
         DatasetReader reader;
         PrintWriter writer;
@@ -129,6 +132,7 @@ public class TestUtils {
                     reader = (DatasetReader) readers[i].newInstance();
                 }
 
+                //IF RANDOM
                 if (rand) {
 
                     //Instantiate the file
@@ -145,10 +149,11 @@ public class TestUtils {
                         writer = new PrintWriter(outFolder + "rand" + outFiles[i]);
                     }
 
-                } else {
+                } else { //IF ORIGINAL
 
                     //Instantiate the file
                     if (reader instanceof RandomReader || reader instanceof HiggsReader) {
+                        //Random and Higgs are already tested in randomized
                         continue;
                     }
                     reader.setFile(inFolderOriginals + set);
@@ -168,6 +173,7 @@ public class TestUtils {
                 continue;
             }
 
+            //Depending on deltas, call the testings
             if (delta == null) {
                 testAlgorithms(reader, writer, minDist[i], maxDist[i], ki[i], wSize, epsilon, beta);
             } else if (delta.length == 0) {
@@ -203,6 +209,7 @@ public class TestUtils {
         algorithms[7] = new CAPPValidation(kiSet, beta, min, max);
         algorithms[8] = new COHENCAPPOblValidation(beta, defaultDelta, kiSet);
         algorithms[9] = new PELLCAPPOblValidation(beta, defaultDelta, kiSet);
+
 
         writer.println("CHEN;;;;;CAPP;;;;;COHENCAPPOBL;;;;;PELLCAPPOBL;;;;;CAPPDELTA;;;;;COHENCAPPDELTA;;;;;PELLCAPPDELTA;;;;;CAPPVALIDATION;;;;;COHENCAPPVALIDATION;;;;;PELLCAPPVALIDATION;");
 
@@ -338,13 +345,13 @@ public class TestUtils {
         LinkedList<Point> window = new LinkedList<>();
 
         //Initialize the algorithms
-        Algorithm[] algorithms = new Algorithm[2+deltas.length];
+        Algorithm[] algorithms = new Algorithm[deltas.length];
         algorithms[0] = new CHEN(kiSet);
         algorithms[1] = new PELLCAPPObl(beta, epsilon, kiSet);
-        writer.print("CHEN;;;;;CAPP");
-        for (int i = 2; i<algorithms.length; i++) {
-            algorithms[i] = new PELLCAPPOblDelta(beta, deltas[i-2], kiSet);
-            writer.print(";;;;;DELTA"+deltas[i-2]);
+        writer.print("CHEN;;;;;PELLCAPP;;;;;;");
+        for (int i = 0; i<algorithms.length; i++) {
+            algorithms[i] = new PELLCAPPOblDelta(beta, deltas[i], kiSet);
+            writer.print("DELTA"+deltas[i]+";;;;;");
         }
         writer.println(";");
 

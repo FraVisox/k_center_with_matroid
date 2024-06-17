@@ -38,7 +38,7 @@ public class CHEN implements Algorithm {
         ArrayList<Point> sol = null;
 
         //We won't go in overflow
-        if (pts.size() <= Math.sqrt(Integer.MAX_VALUE)) {
+        if (pts.size() <= 30000) { //FIXME
             //First we create all the distances and put them in an array
             int length = pts.size() * pts.size() - pts.size()+1;
             if (pts.size() <= k) {
