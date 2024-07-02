@@ -39,10 +39,6 @@ public class CHEN implements Algorithm {
 
         //We won't go in overflow
         if (pts.size() <= 30000) { //FIXME
-            System.out.println("CHOOSING ARRAY");
-
-            long start = System.nanoTime();
-
             //First we create all the distances and put them in an array
             int length = pts.size() * pts.size() - pts.size()+1;
             if (pts.size() <= k) {
@@ -62,20 +58,13 @@ public class CHEN implements Algorithm {
             if (pts.size() <= k) {
                 distances[i] = 0;
             }
-            long end = System.nanoTime();
-            System.out.println("5. TIME TO CREATE LIST OF DISTANCES: "+(end-start));
 
             //Then we sort all the distances, so that they are in non-decreasing order
-            start = System.nanoTime();
-
             Arrays.sort(distances);
-            end = System.nanoTime();
-            System.out.println("6. TIME TO SORT THE LIST OF DISTANCES: "+(end-start));
 
             //Then we perform a binary search on the distances to search the best answer
             int low = 0;
             int high = distances.length-1;
-            start = System.nanoTime();
             while (low <= high) {
                 int mid = (high + low) / 2;
 
@@ -94,14 +83,7 @@ public class CHEN implements Algorithm {
                     low = mid + 1;
                 }
             }
-            end = System.nanoTime();
-            System.out.println("8. TIME TO PERFORM BINARY SEARCH ON ALL DISTANCES: "+(end-start)+"\n\n---------------------------------\n\n");
         } else {
-            System.out.println("CHOOSING TREESET");
-
-            long start = System.nanoTime();
-
-
             TreeSet<Double> distances = new TreeSet<>();
             for (Point p : pts) {
                 for (Point q : pts) {
@@ -114,19 +96,12 @@ public class CHEN implements Algorithm {
             if (pts.size() <= k) {
                 distances.add((double) 0);
             }
-            long end = System.nanoTime();
-            System.out.println("5. TIME TO CREATE LIST OF DISTANCES: "+(end-start));
 
-            System.out.println("6. NO TIME TO SORT THE LIST OF DISTANCES");
 
             //Then we perform a linear search on the distances to search the best answer
-            start = System.nanoTime();
-
             for (Double dist : distances) {
                 ArrayList<Point> thisSol = queryDist(dist);
                 if (thisSol != null) {
-                    end = System.nanoTime();
-                    System.out.println("8. TOTAL TIME TO PERFORM LINEAR SEARCH ON ALL DISTANCES: "+(end-start)+"\n\n---------------------------------\n\n");
                     return thisSol;
                 }
             }
@@ -149,8 +124,6 @@ public class CHEN implements Algorithm {
         //Create the partition: the key point in the map is the head of the partition
         TreeMap<Point, ArrayList<Point>> partition = new TreeMap<>();
 
-        long start = System.nanoTime();
-
         //We take a random point (the first one to simplify)
         partition.put(pts.getFirst(), new ArrayList<>());
 
@@ -168,12 +141,8 @@ public class CHEN implements Algorithm {
                 }
             }
         }
-        long end = System.nanoTime();
-        System.out.println("7a. TIME TO SELECT PARTITIONS CENTERS (if possible): "+(end-start));
 
         //Then we create all the partitions
-        start = System.nanoTime();
-
         for (Point p : pts) {
             for (Point pivot : partition.keySet()) {
                 if (p.getDistance(pivot) <= dist) {
@@ -184,9 +153,6 @@ public class CHEN implements Algorithm {
                 }
             }
         }
-        end = System.nanoTime();
-        System.out.println("7b. TIME TO CREATE PARTITION: "+(end-start));
-
 
         //Then we resolve the partition matroid intersection
         return sparsePartitionMatroidIntersection(partition);
@@ -195,7 +161,6 @@ public class CHEN implements Algorithm {
     //We use a sparse graph, as the graph isn't changed after its creation, but only used to compute the maximum flow
     private ArrayList<Point> sparsePartitionMatroidIntersection(TreeMap<Point, ArrayList<Point>> partition) {
 
-        long start = System.nanoTime();
         List<Triple<Integer, Integer, Double>> edges = new ArrayList<>(partition.size());
         //MAPPING OF NODES TO INTEGER (essential for the sparse graph):
         // node 0 is the source
@@ -224,23 +189,13 @@ public class CHEN implements Algorithm {
         for (int j = 0; j < ki.length; j++) {
             edges.add(new Triple<>(j + 1, i, (double) ki[j]));
         }
-        long end = System.nanoTime();
-        System.out.println("7c. TIME TO CREATE EDGES FOR GRAPH: "+(end-start));
 
         //Create graph
-        start = System.nanoTime();
-
         SparseIntDirectedWeightedGraph graph = new SparseIntDirectedWeightedGraph(i + 1, edges);
-        end = System.nanoTime();
-        System.out.println("7d. TIME TO CREATE GRAPH: "+(end-start));
 
         //Use the PushRelabel algorithm to calculate the flow from source to sink. It's the most efficient algorithm
-        start = System.nanoTime();
-
         PushRelabelMFImpl<Integer, Integer> alg = new PushRelabelMFImpl<>(graph);
         double flow = alg.calculateMaximumFlow(0, i);
-        end = System.nanoTime();
-        System.out.println("7e. TIME TO CALCULATE FLOW: "+(end-start));
 
         //If the flow is less than the number of partitions, it's a failure. Note that the flow can't be more than this number,
         //as the sum of the weight of the edges that connect the source is partition.keySet().size()
@@ -248,7 +203,6 @@ public class CHEN implements Algorithm {
             return null;
         }
 
-        start = System.nanoTime();
         //Get the values of flow through each edge
         Map<Integer, Double> flows = alg.getFlowMap();
         ArrayList<Point> centers = new ArrayList<>((int) flow);
@@ -270,8 +224,6 @@ public class CHEN implements Algorithm {
                 new_i++;
             }
         }
-        end = System.nanoTime();
-        System.out.println("7f. TIME TO OBTAIN CENTERS WITH THE FLOW: "+(end-start));
         return centers;
     }
     private final LinkedList<Point> pts;
