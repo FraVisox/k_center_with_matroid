@@ -18,9 +18,13 @@ public class BlobsTestUtils {
     //Ki of the blobs
     private static final int[] blobsKi = {3,3,3,3,3,3,3};
 
-    //VALUES OF MAX AND MIN DISTANCES (measured with CalculateMinMaxDist). The first two are:
+    //VALUES OF MAX AND MIN DISTANCES (measured with CalculateMinMaxDist)
     private static final double[] blobsMinDist = {0.04, 0.65, 1.71, 2.81, 4, 4.36, 5.83, 6.84, 7.4, 8.9};
     private static final double[] blobsMaxDist = {163.1, 208.7, 235.4, 276.9, 278.6, 323.1, 333.4, 340.7, 366.2, 365.5};
+
+    //REAL
+    private static final double[] realBlobsMinDist = {0.10, 0.65, 2.1, 3, 4.5, 5.5, 6.5, 7.4, 7.4, 9.6};
+    private static final double[] realBlobsMaxDist = {160.6, 207.6, 234.5, 275.6, 276.5, 321.6, 332.2, 338.3, 364, 365.3};
 
     //Test of blobs datasets
     public static void testBlobs() {
@@ -41,7 +45,7 @@ public class BlobsTestUtils {
             }
 
             //TEST THINGS
-            testAlgorithms(reader, writer, blobsMinDist[i], blobsMaxDist[i], blobsKi, defaultWSize, defaultEpsilon, defaultBeta);
+            testAlgorithms(reader, writer, blobsMinDist[i], blobsMaxDist[i],realBlobsMinDist[i],realBlobsMaxDist[i], blobsKi, defaultWSize, defaultEpsilon, defaultBeta);
 
             //CLOSE
             writer.close();

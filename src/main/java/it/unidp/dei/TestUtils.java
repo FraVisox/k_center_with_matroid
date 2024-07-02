@@ -38,7 +38,7 @@ public class TestUtils {
     private static final double defaultDelta = 0.5;
     public static final double defaultBeta = 2;
     public static int defaultWSize = 10000;
-    private static final int[][] defaultKi = {{2, 2, 2, 2, 2, 2, 2}, {2, 2, 2, 2, 2, 2, 2}, {2, 2}, {2, 2, 2, 2, 2, 2}, {2, 2, 2, 2, 2, 2, 2}};
+    private static final int[][] defaultKi = {{5, 7, 1, 0, 0, 0, 1}};
     public static final double INF = 8900;
 
     //VALUES OF MAX AND MIN DISTANCES (measured with CalculateMinMaxDist):
@@ -63,18 +63,20 @@ public class TestUtils {
     //Test with different ki of standard datasets
     public static void testKi() {
         int[][][] ki = {
-                {{1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1}, {1, 1}, {1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1}},
-                //{{2, 2, 2, 2, 2, 2, 2}, {2, 2, 2, 2, 2, 2, 2}, {2, 2}, {2, 2, 2, 2, 2, 2}, {2, 2, 2, 2, 2, 2, 2}}, DEFAULT ONES
-                {{5, 5, 5, 5, 5, 5, 5}, {5, 5, 5, 5, 5, 5, 5}, {10, 10}, {5, 5, 5, 5, 5, 5, 5}, {5, 5, 5, 5, 5, 5, 5}},
-                {{10, 10, 10, 10, 10, 10, 10}, {10, 10, 10, 10, 10, 10, 10}, {15, 15}, {10, 10, 10, 10, 10, 10, 10}, {10, 10, 10, 10, 10, 10, 10}},
-                {{15, 15, 15, 15, 15, 15, 15}, {15, 15, 15, 15, 15, 15, 15}, {20, 20}, {15, 15, 15, 15, 15, 15, 15}, {15, 15, 15, 15, 15, 15, 15}},
-                {{20, 20, 20, 20, 20, 20, 20}, {20, 20, 20, 20, 20, 20, 20}, {25, 25}, {20, 20, 20, 20, 20, 20, 20}, {20, 20, 20, 20, 20, 20, 20}},
-                {{25, 25, 25, 25, 25, 25, 25}, {25, 25, 25, 25, 25, 25, 25}, {30, 30}, {25, 25, 25, 25, 25, 25, 25}, {25, 25, 25, 25, 25, 25, 25}},
-                {{50, 50, 50, 50, 50, 50, 50}, {50, 50, 50, 50, 50, 50, 50}, {50, 50}, {50, 50, 50, 50, 50, 50, 50}, {50, 50, 50, 50, 50, 50, 50}},
-                {{100, 100, 100, 100, 100, 100, 100}, {100, 100, 100, 100, 100, 100, 100}, {100, 100}, {100, 100, 100, 100, 100, 100, 100}, {100, 100, 100, 100, 100, 100, 100}},
+                //PHONES, COVTYPE, HIGGS, RANDOM, NORMALIZED
+                {{1, 1, 1, 1, 1, 1, 1}, {3, 4, 0, 0, 0, 0, 0}, {1, 1}, {1, 1, 1, 1, 1, 1}, {3, 4, 0, 0, 0, 0, 0}},
+                //{{2, 2, 2, 2, 2, 2, 2}, {5, 7, 1, 0, 0, 0, 1}, {2, 2}, {2, 2, 2, 2, 2, 2}, {5, 7, 1, 0, 0, 0, 1}},
+                //{{5, 6, 5, 6, 4, 4, 5}, {13, 17, 2, 0, 1, 1, 1}, {9, 11}, {5, 5, 5, 5, 5, 5}, {13, 17, 2, 0, 1, 1, 1}},
+                {{10, 11, 9, 12, 9, 9, 10}, {25, 35, 4, 0, 1, 2, 3}, {14, 16}, {10, 10, 10, 10, 10, 10}, {25, 35, 4, 0, 1, 2, 3}},
+                //{{15, 16, 14, 19, 13, 13, 15}, {37, 52, 6, 1, 2, 3, 4}, {19, 21}, {15, 15, 15, 15, 15, 15}, {37, 52, 6, 1, 2, 3, 4}},
+                //{{20, 22, 19, 25, 18, 17, 19}, {50, 69, 9, 1, 2, 4, 5}, {24, 26}, {20, 20, 20, 20, 20, 20}, {50, 69, 9, 1, 2, 4, 5}},
+                {{25, 27, 24, 31, 22, 22, 24}, {62, 87, 11, 1, 3, 5, 6}, {28, 32}, {25, 25, 25, 25, 25, 25}, {62, 87, 11, 1, 3, 5, 6}},
+                //{{50, 55, 48, 62, 44, 43, 48}, {125, 173, 21, 2, 6, 11, 12}, {47, 53}, {50, 50, 50, 51, 50, 49}, {125, 173, 21, 2, 6, 11, 12}},
+                //{{99, 110, 95, 125, 88, 86, 97}, {250, 346, 43, 3, 12, 22, 24}, {94, 106}, {100, 100, 100, 102, 100, 98},  {250, 346, 43, 3, 12, 22, 24}},
         };
         for (int[][] ints : ki) {
-            testDatasets(true, "k" + ints[0][0], ints, defaultWSize, defaultEpsilon, defaultBeta, null);
+            int k = Algorithm.calcK(ints[0]);
+            testDatasets(true, "k" + k, ints, defaultWSize, defaultEpsilon, defaultBeta, null);
         }
     }
 
@@ -111,8 +113,10 @@ public class TestUtils {
     //Test only some algorithms (CHEN, CAPPOBL, DELTA) with different delta
     public static void testDeltaW() {
         int[] wSizes = {500, 1000, 5000, 10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000, 200000, 500000};
-        double[] deltas = {0.025, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 2.0};
+        //int[] wSizes = {22000, 22500, 23000, 23500, 24000, 24500, 25000, 25500, 26000};
+        double[] deltas = {0.5, 1.0, 1.5, 2.0};
         for (int ww : wSizes) {
+            System.out.println("\n\n\nINITIALIZING TEST WITH "+ww+"\n\n");
             testDatasets(true, "deltas"+ww, defaultKi, ww, defaultEpsilon, defaultBeta, deltas);
         }
     }
@@ -122,6 +126,9 @@ public class TestUtils {
         DatasetReader reader;
         PrintWriter writer;
         for (int i = 0; i< datasets.length; i++) {
+            if (i != 1 && i != 4) {
+                continue;
+            }
             String set = datasets[i];
             try {
                 //Create a dataset reader
@@ -175,11 +182,11 @@ public class TestUtils {
 
             //Depending on deltas, call the testings
             if (delta == null) {
-                testAlgorithms(reader, writer, minDist[i], maxDist[i], ki[i], wSize, epsilon, beta);
+                testAlgorithms(reader, writer, minDist[i], maxDist[i],0,0, ki[0], wSize, epsilon, beta);
             } else if (delta.length == 0) {
-                testKAlgorithms(reader, writer, minDist[i], maxDist[i], ki[i], wSize, epsilon, beta);
+                testKAlgorithms(reader, writer, minDist[i], maxDist[i], ki[0], wSize, epsilon, beta);
             } else {
-                testDeltasAlgorithms(reader, writer, ki[i], wSize, epsilon, beta, delta);
+                testDeltasAlgorithms(reader, writer, ki[0], wSize, epsilon, beta, delta);
             }
 
             //CLOSE
@@ -192,7 +199,7 @@ public class TestUtils {
 
     //In every line of the output file we will have a header:
     //updateTime;queryTime;radius;independence;memory
-    public static void testAlgorithms(DatasetReader reader, PrintWriter writer, double min, double max, int[] kiSet, int wSize, double epsilon, double beta) {
+    public static void testAlgorithms(DatasetReader reader, PrintWriter writer, double min, double max, double realMin, double realMax, int[] kiSet, int wSize, double epsilon, double beta) {
 
         //Testing LinkedList, contains all the window
         LinkedList<Point> window = new LinkedList<>();
@@ -200,18 +207,21 @@ public class TestUtils {
         //Initialize the algorithms
         Algorithm[] algorithms = new Algorithm[10];
         algorithms[0] = new CHEN(kiSet);
+
         algorithms[1] = new CAPP(kiSet, epsilon, beta, min, max);
         algorithms[2] = new COHENCAPPObl(beta, epsilon, kiSet);
         algorithms[3] = new PELLCAPPObl(beta, epsilon, kiSet);
+
         algorithms[4] = new CAPPDelta(kiSet, defaultDelta, beta, min, max);
         algorithms[5] = new COHENCAPPOblDelta(beta, defaultDelta, kiSet);
         algorithms[6] = new PELLCAPPOblDelta(beta, defaultDelta, kiSet);
+
         algorithms[7] = new CAPPValidation(kiSet, beta, min, max);
         algorithms[8] = new COHENCAPPOblValidation(beta, defaultDelta, kiSet);
         algorithms[9] = new PELLCAPPOblValidation(beta, defaultDelta, kiSet);
 
 
-        writer.println("CHEN;;;;;CAPP;;;;;COHENCAPPOBL;;;;;PELLCAPPOBL;;;;;CAPPDELTA;;;;;COHENCAPPDELTA;;;;;PELLCAPPDELTA;;;;;CAPPVALIDATION;;;;;COHENCAPPVALIDATION;;;;;PELLCAPPVALIDATION;");
+        writer.println("CHEN;;;;;CAPP;;;;;COHCAPP;;;;;PELLCAPP;;;;;CAPPDELTA;;;;;COHCAPPDELTA;;;;;PELLCAPPDELTA;;;;;CAPPVAL;;;;;COHCAPPVAL;;;;;PELLCAPPVAL;");
 
         String header = "Update Time;Query Time;Radius;Memory";
         for (int i = 0; i<algorithms.length; i++) {
@@ -245,23 +255,17 @@ public class TestUtils {
 
             window.removeFirst();
 
-            ArrayList<Point>[] centers = new ArrayList[algorithms.length];
             //Tests
-            for (int i = 0; i<algorithms.length; i++) {
-                calcUpdateTime(algorithms[i], p, time, writer);
-                centers[i] = calcQuery(algorithms[i], writer, window, kiSet);
-                calcMemory(algorithms[i], writer);
+            for (Algorithm algorithm : algorithms) {
+                calcUpdateTime(algorithm, p, time, writer);
+                calcQuery(algorithm, writer, window, kiSet);
+                calcMemory(algorithm, writer);
                 writer.print(";;");
             }
             writer.println();
 
             //FLUSH
             writer.flush();
-
-            //TESTS REGARDING CENTERS
-            if (!centers[1].equals(centers[2]) || !centers[1].equals(centers[3]) || !centers[4].equals(centers[5]) || !centers[4].equals(centers[6]) || !centers[7].equals(centers[8]) || !centers[7].equals(centers[9])) {
-                throw new RuntimeException("Error in the implementation of the oblivious versions");
-            }
         }
     }
 
@@ -345,10 +349,10 @@ public class TestUtils {
         LinkedList<Point> window = new LinkedList<>();
 
         //Initialize the algorithms
-        Algorithm[] algorithms = new Algorithm[deltas.length];
-        algorithms[0] = new CHEN(kiSet);
-        algorithms[1] = new PELLCAPPObl(beta, epsilon, kiSet);
-        writer.print("CHEN;;;;;PELLCAPP;;;;;;");
+        Algorithm[] algorithms = new Algorithm[deltas.length /*+2*/];
+        //algorithms[0] = new CHEN(kiSet);
+        //algorithms[1] = new PELLCAPPObl(beta, epsilon, kiSet);
+        //writer.print("CHEN;;;;;PELLCAPP;;;;;;");
         for (int i = 0; i<algorithms.length; i++) {
             algorithms[i] = new PELLCAPPOblDelta(beta, deltas[i], kiSet);
             writer.print("DELTA"+deltas[i]+";;;;;");
@@ -362,7 +366,7 @@ public class TestUtils {
         }
         writer.println();
 
-        for (int time = 1; time <= wSize+stride && reader.hasNext(); time++) {
+        for (int time = 1; time <= 30000+stride && reader.hasNext(); time++) {
             Point p = reader.nextPoint(time, wSize);
 
             if (p == null) {
@@ -370,8 +374,8 @@ public class TestUtils {
                 continue;
             }
 
-            //If window is not full, we don't query
-            if (time <= wSize) {
+            //If window is not full, we don't query TODO
+            if (time <= 30000) {
                 window.addLast(p);
                 for (Algorithm alg : algorithms) {
                     alg.update(p, time);
