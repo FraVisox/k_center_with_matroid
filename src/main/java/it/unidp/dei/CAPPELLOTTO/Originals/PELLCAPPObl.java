@@ -114,8 +114,11 @@ public class PELLCAPPObl implements Algorithm
     //This function is the same as the one in CAPP
     public ArrayList<Point> query()
     {
+        long start = System.nanoTime();
         //Binary search on guesses
         Integer valid = binarySearchGuess();
+        long end = System.nanoTime();
+        System.out.println("\n---------------------------------\n1. TIME TO SEARCH BETWEEN GUESSES: "+(end-start));
 
         //If there isn't a valid guess, it returns null
         if (valid == null) {

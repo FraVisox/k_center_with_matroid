@@ -136,13 +136,27 @@ public class Guess {
 
     //To be used only after the call to isCorrect() returns true
     public ArrayList<Point> query() {
+        long start = System.nanoTime();
         LinkedList<Point> union = new LinkedList<>(O);
+        long end = System.nanoTime();
+        System.out.println("2. TIME TO CREATE UNION AND PUT O: "+(end-start));
+
+        start = System.nanoTime();
+
         for (LinkedList<Point>[] list : R.values()) {
             for (LinkedList<Point> l : list) {
                 union.addAll(l);
             }
         }
+        end = System.nanoTime();
+        System.out.println("3. TIME TO PUT IN UNION R: "+(end-start));
+
+        start = System.nanoTime();
+
         CHEN chenEtAl = new CHEN(union, ki);
+        end = System.nanoTime();
+        System.out.println("4. TIME TO CREATE CHEN ALGORITHM: "+(end-start));
+
         return chenEtAl.query();
     }
 
