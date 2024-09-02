@@ -5,8 +5,6 @@ import it.unidp.dei.CAPPELLOTTO.Utils.Diameter.Diameter;
 import it.unidp.dei.CAPPELLOTTO.Utils.Diameter.PELLDiameter;
 import it.unidp.dei.CAPPELLOTTO.Utils.Guess.GuessValidation;
 import it.unidp.dei.CAPPELLOTTO.Utils.Guess.KGuessValidation;
-import it.unidp.dei.CHENETAL.CHEN;
-import it.unidp.dei.Main;
 import it.unidp.dei.Point;
 import it.unidp.dei.TestUtils;
 
@@ -16,10 +14,8 @@ import java.util.TreeMap;
 
 public class KPELLCAPPOblValidation implements Algorithm
 {
-    public KPELLCAPPOblValidation(double _beta, double _eps, int[] _ki) {
+    public KPELLCAPPOblValidation(double _beta, int[] _ki) {
         beta = _beta;
-        double epsilon1 = _eps/(1+2*CHEN.alfa);
-        delta = epsilon1/(1+_beta);
         ki = _ki;
         k = Algorithm.calcK(_ki);
         diameter = new PELLDiameter(beta);
@@ -51,7 +47,7 @@ public class KPELLCAPPOblValidation implements Algorithm
 
         //Create first and last indexes
         int firstIndex = (int) Math.floor(Math.log(r_t / 2) / Math.log(1 + beta));
-        int lastIndex = (int) Math.ceil(Math.log(2 * M_t / delta) / Math.log(1 + beta));
+        int lastIndex = (int) Math.ceil(Math.log(M_t) / Math.log(1 + beta));
 
         if (guesses.isEmpty()) {
             for (int i = firstIndex; i <= lastIndex; i++) {
@@ -170,7 +166,6 @@ public class KPELLCAPPOblValidation implements Algorithm
     private final LinkedList<Point> last_points = new LinkedList<>();
     private final int k;
     private final double beta;
-    private final double delta;
     private final int[] ki;
 }
 

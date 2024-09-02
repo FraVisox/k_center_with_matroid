@@ -6,14 +6,13 @@ public class Main {
 
         if (args.length != 1) {
             System.out.println("TESTS TO RUN:\n" +
-                    "- cambia qualcosa tra originals e randomized: ro\n"+
-                    "- cambiare il valore di wsize: w\n" +
-                    "- cambiare il delta con varie dimensioni di window per vedere la variazione dei parametri: wd\n" +
-                    "- aumento memoria/tempo in funzione di k: k\n" +
-                    "- aumento memoria/tempo in funzione di epsilon: e\n" +
-                    "- aumento memoria/tempo in funzione di beta: b\n"+
+                    "- differenze tra originals e randomized (e quindi tra originali e oblivious): ro\n"+
                     "- differenze algoritmi con k centri o con meno: kalg\n"+
-                    "- aumento memoria/tempo in funzione di doubling dimension: dd\n");
+                    "- aumento memoria/tempo in funzione di beta: b\n"+
+                    "- cambiare il valore di wsize: w\n" +
+                    "- aumento memoria/tempo in funzione di doubling dimension: dd\n" +
+                    "- testare picco: wd\n" +
+                    "- aumento memoria/tempo in funzione di k: k\n");
         } else if (args[0].equalsIgnoreCase("ro")) {
             System.out.println("\n----------------------\nSTART OF TEST OF RANDOMIZED DATASETS\n----------------------\n");
             TestUtils.testRandomized();
@@ -25,10 +24,6 @@ public class Main {
             System.out.println("\n----------------------\nSTART OF TEST OF WSIZE\n----------------------\n");
             TestUtils.testWSize();
             System.out.println("\n----------------------\nWSIZE TEST FINISHED\n----------------------\n");
-        } else if (args[0].equalsIgnoreCase("wd")) {
-            System.out.println("\n----------------------\nSTART OF TEST OF DELTAS AND WSIZES\n----------------------\n");
-            TestUtils.testDeltaW();
-            System.out.println("\n----------------------\nDELTAS AND WSIZES TEST FINISHED\n----------------------\n");
         } else if (args[0].equalsIgnoreCase("b")) {
             System.out.println("\n----------------------\nSTART OF TEST OF BETA\n----------------------\n");
             TestUtils.testBeta();
@@ -37,11 +32,11 @@ public class Main {
             System.out.println("\n----------------------\nSTART OF TEST OF KI\n----------------------\n");
             TestUtils.testKi();
             System.out.println("\n----------------------\nKI TEST FINISHED\n----------------------\n");
-        } else if (args[0].equalsIgnoreCase("e")) {
+        } /*else if (args[0].equalsIgnoreCase("e")) {
             System.out.println("\n----------------------\nSTART OF TEST OF EPSILON\n----------------------\n");
             TestUtils.testEpsilon();
             System.out.println("\n----------------------\nEPSILON TEST FINISHED\n----------------------\n");
-        } else if (args[0].equalsIgnoreCase("dd")) {
+        }*/ else if (args[0].equalsIgnoreCase("dd")) {
             System.out.println("\n----------------------\nSTART OF TEST OF BLOBS\n----------------------\n");
             BlobsTestUtils.testBlobs();
             System.out.println("\n----------------------\nBLOBS TEST FINISHED\n----------------------\n");
@@ -49,6 +44,8 @@ public class Main {
             System.out.println("\n----------------------\nSTART OF TEST OF K ALGORITHMS\n----------------------\n");
             TestUtils.testKAlg();
             System.out.println("\n----------------------\nK ALGORITHMS TEST FINISHED\n----------------------\n");
+        } else {
+            System.out.println("Command "+args[0]+" not recognized, aborting");
         }
     }
 }

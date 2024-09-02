@@ -45,7 +45,7 @@ public class BlobsTestUtils {
             }
 
             //TEST THINGS
-            testAlgorithms(reader, writer, blobsMinDist[i], blobsMaxDist[i],realBlobsMinDist[i],realBlobsMaxDist[i], blobsKi, defaultWSize, defaultEpsilon, defaultBeta);
+            testAlgorithms(reader, writer, blobsKi, defaultWSize, defaultEpsilon, defaultBeta);
 
             //CLOSE
             writer.close();

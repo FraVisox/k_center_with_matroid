@@ -38,7 +38,7 @@ public class CHEN implements Algorithm {
         ArrayList<Point> sol = null;
 
         //We won't go in overflow
-        if (pts.size() <= 30000) { //FIXME
+        if (pts.size() <= 30000) { //Value obtained experimentally
             //First we create all the distances and put them in an array
             int length = pts.size() * pts.size() - pts.size()+1;
             if (pts.size() <= k) {
@@ -120,7 +120,6 @@ public class CHEN implements Algorithm {
 
     //It returns null if the distance is not suitable to create a k-center clustering
     private ArrayList<Point> queryDist(double dist) {
-
         //Create the partition: the key point in the map is the head of the partition
         TreeMap<Point, ArrayList<Point>> partition = new TreeMap<>();
 
@@ -160,7 +159,6 @@ public class CHEN implements Algorithm {
 
     //We use a sparse graph, as the graph isn't changed after its creation, but only used to compute the maximum flow
     private ArrayList<Point> sparsePartitionMatroidIntersection(TreeMap<Point, ArrayList<Point>> partition) {
-
         List<Triple<Integer, Integer, Double>> edges = new ArrayList<>(partition.size());
         //MAPPING OF NODES TO INTEGER (essential for the sparse graph):
         // node 0 is the source

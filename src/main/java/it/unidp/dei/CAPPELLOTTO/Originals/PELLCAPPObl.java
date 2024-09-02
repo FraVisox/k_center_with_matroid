@@ -1,13 +1,10 @@
 package it.unidp.dei.CAPPELLOTTO.Originals;
 
 import it.unidp.dei.Algorithm;
-import it.unidp.dei.CAPPELLOTTO.Utils.Diameter.Diameter;
 import it.unidp.dei.CAPPELLOTTO.Utils.Diameter.PELLDiameter;
 import it.unidp.dei.CAPPELLOTTO.Utils.Guess.Guess;
 import it.unidp.dei.CHENETAL.CHEN;
-import it.unidp.dei.Main;
 import it.unidp.dei.Point;
-import it.unidp.dei.TestUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
