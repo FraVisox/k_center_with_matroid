@@ -31,16 +31,15 @@ public class BlobsTestUtils {
         DatasetReader reader;
         PrintWriter writer;
 
-        for (int i = 0; i < blobsDatasetsDimensions.length; i++) {
-            int dim = blobsDatasetsDimensions[i];
+        for (int dim : blobsDatasetsDimensions) {
             try {
                 //Create a dataset reader
                 reader = new RandomReader(dim);
-                reader.setFile(inFolder+"blobs"+dim+".csv");
+                reader.setFile(inFolder + "blobs" + dim + ".csv");
                 //Create a results writer
-                writer = new PrintWriter(outFolder+"testBlobs"+dim+".csv");
+                writer = new PrintWriter(outFolder + "testBlobs" + dim + ".csv");
             } catch (FileNotFoundException e) {
-                System.out.println("File blobs"+dim+".csv not found, skipping to next dataset");
+                System.out.println("File blobs" + dim + ".csv not found, skipping to next dataset");
                 continue;
             }
 
@@ -51,7 +50,7 @@ public class BlobsTestUtils {
             writer.close();
 
             reader.close();
-            System.out.println("blobs"+dim+" finished");
+            System.out.println("blobs" + dim + " finished");
         }
     }
 }

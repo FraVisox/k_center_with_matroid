@@ -1,6 +1,6 @@
 package it.unidp.dei;
 
-//Only contains the code to manage the commands passed by the user
+//Only contains the code to manage the commands passed by the user, and calls the methods of TestUtils or BlobsTestUtils
 public class Main {
     public static void main(String[] args) {
 
@@ -11,7 +11,6 @@ public class Main {
                     "- aumento memoria/tempo in funzione di beta: b\n"+
                     "- cambiare il valore di wsize: w\n" +
                     "- aumento memoria/tempo in funzione di doubling dimension: dd\n" +
-                    "- testare picco: wd\n" +
                     "- aumento memoria/tempo in funzione di k: k\n");
         } else if (args[0].equalsIgnoreCase("ro")) {
             System.out.println("\n----------------------\nSTART OF TEST OF RANDOMIZED DATASETS\n----------------------\n");

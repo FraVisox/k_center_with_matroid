@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Locale;
 
+//Methods called by Main.java to make tests
 public class TestUtils {
     //Folders of input and output files
     public static final String inFolderOriginals = "data/originals/";
@@ -45,7 +46,7 @@ public class TestUtils {
     private static final double[] minDist = {8.1e-5, 2.82, 0.008, 0.35, 5.8e-4};
     private static final double[] maxDist = {52.6, 8853.4, 26.7, 3.32, 2.9};
 
-    //VALUES OF RIGHT MAX AND MIN DISTANCES for 10.000 points:
+    //VALUES OF REAL MAX AND MIN DISTANCES for 10.000 points:
     private static final double[] realMinDist = {0.002, 8.12, 0.02, 0.56, 0.007};
     private static final double[] realMaxDist = {33.7, 8693, 15.4, 3.09, 2.7};
 
@@ -80,7 +81,7 @@ public class TestUtils {
     }
 
 
-    /* EPSILON TEST
+    /* EPSILON TEST. Omitted as we test delta
     //Test with different epsilon on standard datasets
     public static void testEpsilon() {
         double[] epsilon = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8}; //, 0.9 DEFAULT
@@ -191,6 +192,8 @@ public class TestUtils {
         }
     }
 
+    //GENERAL TESTING: all the PELL versions
+
     //In every line of the output file we will have a header:
     //updateTime;queryTime;radius;ratio;memory
     public static void testAlgorithms(DatasetReader reader, PrintWriter writer, int[] kiSet, int wSize, double epsilon, double beta) {
@@ -200,9 +203,8 @@ public class TestUtils {
 
         //Initialize the algorithms
         Algorithm[] algorithms;
-        if (((reader instanceof PhonesReader || reader instanceof HiggsReader) && wSize > 30000 && wSize < 50000)
-            ||
-            (reader instanceof CovertypeReader && wSize > 30000 && wSize <= 40000))    {
+        if ((reader instanceof PhonesReader || reader instanceof HiggsReader || reader instanceof CovertypeReader) && wSize == 40000)
+        {
             //NO CHEN
             algorithms = new Algorithm[5];
 
@@ -216,11 +218,9 @@ public class TestUtils {
 
             writer.println("PELLCAPP;;;;;;PELLCAPPDELTA05;;;;;;PELLCAPPDELTA10;;;;;;PELLCAPPDELTA15;;;;;;PELLCAPPDELTA20;;;;;;");
 
-        } else if (((reader instanceof PhonesReader || reader instanceof HiggsReader) && wSize >= 50000)
-            ||
-            (reader instanceof CovertypeReader && wSize > 40000)){
+        } else if ((reader instanceof PhonesReader || reader instanceof HiggsReader || reader instanceof CovertypeReader) && wSize >= 50000) {
 
-            //NO CAPP
+            //NO PELLCAPP
             algorithms = new Algorithm[4];
 
             int i = 0;
@@ -230,7 +230,7 @@ public class TestUtils {
 
             writer.println("PELLCAPPDELTA05;;;;;;PELLCAPPDELTA10;;;;;;PELLCAPPDELTA15;;;;;;PELLCAPPDELTA20;;;;;;");
         } else if (reader instanceof RandomReader && wSize >= 40000) {
-            //NO CAPPDELTA 0.5 or CAPP
+            //NO PELLCAPPDELTA 0.5 and PELLCAPP
             algorithms = new Algorithm[3];
 
             for (int i = 1; i < defaultDeltas.length; i++) {
@@ -281,6 +281,7 @@ public class TestUtils {
             }
 
             if (time % 50 == 0) {
+                //Check of passing of time
                 System.out.println(time);
             }
 
@@ -308,6 +309,8 @@ public class TestUtils {
             writer.flush();
         }
     }
+
+    //TESTS of first phase
 
     //In every line of the output file we will have a header:
     //updateTime;queryTime;radius;ratio;memory
@@ -399,6 +402,8 @@ public class TestUtils {
         }
     }
 
+    //TESTS of K-Algorithms
+
     //In every line of the output file we will have a header:
     //updateTime;queryTime;radius;ratio;memory
     public static void testKAlgorithms(DatasetReader reader, PrintWriter writer, double min, double max, int[] kiSet, int wSize, double epsilon, double beta) {
@@ -486,6 +491,8 @@ public class TestUtils {
 
         }
     }
+
+    //PRIVATE METHODS to calculate time, memory and radius/ratio of the algorithms
 
     private static void calcUpdateTime(Algorithm alg, Point p, int time, PrintWriter writer) {
         //TIME TEST: we call explicitly the garbage collector to allow our algorithm
