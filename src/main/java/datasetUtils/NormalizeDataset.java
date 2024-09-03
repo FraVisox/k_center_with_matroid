@@ -9,7 +9,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-//In this case, we only normalize covtype
+//Class to normalize covtype dataset (and obtain normalized)
 public class NormalizeDataset {
     private static final String outFolder = TestUtils.inFolderOriginals;
     private static final String inFolder = TestUtils.inFolderOriginals;

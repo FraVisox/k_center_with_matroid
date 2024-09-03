@@ -8,6 +8,8 @@ import org.jgrapht.alg.util.Triple;
 import java.util.*;
 import org.jgrapht.opt.graph.sparse.SparseIntDirectedWeightedGraph;
 
+
+//Implementation of the state of the art Chen et al. algorithm
 public class CHEN implements Algorithm {
 
     //Approximation of sequential algorithm. In our case, CHEN gives a 3-approximation
@@ -25,6 +27,7 @@ public class CHEN implements Algorithm {
         k = Algorithm.calcK(_ki);
     }
 
+    //Updating only means to add the point to the list of points, and maybe delete another one
     @Override
     public void update(Point p, int time) {
         if (!pts.isEmpty() && pts.getFirst().hasExpired(time)) {
@@ -33,12 +36,12 @@ public class CHEN implements Algorithm {
         pts.addLast(p);
     }
 
+    //The implementation is partially taken by the Ceccarello et al. paper, for reference see the thesis
     @Override
     public ArrayList<Point> query() {
         ArrayList<Point> sol = null;
 
-        //We won't go in overflow
-        if (pts.size() <= 30000) { //Value obtained experimentally
+        if (pts.size() <= 30000) { //Value obtained experimentally to not go in overflow
             //First we create all the distances and put them in an array
             int length = pts.size() * pts.size() - pts.size()+1;
             if (pts.size() <= k) {

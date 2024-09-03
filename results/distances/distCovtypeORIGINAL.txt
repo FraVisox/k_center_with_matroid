@@ -1,0 +1,64 @@
+At time: 500
+Min distance: 25.436194683953808
+Max distance: 7978.482625161253
+
+At time: 1000
+Min distance: 25.436194683953808
+Max distance: 7978.482625161253
+
+At time: 5000
+Min distance: 9.746794344808963
+Max distance: 8610.946115265151
+
+At time: 10000
+Min distance: 9.746794344808963
+Max distance: 8610.946115265151
+
+At time: 20000
+Min distance: 7.280109889280518
+Max distance: 8818.167099800276
+
+At time: 30000
+Min distance: 7.280109889280518
+Max distance: 8818.167099800276
+
+At time: 40000
+Min distance: 7.280109889280518
+Max distance: 8818.167099800276
+
+At time: 50000
+Min distance: 7.280109889280518
+Max distance: 8818.167099800276
+
+At time: 60000
+Min distance: 7.280109889280518
+Max distance: 8818.167099800276
+
+At time: 70000
+Min distance: 7.280109889280518
+Max distance: 8818.167099800276
+
+At time: 80000
+Min distance: 7.280109889280518
+Max distance: 8818.167099800276
+
+At time: 90000
+Min distance: 7.280109889280518
+Max distance: 8818.167099800276
+
+At time: 100000
+Min distance: 7.280109889280518
+Max distance: 8818.167099800276
+
+At time: 200000
+Min distance: 2.8284271247461903
+Max distance: 8818.167099800276
+
+At time: 500000
+Min distance: 2.8284271247461903
+Max distance: 8833.16223104727
+
+FINAL: 500001
+Min distance: 2.8284271247461903
+Max distance: 8833.16223104727
+

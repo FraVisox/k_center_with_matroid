@@ -2,6 +2,7 @@ package it.unidp.dei.datasetReaders;
 
 import it.unidp.dei.Point;
 
+//Reader of COVERTYPE (and also NORMALIZED)
 public class CovertypeReader extends DatasetReader {
     @Override
     public Point nextPoint(int time, int wSize) {

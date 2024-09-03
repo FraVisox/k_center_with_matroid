@@ -3,6 +3,7 @@ package it.unidp.dei;
 import java.util.Arrays;
 import java.util.Collection;
 
+//Point of a dataset
 public class Point implements Comparable<Point> {
     public Point(double[] _coords, int _time, int _windowSize, int _group) {
         coords = _coords;
@@ -10,15 +11,17 @@ public class Point implements Comparable<Point> {
         group = _group;
     }
 
+    //Group or category
     public int getGroup() {
         return group;
     }
 
+    //Tells if it has expired (it remembers the exitTime when it is constructed)
     public boolean hasExpired(int currentTime) {
         return exitTime <= currentTime;
     }
 
-    //It returns the distance of this point from the other point passed.
+    //Returns the distance of this point from the other point passed.
     public double getDistance(Point p) {
         double quad_dist = 0;
         for (int i = 0; i<coords.length; i++) {
@@ -28,7 +31,7 @@ public class Point implements Comparable<Point> {
         return Math.sqrt(quad_dist);
     }
 
-    //It returns the minimum distance of this point from a Collection of points.
+    //Returns the minimum distance of this point from a Collection of points.
     public double getMinDistance(Collection<Point> set) {
         double mind = TestUtils.INF;
         for(Point q : set) {
@@ -37,8 +40,8 @@ public class Point implements Comparable<Point> {
         return mind;
     }
 
-    //It returns the minimum distance of this point from a Collection of points.
-    //If that distance is zero, it is returned the second minimum distance.
+    //Returns the minimum distance of this point from a Collection of points.
+    //The minimum distance can't be zero.
     //USED IN CalculateMinMaxDist
     public double getMinDistanceWithoutZeroes(Collection<Point> set, double INF) {
         double mind = INF;
@@ -50,8 +53,8 @@ public class Point implements Comparable<Point> {
         return mind;
     }
 
-    //It returns the minimum distance of this point from a Collection of points, excluding itself
-    //USED IN CAPPObl and KCAPPObl
+    //Returns the minimum distance of this point from a Collection of points, excluding itself
+    //USED IN CAPPObl and variants
     public double getMinDistanceWithoutItself(Collection<Point> set, double INF) {
         double mind = INF;
         for(Point q : set) {
@@ -62,7 +65,7 @@ public class Point implements Comparable<Point> {
         return mind;
     }
 
-    //It returns the maximum distance of this point from a Collection of points.
+    //Returns the maximum distance of this point from a Collection of points.
     public double getMaxDistance(Collection<Point> set) {
         double maxd = 0;
         for(Point q : set) {
@@ -71,6 +74,7 @@ public class Point implements Comparable<Point> {
         return maxd;
     }
 
+    //Comparisons
     @Override
     public boolean equals(Object o){
         if(!(o instanceof Point)) {
@@ -78,7 +82,6 @@ public class Point implements Comparable<Point> {
         }
         return this.exitTime == ((Point)o).exitTime;
     }
-
     @Override
     public int compareTo(Point q) {
         return (this.exitTime-q.exitTime);
@@ -91,6 +94,7 @@ public class Point implements Comparable<Point> {
         return exitTime;
     }
 
+    //Useful for debug purposes
     @Override
     public String toString() {
         return Integer.toString(exitTime);

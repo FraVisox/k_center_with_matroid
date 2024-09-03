@@ -6,11 +6,18 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.Random;
 
+//Create the RANDOM dataset
 public class CreateRandomDataset {
     private static final String file = "random20.csv";
     private static final int numOfPoints = 1000000;
+
+    //Number of categories
     private static final int numOfGroups = 6;
+
+    //Number of dimensions
     private static final int doublingDimension = 20;
+
+    //Number of dimensions that are not zero
     private static final int notZeroes = 20;
     public static void main(String[] args) {
         PrintWriter writer;

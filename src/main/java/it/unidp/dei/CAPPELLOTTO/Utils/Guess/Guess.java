@@ -6,6 +6,7 @@ import it.unidp.dei.Point;
 
 import java.util.*;
 
+//The main unit of all the CAPP algorithms and variants. It contains the code written in the thesis
 public class Guess {
 
     public Guess(double _gamma, double _delta, int[] _ki) {
@@ -146,6 +147,8 @@ public class Guess {
         return chenEtAl.query();
     }
 
+    //Returns true if and only if the union of points of AV, RV and OV which are at distance
+    //greater than 2*gamma has cardinality <= k
     public boolean isCorrect() {
         if (RV.size() > k) {
             return false;

@@ -5,6 +5,7 @@ import it.unidp.dei.Point;
 
 import java.util.*;
 
+//Guess used for K-Algorithms (it simply uses KCHEN instead of CHEN)
 public class KGuess extends Guess {
     public KGuess(double _gamma, double _delta, int[] _ki) {
         super(_gamma, _delta, _ki);

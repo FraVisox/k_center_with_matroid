@@ -8,12 +8,15 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 
+//Randomize the dataset by simply swapping the lines
 public class RandomizeDataset {
     private static final String outFolder = TestUtils.inFolderRandomized;
     private static final String inFolder = TestUtils.inFolderOriginals;
 
-    //HIGGS does not need to be randomized, as it is already randomized
+    //HIGGS does not need to be randomized, as it is already randomized. NORMALIZED is taken from the randomized covtype
     private static final String[] datasets = {"Phones_accelerometer.csv", "covtype.dat"};
+
+    //Tells if there is the header in the csv file
     private static final boolean[] isThereFirst = {true, false};
 
     public static void main(String[] args) {
@@ -47,12 +50,15 @@ public class RandomizeDataset {
 
             reader.close();
 
+            //Shuffle everything
             Collections.shuffle(strings);
 
+            //Write header
             if (isThereFirst[i]) {
                 writer.write(first+"\n");
             }
 
+            //Write lines
             for (String s : strings) {
                 writer.write(s+"\n");
             }

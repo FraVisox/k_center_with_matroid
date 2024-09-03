@@ -3,7 +3,8 @@ package it.unidp.dei.datasetReaders;
 import java.io.*;
 import java.util.StringTokenizer;
 
-//This entire class is similar to the one in Pellizzoni code, for reference see the paper
+//This entire class is similar to the one in Pellizzoni e al. code, for reference see the paper.
+//It is used to read a generic dataset
 public class InputFileReader {
     public InputFileReader(String fileName) throws FileNotFoundException {
         reader = new BufferedReader(new java.io.FileReader(fileName));

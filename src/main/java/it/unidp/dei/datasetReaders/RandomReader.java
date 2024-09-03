@@ -5,6 +5,7 @@ import it.unidp.dei.Point;
 import java.io.FileNotFoundException;
 import java.util.Random;
 
+//Reader of RANDOM and all the BLOBS datasets
 public class RandomReader extends DatasetReader {
     public RandomReader(int dimension) {
         doublingDimension = dimension;

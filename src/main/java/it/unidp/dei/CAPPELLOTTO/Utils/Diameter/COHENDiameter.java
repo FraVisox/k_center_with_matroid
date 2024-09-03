@@ -5,7 +5,7 @@ import it.unidp.dei.Point;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-//This algorithm is the one presented in Cohen-Addad's paper
+//This algorithm is the one presented in Cohen-Addad's paper, also implemented by Pellizzoni
 public class COHENDiameter extends Diameter
 {
     public COHENDiameter(double _eps) {
