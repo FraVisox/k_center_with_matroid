@@ -1,3 +1,4 @@
+import numpy as np
 from icecream import ic
 import seaborn as sns
 import polars as pl
@@ -13,7 +14,7 @@ y_axis = ["update", "query", "memory", "ratio"]
 color = "algorithm"
 
 # File to read from
-datasets = ["phones", "higgs", "covtype", "normalized", "random"]
+datasets = ["phones", "higgs", "covtype"]
 file_names = []
 for i in datasets:
     file_names.append(x_axis + "_" + i)
@@ -66,14 +67,17 @@ def filter(df):
     """
     df = df.filter(
         pl.col("dataset") != "RANDOM",
-        pl.col("algorithm") != "PELLCAPP",
         pl.col("dataset") != "NORMALIZED",
     )
     df = df.with_columns(
         pl.col("algorithm").str.extract(r"DELTA(\d+)").cast(pl.Float64).alias("delta") / 10
     )
     df = df.with_columns(
-        pl.col("algorithm").str.replace(r"PELLCAPPDELTA(\d+)", "OursOblivious")
+        pl.col("algorithm").str.replace(r"PELLCAPPDELTA(\d+)", "OursOblivious"),
+    ).with_columns(
+        pl.col("algorithm").str.replace(r"CAPPDELTA(\d+)", "Ours")
+    ).filter(
+        pl.col("algorithm").is_in(["CHEN", "Ours", "OursOblivious"])
     )
     df = df.filter(pl.col("wsize").is_in([10000, 50000, 500000]))
     df = df.with_columns(
@@ -90,6 +94,27 @@ def hline(data, **kwargs):
         ax.axhline(bline, c=kwargs["color"])
 
 
+def load(file):
+    input_file = "experiments_results/" + file + ".csv"
+    if replace_commas:
+        replace_dots_with_commas(input_file)
+    df = pl.read_csv(source=input_file, separator=";", infer_schema_length=10000)
+    df = ( df
+        .with_columns(pl.lit(file.split("_")[1].upper())
+        .alias("dataset"))
+    )
+    if "wsize" not in df.columns:
+        df = df.with_columns(pl.lit(10000, pl.Int64).alias("wsize"))
+    if "type" in df.columns:
+        df = df.filter(pl.col("type") == "Rand")
+    df = df.select(
+        "wsize", "algorithm", "update", "query", "radius", "ratio", "memory", "dataset"
+    )
+    # FILTERS
+    df = filter(df)
+    return df
+
+
 def read_and_plot_bar(output_file_path):
     """
     Reads data from input files, performs filtering, and generates bar plots based on the provided parameters.
@@ -102,27 +127,17 @@ def read_and_plot_bar(output_file_path):
     """
 
     dataframe = []
-    for file in file_names:
-        if file == "random" or file == "higgs":
-            continue
-        input_file = "experiments_results/" + file + ".csv"
-        if replace_commas:
-            replace_dots_with_commas(input_file)
-        df = pl.read_csv(source=input_file, separator=";", infer_schema_length=10000)
-        df = df.with_columns(pl.lit(file.split("_")[1].upper()).alias("dataset"))
-        # FILTERS
-        df = filter(df)
+    for dataset in datasets:
+        file = "wsize_" + dataset
+        df = load(file)
+        dataframe.append(df)
+        file = "type_" + dataset
+        df = load(file).filter(pl.col("algorithm") == "Ours")
         dataframe.append(df)
     dat = pl.concat(dataframe)
     dat = dat.filter(pl.col("wsize") == 10000)
 
-    ic(dat)
-
     for graph in y_axis:
-        # if graph == "query":
-        #     g = sns.FacetGrid(dat, col="dataset", col_wrap=3, sharex=False, sharey=True, aspect=3)
-        # else :
-        #     g = sns.FacetGrid(dat, col="dataset", col_wrap=3, sharex=False, sharey=False, aspect=3)
         g = sns.FacetGrid(
             dat,
             col="dataset",
@@ -137,9 +152,16 @@ def read_and_plot_bar(output_file_path):
             x="delta",  # x axis
             y=graph,  # y axis
             hue="algorithm",  # color
+        )
+        g.map_dataframe(
+            sns.scatterplot,  # barplot or lineplot
+            x="delta",  # x axis
+            y=graph,  # y axis
+            hue="algorithm",  # color
+            size="algorithm",
             style="algorithm",
-            markers=True,
-            dashes=False,
+            sizes=list( np.array([1, 1, 3]) * 50 ),
+            size_order=["CHEN", "Ours", "OursOblivious"],
         )
         g.map_dataframe(
             hline,
