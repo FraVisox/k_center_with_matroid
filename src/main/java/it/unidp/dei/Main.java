@@ -17,7 +17,7 @@ public class Main {
             TestUtils.testRandomized();
             System.out.println("\n----------------------\nTEST OF RANDOMIZED DATASETS FINISHED\n----------------------\n");
             System.out.println("\n----------------------\nSTART OF TEST OF ORIGINAL DATASETS\n----------------------\n");
-            TestUtils.testOriginals();
+            //TestUtils.testOriginals();
             System.out.println("\n----------------------\nTEST OF ORIGINAL DATASETS FINISHED\n----------------------\n");
         } else if (args[0].equalsIgnoreCase("w")) {
             System.out.println("\n----------------------\nSTART OF TEST OF WSIZE\n----------------------\n");

@@ -104,7 +104,7 @@ public class TestUtils {
     public static void testWSize() {
         int[] wSize = {/*500, 1000, 5000,*/ 10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000, 200000, 500000};
         for (int w : wSize) {
-            testDatasets(true, "wCAPP" + w, defaultKi, w, defaultBeta, false);
+            testDatasets(true, "w" + w, defaultKi, w, defaultBeta, false);
             System.gc();
         }
     }
@@ -145,7 +145,7 @@ public class TestUtils {
                     if (name != null) {
                         writer = new PrintWriter(outFolder + "rand" + name + outFiles[i]);
                     } else {
-                        writer = new PrintWriter(outFolder + "rand" + outFiles[i]);
+                        writer = new PrintWriter(outFolder + "randCAPP" + outFiles[i]);
                     }
 
                 } else { //IF ORIGINAL
@@ -262,14 +262,14 @@ public class TestUtils {
 
          */
 
-        algorithms = new Algorithm[6];
+        algorithms = new Algorithm[5];
         algorithms[0] = new JONES(kiSet);
 
-        algorithms[1] = new PELLCAPP(beta, epsilon, kiSet);
+        //algorithms[1] = new PELLCAPP(beta, epsilon, kiSet);
 
-        int i = 2;
+        int i = 1;
         for (double dd : defaultDeltas) {
-            algorithms[i] = new PELLCAPPDELTAxx(beta, dd, kiSet);
+            algorithms[i] = new CAPPDELTAxx(kiSet, dd, beta, minDist, maxDist);
             i++;
         }
 
@@ -341,8 +341,10 @@ public class TestUtils {
         LinkedList<Point> window = new LinkedList<>();
 
         //Initialize the algorithms
-        Algorithm[] algorithms = new Algorithm[25];
+        Algorithm[] algorithms = new Algorithm[9];
         algorithms[0] = new JONES(kiSet);
+
+        /*
 
         algorithms[1] = new CAPP(kiSet, epsilon, beta, min, max);
         algorithms[2] = new CAPP(kiSet, epsilon, beta, realMin, realMax);
@@ -350,23 +352,30 @@ public class TestUtils {
         algorithms[4] = new PELLCAPP(beta, epsilon, kiSet);
 
         int i = 5;
+        */
+
+        int i = 1;
 
         for (double dd : defaultDeltas) {
-            if (dd > 2) break;
             algorithms[i] = new CAPPDELTAxx(kiSet, dd, beta, min, max);
-            algorithms[i+1] = new CAPPDELTAxx(kiSet, dd, beta, realMin, realMax);
-            algorithms[i+2] = new COHCAPPDELTAxx(beta, dd, kiSet);
-            algorithms[i+3] = new PELLCAPPDELTAxx(beta, dd, kiSet);
-            i += 4;
+            //algorithms[i+1] = new CAPPDELTAxx(kiSet, dd, beta, realMin, realMax);
+            //algorithms[i+2] = new COHCAPPDELTAxx(beta, dd, kiSet);
+            //algorithms[i+3] = new PELLCAPPDELTAxx(beta, dd, kiSet);
+            //i += 4;
+            i++;
         }
+        /*
 
         algorithms[i] = new CAPPVAL(kiSet, beta, min, max);
         algorithms[i+1] = new CAPPVAL(kiSet, beta, realMin, realMax);
         algorithms[i+2] = new COHCAPPVAL(beta, kiSet);
         algorithms[i+3] = new PELLCAPPVAL(beta, kiSet);
 
+         */
 
-        writer.println("JONES;;;;;;CAPP;;;;;;REALCAPP;;;;;;COHCAPP;;;;;;PELLCAPP;;;;;;CAPPDELTA05;;;;;;REALCAPPDELTA05;;;;;;COHCAPPDELTA05;;;;;;PELLCAPPDELTA05;;;;;;CAPPDELTA10;;;;;;REALCAPPDELTA10;;;;;;COHCAPPDELTA10;;;;;;PELLCAPPDELTA10;;;;;;CAPPDELTA15;;;;;;REALCAPPDELTA15;;;;;;COHCAPPDELTA15;;;;;;PELLCAPPDELTA15;;;;;;CAPPDELTA20;;;;;;REALCAPPDELTA20;;;;;;COHCAPPDELTA20;;;;;;PELLCAPPDELTA20;;;;;;CAPPVAL;;;;;;REALCAPPVAL;;;;;;COHCAPPVAL;;;;;;PELLCAPPVAL;;;;;;;");
+
+        //writer.println("JONES;;;;;;CAPP;;;;;;REALCAPP;;;;;;COHCAPP;;;;;;PELLCAPP;;;;;;CAPPDELTA05;;;;;;REALCAPPDELTA05;;;;;;COHCAPPDELTA05;;;;;;PELLCAPPDELTA05;;;;;;CAPPDELTA10;;;;;;REALCAPPDELTA10;;;;;;COHCAPPDELTA10;;;;;;PELLCAPPDELTA10;;;;;;CAPPDELTA15;;;;;;REALCAPPDELTA15;;;;;;COHCAPPDELTA15;;;;;;PELLCAPPDELTA15;;;;;;CAPPDELTA20;;;;;;REALCAPPDELTA20;;;;;;COHCAPPDELTA20;;;;;;PELLCAPPDELTA20;;;;;;CAPPVAL;;;;;;REALCAPPVAL;;;;;;COHCAPPVAL;;;;;;PELLCAPPVAL;;;;;;;");
+        writer.println("JONES;;;;;;CAPPDELTA05;;;;;;CAPPDELTA10;;;;;;CAPPDELTA15;;;;;;CAPPDELTA20;;;;;;CAPPDELTA25;;;;;;CAPPDELTA30;;;;;;CAPPDELTA35;;;;;;CAPPDELTA40;;;;;;");
 
         String header = "Update Time;Query Time;Radius;Ratio;Memory";
         for (i = 0; i<algorithms.length; i++) {
