@@ -2,7 +2,7 @@ package it.unidp.dei.CAPPELLOTTO.CAPPVAL;
 
 import it.unidp.dei.Algorithm;
 import it.unidp.dei.CAPPELLOTTO.Utils.Guess.GuessVAL;
-import it.unidp.dei.CAPPELLOTTO.Utils.Guess.KGuessVAL;
+import it.unidp.dei.CAPPELLOTTO.Utils.Guess.KCGuessVAL;
 import it.unidp.dei.Point;
 
 import java.util.ArrayList;
@@ -16,12 +16,12 @@ public class KCAPPVAL implements Algorithm {
         int first_i = (int)Math.floor(Math.log(_minDist)/Math.log(1+_beta));
         int last_i = (int)Math.ceil(Math.log(_maxDist)/Math.log(1+_beta));
         int number_of_guesses = last_i-first_i+1;
-        guesses = new KGuessVAL[number_of_guesses];
+        guesses = new KCGuessVAL[number_of_guesses];
 
         //We use the definition: we start from (1+beta)^first_i, and don't start from minDist as in Pellizzoni
         double gamma = Math.pow((1+_beta), first_i);
         for (int i = 0; i<number_of_guesses; i++) {
-            guesses[i] = new KGuessVAL(gamma, _ki);
+            guesses[i] = new KCGuessVAL(gamma, _ki);
             gamma *= (1+_beta);
         }
     }
@@ -48,7 +48,7 @@ public class KCAPPVAL implements Algorithm {
     @Override
     public int getSize() {
         int size = 0;
-        for (KGuessVAL g : guesses) {
+        for (KCGuessVAL g : guesses) {
             size += g.getSize();
         }
         return size;
@@ -71,5 +71,5 @@ public class KCAPPVAL implements Algorithm {
     }
 
     //Array of guesses
-    private final KGuessVAL[] guesses;
+    private final KCGuessVAL[] guesses;
 }

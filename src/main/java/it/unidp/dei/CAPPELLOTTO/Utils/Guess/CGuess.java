@@ -1,15 +1,15 @@
 package it.unidp.dei.CAPPELLOTTO.Utils.Guess;
 
 import it.unidp.dei.Algorithm;
-import it.unidp.dei.JONES.JONES;
+import it.unidp.dei.CHENETAL.CHEN;
 import it.unidp.dei.Point;
 
 import java.util.*;
 
-//GuessVAL with CHEN instead of JONES
-public class Guess {
+//Guess with CHEN instead of JONES
+public class CGuess {
 
-    public Guess(double _gamma, double _delta, int[] _ki) {
+    public CGuess(double _gamma, double _delta, int[] _ki) {
         gamma = _gamma;
         delta = _delta;
         ki = _ki;
@@ -18,7 +18,7 @@ public class Guess {
         R = new TreeMap<>();
     }
 
-    public Guess(double _gamma, double _delta, int[] _ki, TreeMap<Point, Point> _RV, TreeMap<Point, LinkedList<Point>[]> _R) {
+    public CGuess(double _gamma, double _delta, int[] _ki, TreeMap<Point, Point> _RV, TreeMap<Point, LinkedList<Point>[]> _R) {
         gamma = _gamma;
         delta = _delta;
         ki = _ki;
@@ -143,8 +143,8 @@ public class Guess {
                 union.addAll(l);
             }
         }
-        JONES jones = new JONES(union, ki); //here we can use JONES or CHEN, we choose JONES as it performs better
-        return jones.query();
+        CHEN chen = new CHEN(union, ki);
+        return chen.query();
     }
 
     //Returns true if and only if the union of points of AV, RV and OV which are at distance

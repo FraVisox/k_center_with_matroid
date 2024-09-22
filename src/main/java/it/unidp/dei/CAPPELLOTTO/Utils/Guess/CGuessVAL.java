@@ -1,22 +1,22 @@
 package it.unidp.dei.CAPPELLOTTO.Utils.Guess;
 
 import it.unidp.dei.Algorithm;
-import it.unidp.dei.JONES.JONES;
+import it.unidp.dei.CHENETAL.CHEN;
 import it.unidp.dei.Point;
 
 import java.util.*;
 
 //The same as Guess, but without the coreset sets
-public class GuessVAL {
+public class CGuessVAL {
 
-    public GuessVAL(double _gamma, int[] _ki) {
+    public CGuessVAL(double _gamma, int[] _ki) {
         gamma = _gamma;
         ki = _ki;
         k = Algorithm.calcK(_ki);
         RV = new TreeMap<>();
     }
 
-    public GuessVAL(double _gamma, int[] _ki, TreeMap<Point, LinkedList<Point>[]> _RV) {
+    public CGuessVAL(double _gamma, int[] _ki, TreeMap<Point, LinkedList<Point>[]> _RV) {
         gamma = _gamma;
         ki = _ki;
         k = Algorithm.calcK(_ki);
@@ -97,8 +97,8 @@ public class GuessVAL {
                 union.addAll(l);
             }
         }
-        JONES jones = new JONES(union, ki);
-        return jones.query();
+        CHEN chen = new CHEN(union, ki);
+        return chen.query();
     }
 
     //Returns true if and only if the union of points of AV, RV and OV which are at distance

@@ -6,12 +6,12 @@ import it.unidp.dei.Point;
 import java.util.*;
 
 //GuessVAL used for K-Algorithms (it simply uses KCHEN instead of CHEN)
-public class KGuessVAL extends GuessVAL {
-    public KGuessVAL(double _gamma, int[] _ki) {
+public class KCGuessVAL extends GuessVAL {
+    public KCGuessVAL(double _gamma, int[] _ki) {
         super(_gamma, _ki);
     }
 
-    public KGuessVAL(double _gamma, int[] _ki, TreeMap<Point, LinkedList<Point>[]> _R) {
+    public KCGuessVAL(double _gamma, int[] _ki, TreeMap<Point, LinkedList<Point>[]> _R) {
         super(_gamma, _ki, _R);
     }
 

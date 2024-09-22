@@ -6,12 +6,12 @@ public class Main {
 
         if (args.length != 1) {
             System.out.println("TESTS TO RUN:\n" +
-                    "- differenze tra originals e randomized (e quindi tra originali e oblivious): ro\n"+
-                    "- differenze algoritmi con k centri o con meno: kalg\n"+
-                    "- aumento memoria/tempo in funzione di beta: b\n"+
-                    "- cambiare il valore di wsize: w\n" +
-                    "- aumento memoria/tempo in funzione di doubling dimension: dd\n" +
-                    "- aumento memoria/tempo in funzione di k: k\n");
+                    "- random and original differences: ro\n"+
+                    "- exactly k centers or less: kalg\n"+
+                    "- beta variation: b\n"+
+                    "- window size variation: w\n" +
+                    "- dimensionality variation: dd\n" +
+                    "- k variation: k\n");
         } else if (args[0].equalsIgnoreCase("ro")) {
             System.out.println("\n----------------------\nSTART OF TEST OF RANDOMIZED DATASETS\n----------------------\n");
             TestUtils.testRandomized();
