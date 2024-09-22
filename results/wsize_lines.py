@@ -1,3 +1,4 @@
+import numpy as np
 from icecream import ic
 import seaborn as sns
 import polars as pl
@@ -73,13 +74,17 @@ def filter(df):
         pl.col("algorithm").str.extract(r"DELTA(\d+)").cast(pl.Float64).alias("delta") / 10
     )
     df = df.with_columns(
-        pl.col("algorithm").str.replace(r"PELLCAPPDELTA(\d+)", "OursOblivious")
+        pl.col("algorithm").str.replace(r"PELLCAPPDELTA(\d+)", "OursOblivious"),
+    ).with_columns(
+        pl.col("algorithm").str.replace(r"CAPPDELTA(\d+)", "Ours")
+    ).filter(
+        pl.col("algorithm").is_in(["CHEN", "Ours", "OursOblivious"])
     )
     # df = df.filter(pl.col("wsize").is_in([10000, 50000, 500000]))
     df = df.with_columns(
         ( pl.col("update") / 1e6 ).alias("update"),
         ( pl.col("query") / 1e6 ).alias("query")
-    )
+    ).filter(pl.col("wsize") >= 10000)
     return df
 
 
@@ -135,9 +140,19 @@ def read_and_plot_bar(output_file_path):
             x="wsize",  # x axis
             y=graph,  # y axis
             hue="algorithm",  # color
+            # style="algorithm",
+            # markers=True,
+            # dashes=False,
+        )
+        g.map_dataframe(
+            sns.scatterplot,  # barplot or lineplot
+            x="wsize",  # x axis
+            y=graph,  # y axis
+            hue="algorithm",  # color
+            size="algorithm",
             style="algorithm",
-            markers=True,
-            dashes=False,
+            sizes=list( np.array([1, 1, 2]) * 50 ),
+            size_order=["CHEN", "Ours", "OursOblivious"],
         )
         g.set_xlabels("window size")
         g.add_legend()
