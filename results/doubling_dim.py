@@ -3,8 +3,8 @@ import polars as pl
 import matplotlib.pyplot as plt
 
 #File to read from
-first = False
-type_of_graph = "doubling_dimension"
+first = True
+type_of_graph = "doubling_dimension_jones"
 file_name = "experiments_results/"+type_of_graph+".csv"
 output_file = "graphs/"+type_of_graph
 
@@ -14,7 +14,7 @@ y_axis = ["update", "query", "radius", "ratio", "memory"]
 color = 'algorithm'
 
 pal = dict(
-    CHEN="#f22020", #red 
+    JONES="#f22020", #red 
     CAPP="#96341c", #brown
     COHCAPP="#8E8E38", #gold
     PELLCAPP="#f47a22", #orange
@@ -27,10 +27,10 @@ pal = dict(
     PELLCAPPDELTA10="#1E90FF", #blue
     PELLCAPPDELTA15="#EE00EE", #fucsia
     PELLCAPPDELTA20="#772b9d", #dark purple
-    PELLCAPPDELTA25="#228c68", #dark green
-    PELLCAPPDELTA30="#00E5EE", #light blue
-    PELLCAPPDELTA35="#f07cab", #pink
-    PELLCAPPDELTA40="#000000", #black
+    #CAPPDELTA05="#228c68", #dark green
+    CAPPDELTA10="#00E5EE", #light blue
+    CAPPDELTA15="#f07cab", #pink
+    CAPPDELTA20="#000000", #black
     )
 
 
@@ -71,7 +71,7 @@ def read_and_plot(output_file_path):
             marker="o",
             palette=pal,
             linewidth=3,
-            hue_order = ["PELLCAPPDELTA20", "PELLCAPPDELTA15", "PELLCAPPDELTA10", "PELLCAPPDELTA05",  "PELLCAPP", "CHEN"]
+            hue_order = ["CAPPDELTA20", "CAPPDELTA15", "CAPPDELTA10", "CAPPDELTA05","PELLCAPPDELTA20", "PELLCAPPDELTA15", "PELLCAPPDELTA10", "PELLCAPPDELTA05",  "PELLCAPP", "JONES"]
             )
         g.add_legend()
         #plt.gcf().set_size_inches(8, 5)

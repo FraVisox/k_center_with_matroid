@@ -3,7 +3,7 @@ import polars as pl
 import matplotlib.pyplot as plt
 
 #Parameters to change
-replace_commas = False
+replace_commas = True
 type_of_graph = "deltas"
 
 #Parameters
@@ -12,14 +12,15 @@ y_axis = ["update", "query", "radius", "memory", "ratio"]
 color = 'algorithm'
 
 #File to read from
-datasets = ["phones", "higgs", "covtype", "normalized", "random"]
+datasets = ["phones", "higgs", "covtype"]#, "normalized", "random"]
 file_names = []
 for i in datasets:
-    file_names.append(x_axis+"_"+i)
+    file_names.append("type_jones_"+i)
 output_file = "graphs/"+type_of_graph+"_bars"
 
 pal = dict(
     CHEN="#f22020", #red 
+    JONES="#f22020", #red 
     CAPP="#96341c", #brown
     COHCAPP="#8E8E38", #gold
     PELLCAPP="#f47a22", #orange
@@ -100,8 +101,6 @@ def read_and_plot_bar(output_file_path):
     """
     dataframe = [] 
     for file in file_names:
-        if file == "random" or file == "higgs":
-            continue
         input_file = "experiments_results/"+file+".csv"
         if replace_commas:
             replace_dots_with_commas(input_file)

@@ -7,12 +7,12 @@ replace_commas = False
 type_of_graph = "wsize" #beta, wsize, type, k
 
 #File to read from
-datasets = ["phones", "higgs", "covtype", "normalized", "random"]
+datasets = ["phones", "higgs", "covtype"]#, "normalized", "random"]
 file_names = []
 for i in datasets:
     if (type_of_graph == "type" and (i == "random" or i == "higgs")):
             continue
-    file_names.append(type_of_graph+"_"+i)
+    file_names.append(type_of_graph+"_jones_"+i)
 output_file = "graphs/"+type_of_graph
 
 #Parameters
@@ -24,6 +24,7 @@ color = 'algorithm'
 
 pal = dict(
     CHEN="#f22020", #red 
+    JONES="#f22020", #red 
     CAPP="#96341c", #brown
     COHCAPP="#8E8E38", #gold
     PELLCAPP="#f47a22", #orange
@@ -91,10 +92,10 @@ def filter(df):
     if (type_of_graph == "beta"):
         df = df.filter(pl.col("beta").is_between(0,50))
     elif (type_of_graph == "wsize"):
-        df = df.filter(pl.col("wsize").is_between(0,100000))
-        df = df.filter(pl.col("algorithm").is_in(["CHEN", "PELLCAPP", "PELLCAPPDELTA05", "PELLCAPPDELTA10", "PELLCAPPDELTA15", "PELLCAPPDELTA20"]))
+        df = df.filter(pl.col("wsize").is_between(10000,500000))
+        df = df.filter(pl.col("algorithm").is_in(["JONES", "CAPPDELTA05", "PELLCAPPDELTA05", "PELLCAPPDELTA10", "PELLCAPPDELTA15", "PELLCAPPDELTA20"]))
     elif (type_of_graph == "type"):
-        df = df.filter(pl.col("algorithm").is_in(["CHEN", "PELLCAPP", "PELLCAPPDELTA05", "PELLCAPPDELTA10", "PELLCAPPDELTA15", "PELLCAPPDELTA20", "PELLCAPPDELTA25", "PELLCAPPDELTA30", "PELLCAPPDELTA35", "PELLCAPPDELTA40"]))
+        df = df.filter(pl.col("algorithm").is_in(["JONES", "CAPPDELTA05", "PELLCAPPDELTA05", "PELLCAPPDELTA10", "PELLCAPPDELTA15", "PELLCAPPDELTA20", "PELLCAPPDELTA25", "PELLCAPPDELTA30", "PELLCAPPDELTA35", "PELLCAPPDELTA40"]))
     return df
 
 def read_and_plot_line(output_file_path):
@@ -134,7 +135,7 @@ def read_and_plot_line(output_file_path):
             marker="o",
             palette=pal,
             linewidth=3,
-            hue_order = ["PELLCAPPDELTA20", "PELLCAPPDELTA15", "PELLCAPPDELTA10", "PELLCAPPDELTA05",  "PELLCAPP", "CHEN"]
+            hue_order = ["PELLCAPPDELTA20", "PELLCAPPDELTA15", "CAPPDELTA05", "PELLCAPPDELTA05",  "JONES", "CHEN"]
             )
         g.add_legend()
         plt.savefig(output_file_path+"_"+graph+".png") #save plot
