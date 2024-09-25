@@ -4,7 +4,7 @@ import it.unidp.dei.Algorithm;
 import it.unidp.dei.CAPPELLOTTO.Utils.Diameter.Diameter;
 import it.unidp.dei.CAPPELLOTTO.Utils.Diameter.PELLDiameter;
 import it.unidp.dei.CAPPELLOTTO.Utils.Guess.GuessVAL;
-import it.unidp.dei.CAPPELLOTTO.Utils.Guess.KGuessVAL;
+import it.unidp.dei.CAPPELLOTTO.Utils.Guess.KCGuessVAL;
 import it.unidp.dei.Point;
 import it.unidp.dei.TestUtils;
 
@@ -56,7 +56,7 @@ public class KPELLCAPPVAL implements Algorithm
                 TreeMap<Point, LinkedList<Point>[]> RV = new TreeMap<>();
                 RV.put(last_points.getLast(), createR(last_points.getLast()));
 
-                guesses.put(i, new KGuessVAL(Math.pow((1 + beta), i), ki, RV));
+                guesses.put(i, new KCGuessVAL(Math.pow((1 + beta), i), ki, RV));
             }
         } else {
             // Delete the sets that are under the first index or over the last.
@@ -78,7 +78,7 @@ public class KPELLCAPPVAL implements Algorithm
                     RV.put(oldest, createR(oldest));
                 }
 
-                guesses.put(i, new KGuessVAL(Math.pow((1+beta), i), ki, RV));
+                guesses.put(i, new KCGuessVAL(Math.pow((1+beta), i), ki, RV));
             }
 
 
@@ -87,7 +87,7 @@ public class KPELLCAPPVAL implements Algorithm
                 TreeMap<Point, LinkedList<Point>[]> RV = new TreeMap<>();
                 RV.put(last_points.getLast(), createR(last_points.getLast()));
 
-                guesses.put(i, new KGuessVAL(Math.pow((1+beta), i), ki, RV));
+                guesses.put(i, new KCGuessVAL(Math.pow((1+beta), i), ki, RV));
             }
         }
         //Insert the point p in the last points
@@ -160,7 +160,7 @@ public class KPELLCAPPVAL implements Algorithm
     }
 
     //Guesses, the key is the exponent to give to (1+beta) to get that guess
-    private final TreeMap<Integer, KGuessVAL> guesses = new TreeMap<>();
+    private final TreeMap<Integer, KCGuessVAL> guesses = new TreeMap<>();
     //Used to estimate the diameter
     private final PELLDiameter diameter;
     //Last k+1 points

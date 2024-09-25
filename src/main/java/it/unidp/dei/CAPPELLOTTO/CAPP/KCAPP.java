@@ -1,13 +1,13 @@
 package it.unidp.dei.CAPPELLOTTO.CAPP;
 
 import it.unidp.dei.Algorithm;
-import it.unidp.dei.CAPPELLOTTO.Utils.Guess.KGuess;
+import it.unidp.dei.CAPPELLOTTO.Utils.Guess.KCGuess;
 import it.unidp.dei.CHENETAL.CHEN;
 import it.unidp.dei.Point;
 
 import java.util.ArrayList;
 
-//Standard K-Algorithm of Cappellotto et al. paper, which uses KGuess class
+//Standard K-Algorithm of Cappellotto et al. paper, which uses KCGuess class
 public class KCAPP implements Algorithm {
 
     public KCAPP(int[] _ki, double _epsilon, double _beta, double _minDist, double _maxDist) {
@@ -19,19 +19,19 @@ public class KCAPP implements Algorithm {
         int first_i = (int)Math.floor(Math.log(_minDist)/Math.log(1+_beta));
         int last_i = (int)Math.ceil(Math.log(_maxDist)/Math.log(1+_beta));
         int number_of_guesses = last_i-first_i+1;
-        guesses = new KGuess[number_of_guesses];
+        guesses = new KCGuess[number_of_guesses];
 
         //We use the definition: we start from (1+beta)^first_i, and don't start from minDist as in Pellizzoni
         double gamma = Math.pow((1+_beta), first_i);
         for (int i = 0; i<number_of_guesses; i++) {
-            guesses[i] = new KGuess(gamma, delta, _ki);
+            guesses[i] = new KCGuess(gamma, delta, _ki);
             gamma *= (1+_beta);
         }
     }
 
     @Override
     public void update(Point p, int time) {
-        for (KGuess g : guesses) {
+        for (KCGuess g : guesses) {
             g.update(p, time);
         }
     }
@@ -51,7 +51,7 @@ public class KCAPP implements Algorithm {
     @Override
     public int getSize() {
         int size = 0;
-        for (KGuess g : guesses) {
+        for (KCGuess g : guesses) {
             size += g.getSize();
         }
         return size;
@@ -74,5 +74,5 @@ public class KCAPP implements Algorithm {
     }
 
     //Array of guesses
-    private final KGuess[] guesses;
+    private final KCGuess[] guesses;
 }

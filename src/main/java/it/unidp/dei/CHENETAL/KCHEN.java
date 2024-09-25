@@ -44,7 +44,7 @@ public class KCHEN implements Algorithm {
     //while we use an algorithm that inserts the most distant point of the points in memory in the set of centers.
     private boolean insertPointAtMaxDistanceBetweenSets(Collection<Point> set, ArrayList<Point> centers){
         int[] kj = ki.clone();
-        for (Point p : set) {
+        for (Point p : centers) {
             kj[p.getGroup()]--;
         }
 

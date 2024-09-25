@@ -6,12 +6,12 @@ import it.unidp.dei.Point;
 import java.util.*;
 
 //Guess used for K-Algorithms (it simply uses KCHEN instead of CHEN)
-public class KGuess extends Guess {
-    public KGuess(double _gamma, double _delta, int[] _ki) {
+public class KCGuess extends Guess {
+    public KCGuess(double _gamma, double _delta, int[] _ki) {
         super(_gamma, _delta, _ki);
     }
 
-    public KGuess(double _gamma, double _delta, int[] _ki, TreeMap<Point, Point> _RV, TreeMap<Point, LinkedList<Point>[]> _R) {
+    public KCGuess(double _gamma, double _delta, int[] _ki, TreeMap<Point, Point> _RV, TreeMap<Point, LinkedList<Point>[]> _R) {
         super(_gamma, _delta, _ki, _RV, _R);
     }
 
