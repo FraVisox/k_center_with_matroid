@@ -158,8 +158,10 @@ def read_and_plot_bar(output_file_path):
             col_wrap=3,
             sharex=False,
             sharey= True,
-            height=3,
-            aspect=1.2,
+            # height=3,
+            # aspect=1.2,
+            height=2,
+            aspect=1.8,
         )
         g.map_dataframe(
             sns.lineplot,  # barplot or lineplot

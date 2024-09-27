@@ -167,8 +167,8 @@ def read_and_plot_bar(output_file_path):
             col_wrap=3,
             sharex=False,
             sharey= graph == "query",
-            height=3,
-            aspect=1.2,
+            height=2,
+            aspect=1.8,
         )
         g.map_dataframe(
             sns.lineplot,  # barplot or lineplot
@@ -199,7 +199,7 @@ def read_and_plot_bar(output_file_path):
         g.add_legend()
         if graph == "query":
             plt.yscale("log")
-        plt.tight_layout()
+        plt.tight_layout(pad=0.0)
         plt.savefig(output_file_path + "_" + graph + ".png", dpi=300)  # save plot
 
 
