@@ -1,4 +1,4 @@
-﻿dimension;algorithm;update;query;radius;ratio;memory
+﻿dimensions;algorithm;update;query;radius;ratio;memory
 2;JONES;6311.285;170247674.7;12.98204904;1;10000
 3;JONES;4812.595;173889334.5;14.59424026;1;10000
 4;JONES;5227.49;191293171.3;16.17966811;1;10000
