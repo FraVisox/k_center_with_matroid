@@ -10,15 +10,23 @@ type_of_graph = "wsize"
 
 # Parameters
 x_axis = "wsize"
-y_axis = ["update", "query", "memory"] # we can omit the ratio because it is rather uninteresting: we always get the same result as Chen
+y_axis = ["query", "memory"] # we can omit the ratio and the update because it is rather uninteresting: we always get the same result as Chen
 color = "algorithm"
 
 # File to read from
 datasets = ["phones", "higgs", "covtype"]
 file_names = []
 for i in datasets:
-    file_names.append(x_axis + "_" + i)
+    file_names.append(x_axis + "_jones_" + i)
 output_file = "graphs/" + type_of_graph + "_lines"
+
+COLORS = sns.color_palette()
+PALETTE = {
+    "JONES": COLORS[0],
+    "OursOblivious": COLORS[1],
+    "Ours": COLORS[2],
+    "CHEN": COLORS[3],
+}
 
 
 def replace_dots_with_commas(file_path):
@@ -54,7 +62,6 @@ def replace_dots_with_commas(file_path):
     except Exception as e:
         print(f"An error occurred: {e}")
 
-
 def filter(df):
     """
     Filters the given DataFrame `df` depending on the type of graph.
@@ -67,8 +74,14 @@ def filter(df):
     """
     df = df.filter(
         pl.col("dataset") != "RANDOM",
-        pl.col("algorithm") != "PELLCAPP",
         pl.col("dataset") != "NORMALIZED",
+    )
+    df = df.with_columns(
+        pl.col("update").str.replace(",", ".").cast(pl.Float64).alias("update"),
+        pl.col("query").str.replace(",", ".").cast(pl.Float64).alias("query"),
+        pl.col("radius").str.replace(",", ".").cast(pl.Float64).alias("radius"),
+        pl.col("memory").str.replace(",", ".").cast(pl.Float64).alias("memory"),
+        pl.col("ratio").str.replace(",", ".").cast(pl.Float64).alias("ratio"),
     )
     df = df.with_columns(
         pl.col("algorithm").str.extract(r"DELTA(\d+)").cast(pl.Float64).alias("delta") / 10
@@ -78,14 +91,14 @@ def filter(df):
     ).with_columns(
         pl.col("algorithm").str.replace(r"CAPPDELTA(\d+)", "Ours")
     ).filter(
-        pl.col("algorithm").is_in(["CHEN", "Ours", "OursOblivious"])
+        pl.col("algorithm").is_in(["JONES", "CHEN", "Ours", "OursOblivious"])
     )
-    # df = df.filter(pl.col("wsize").is_in([10000, 50000, 500000]))
     df = df.with_columns(
         ( pl.col("update") / 1e6 ).alias("update"),
         ( pl.col("query") / 1e6 ).alias("query")
-    ).filter(pl.col("wsize") >= 10000)
+    )
     return df
+
 
 
 def hline(data, **kwargs):
@@ -111,19 +124,32 @@ def read_and_plot_bar(output_file_path):
         if file == "random" or file == "higgs":
             continue
         input_file = "experiments_results/" + file + ".csv"
+        ic(input_file)
         if replace_commas:
             replace_dots_with_commas(input_file)
         df = pl.read_csv(source=input_file, separator=";", infer_schema_length=10000)
-        df = df.with_columns(pl.lit(file.split("_")[1].upper()).alias("dataset"))
+        df = df.with_columns(pl.lit(file.split("_")[-1].upper()).alias("dataset"))
         # FILTERS
         df = filter(df)
         dataframe.append(df)
+
+        # Add CHEN results
+        input_file = "experiments_results/CHEN/" + file + ".csv"
+        input_file = input_file.replace("_jones", "")
+        df = pl.read_csv(source=input_file, separator=";", infer_schema_length=10000)
+        df = df.with_columns(pl.lit(file.split("_")[-1].upper()).alias("dataset"))
+        df = df.filter(
+            pl.col("algorithm") == "CHEN",
+            pl.col("wsize") >= 10000
+        )
+        df = filter(df)
+        dataframe.append(df)
+
     dat = ( pl
         .concat(dataframe)
         .filter(( pl.col("delta") == 0.5 ) | (pl.col("delta").is_null()))
     )
 
-    ic(dat)
 
     for graph in y_axis:
         g = sns.FacetGrid(
@@ -132,8 +158,10 @@ def read_and_plot_bar(output_file_path):
             col_wrap=3,
             sharex=False,
             sharey= True,
-            height=3,
-            aspect=1.2,
+            # height=3,
+            # aspect=1.2,
+            height=2,
+            aspect=1.8,
         )
         g.map_dataframe(
             sns.lineplot,  # barplot or lineplot
@@ -151,8 +179,8 @@ def read_and_plot_bar(output_file_path):
             hue="algorithm",  # color
             size="algorithm",
             style="algorithm",
-            sizes=list( np.array([1, 1, 2]) * 50 ),
-            size_order=["CHEN", "Ours", "OursOblivious"],
+            sizes=list( np.array([1, 1, 1, 2]) * 50 ),
+            size_order=["JONES", "CHEN", "Ours", "OursOblivious"],
         )
         g.set_xlabels("window size")
         g.add_legend()

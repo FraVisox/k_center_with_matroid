@@ -1,3 +1,4 @@
+import os.path
 import numpy as np
 from icecream import ic
 import seaborn as sns
@@ -20,6 +21,13 @@ for i in datasets:
     file_names.append(x_axis + "_" + i)
 output_file = "graphs/" + type_of_graph + "_lines"
 
+COLORS = sns.color_palette()
+PALETTE = {
+    "JONES": COLORS[0],
+    "OursOblivious": COLORS[1],
+    "Ours": COLORS[2],
+    "CHEN": COLORS[3],
+}
 
 def replace_dots_with_commas(file_path):
     """
@@ -70,6 +78,13 @@ def filter(df):
         pl.col("dataset") != "NORMALIZED",
     )
     df = df.with_columns(
+        pl.col("update").str.replace(",", ".").cast(pl.Float64).alias("update"),
+        pl.col("query").str.replace(",", ".").cast(pl.Float64).alias("query"),
+        pl.col("radius").str.replace(",", ".").cast(pl.Float64).alias("radius"),
+        pl.col("memory").str.replace(",", ".").cast(pl.Float64).alias("memory"),
+        pl.col("ratio").str.replace(",", ".").cast(pl.Float64).alias("ratio"),
+    )
+    df = df.with_columns(
         pl.col("algorithm").str.extract(r"DELTA(\d+)").cast(pl.Float64).alias("delta") / 10
     )
     df = df.with_columns(
@@ -77,9 +92,9 @@ def filter(df):
     ).with_columns(
         pl.col("algorithm").str.replace(r"CAPPDELTA(\d+)", "Ours")
     ).filter(
-        pl.col("algorithm").is_in(["CHEN", "Ours", "OursOblivious"])
+        pl.col("algorithm").is_in(["JONES", "CHEN", "Ours", "OursOblivious"])
     )
-    df = df.filter(pl.col("wsize").is_in([10000, 50000, 500000]))
+    df = df.filter(pl.col("wsize").is_in([10000]))
     df = df.with_columns(
         ( pl.col("update") / 1e6 ).alias("update"),
         ( pl.col("query") / 1e6 ).alias("query")
@@ -88,19 +103,23 @@ def filter(df):
 
 
 def hline(data, **kwargs):
-    baseline = data[data["algorithm"] == "CHEN"]
+    baseline = data[data["algorithm"].isin(["JONES", "CHEN"])]
     ax = plt.gca()
-    for bline in baseline[kwargs["y"]]:
-        ax.axhline(bline, c=kwargs["color"])
+    for _, bline in baseline.iterrows():
+        color_group = bline["algorithm"]
+        yline = bline[kwargs["y"]]
+        ax.axhline(yline, 
+                   c=kwargs["palette"][color_group], 
+                   linestyle=kwargs["dashes"][color_group])
 
 
-def load(file):
-    input_file = "experiments_results/" + file + ".csv"
+def load(file, basedir="experiments_results/"):
+    input_file = basedir + file + ".csv"
     if replace_commas:
         replace_dots_with_commas(input_file)
     df = pl.read_csv(source=input_file, separator=";", infer_schema_length=10000)
     df = ( df
-        .with_columns(pl.lit(file.split("_")[1].upper())
+        .with_columns(pl.lit(file.split("_")[-1].upper())
         .alias("dataset"))
     )
     if "wsize" not in df.columns:
@@ -128,11 +147,15 @@ def read_and_plot_bar(output_file_path):
 
     dataframe = []
     for dataset in datasets:
-        file = "wsize_" + dataset
-        df = load(file)
+        # file = "wsize_jones_" + dataset
+        # df = load(file)
+        # dataframe.append(df)
+        file = "type_jones_" + dataset
+        df = load(file)#.filter(pl.col("algorithm") == "Ours")
         dataframe.append(df)
+        # Add CHEN results
         file = "type_" + dataset
-        df = load(file).filter(pl.col("algorithm") == "Ours")
+        df = load(file, "experiments_results/CHEN/").filter(pl.col("algorithm") == "CHEN")
         dataframe.append(df)
     dat = pl.concat(dataframe)
     dat = dat.filter(pl.col("wsize") == 10000)
@@ -144,14 +167,15 @@ def read_and_plot_bar(output_file_path):
             col_wrap=3,
             sharex=False,
             sharey= graph == "query",
-            height=3,
-            aspect=1.2,
+            height=2,
+            aspect=1.8,
         )
         g.map_dataframe(
             sns.lineplot,  # barplot or lineplot
             x="delta",  # x axis
             y=graph,  # y axis
             hue="algorithm",  # color
+            palette=PALETTE
         )
         g.map_dataframe(
             sns.scatterplot,  # barplot or lineplot
@@ -160,6 +184,7 @@ def read_and_plot_bar(output_file_path):
             hue="algorithm",  # color
             size="algorithm",
             style="algorithm",
+            palette=PALETTE,
             sizes=list( np.array([1, 1, 3]) * 50 ),
             size_order=["CHEN", "Ours", "OursOblivious"],
         )
@@ -167,13 +192,15 @@ def read_and_plot_bar(output_file_path):
             hline,
             y=graph,  # y axis
             hue="algorithm",  # color
+            palette=PALETTE,
+            dashes={"CHEN": ":", "JONES": "--"}
         )
         g.set_xlabels(r"$\delta$", usetex=True)
         g.add_legend()
         if graph == "query":
             plt.yscale("log")
-        plt.tight_layout()
-        plt.savefig(ic(output_file_path + "_" + graph + ".png"), dpi=300)  # save plot
+        plt.tight_layout(pad=0.0)
+        plt.savefig(output_file_path + "_" + graph + ".png", dpi=300)  # save plot
 
 
 # USE
