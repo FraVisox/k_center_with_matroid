@@ -1,37 +1,19 @@
 import seaborn as sns
 import polars as pl
 import matplotlib.pyplot as plt
+import numpy as np
+
 
 #File to read from
-first = True
+first = False
 type_of_graph = "doubling_dimension_jones"
 file_name = "experiments_results/"+type_of_graph+".csv"
-output_file = "graphs/"+type_of_graph
+output_file = "graphs/dimensionality"
 
 #Parameters
-x_axis = "dimension"
+x_axis = "dimensions"
 y_axis = ["update", "query", "radius", "ratio", "memory"]
 color = 'algorithm'
-
-pal = dict(
-    JONES="#f22020", #red 
-    CAPP="#96341c", #brown
-    COHCAPP="#8E8E38", #gold
-    PELLCAPP="#f47a22", #orange
-    CAPPDELTA05="#7dfc00", #light green
-    COHCAPPDELTA05="#008B8B", #verde acqua
-    PELLCAPPDELTA05="#0ec434", #green
-    CAPPVAL="#8B8B83", #grey
-    COHCAPPVAL="#b732cc", #purple
-    PELLCAPPVAL="#2f2aa0", #dark blue
-    PELLCAPPDELTA10="#1E90FF", #blue
-    PELLCAPPDELTA15="#EE00EE", #fucsia
-    PELLCAPPDELTA20="#772b9d", #dark purple
-    #CAPPDELTA05="#228c68", #dark green
-    CAPPDELTA10="#00E5EE", #light blue
-    CAPPDELTA15="#f07cab", #pink
-    CAPPDELTA20="#000000", #black
-    )
 
 
 def replace_dots_with_commas(file_path):
@@ -60,18 +42,45 @@ def read_and_plot(output_file_path):
     df = pl.read_csv(source=file_name, separator=";")
     df = df.with_columns(
         pl.lit("blobs").alias("dataset")
+    ).filter(
+        pl.col("algorithm").is_in(["JONES", "CAPPDELTA05", "CAPPDELTA20", "PELLCAPPDELTA05", "PELLCAPPDELTA20"])
+    )
+    df = df.with_columns(
+        pl.col("algorithm").str.replace("PELLCAPPDELTA05", "OursOblivious 0.5"),
+    ).with_columns(
+        pl.col("algorithm").str.replace("CAPPDELTA05", "Ours 0.5")
+    ).with_columns(
+        pl.col("algorithm").str.replace("PELLCAPPDELTA10", "OursOblivious 1.0"),
+    ).with_columns(
+        pl.col("algorithm").str.replace("CAPPDELTA10", "Ours 1.0")
+    ).with_columns(
+        pl.col("algorithm").str.replace("PELLCAPPDELTA15", "OursOblivious 1.5"),
+    ).with_columns(
+        pl.col("algorithm").str.replace("CAPPDELTA15", "Ours 1.5")
+    ).with_columns(
+        pl.col("algorithm").str.replace("PELLCAPPDELTA20", "OursOblivious 2.0"),
+    ).with_columns(
+        pl.col("algorithm").str.replace("CAPPDELTA20", "Ours 2.0")
     )
     for graph in y_axis:
         g = sns.FacetGrid(df, col="dataset", sharex=False, sharey=False, aspect=1.5)
+        hue_order = ["JONES", "OursOblivious 0.5", "Ours 0.5",# "OursOblivious 1.0", "Ours 1.0", "OursOblivious 1.5", "Ours 1.5", 
+                     "OursOblivious 2.0", "Ours 2.0"]
         g.map_dataframe(
             sns.lineplot,  #barplot or lineplot
             x    = x_axis,   #x axis
             y    = graph, #y axis
             hue  = color, #color
-            marker="o",
-            palette=pal,
+            #marker="o",
             linewidth=3,
-            hue_order = ["CAPPDELTA20", "CAPPDELTA15", "CAPPDELTA10", "CAPPDELTA05","PELLCAPPDELTA20", "PELLCAPPDELTA15", "PELLCAPPDELTA10", "PELLCAPPDELTA05",  "PELLCAPP", "JONES"]
+            hue_order = hue_order,
+            markers=True,
+            size="algorithm",
+            style="algorithm",
+            legend="brief",
+            size_order=hue_order,
+            markersize=8,
+            dashes=False
             )
         g.add_legend()
         #plt.gcf().set_size_inches(8, 5)

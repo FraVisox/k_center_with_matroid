@@ -7,7 +7,7 @@ replace_commas = False
 type_of_graph = "wsize" #beta, wsize, type, k
 
 #File to read from
-datasets = ["phones", "higgs", "covtype"]#, "normalized", "random"]
+datasets = ["phones"]#, "higgs", "covtype"]#, "normalized", "random"]
 file_names = []
 for i in datasets:
     if (type_of_graph == "type" and (i == "random" or i == "higgs")):
@@ -23,24 +23,25 @@ y_axis = ["update", "query", "radius", "ratio", "memory"]
 color = 'algorithm'
 
 pal = dict(
-    CHEN="#f22020", #red 
+    CHEN="#f47a22", #red 
     JONES="#f22020", #red 
-    CAPP="#96341c", #brown
-    COHCAPP="#8E8E38", #gold
-    PELLCAPP="#f47a22", #orange
-    CAPPDELTA05="#7dfc00", #light green
-    COHCAPPDELTA05="#008B8B", #verde acqua
+    #CAPP="#96341c", #brown
+    #COHCAPP="#8E8E38", #gold
+    #PELLCAPP="#f47a22", #orange
+    CAPPDELTA05="#1E90FF", #light green
+    #COHCAPPDELTA05="#008B8B", #verde acqua
     PELLCAPPDELTA05="#0ec434", #green
-    CAPPVAL="#8B8B83", #grey
-    COHCAPPVAL="#b732cc", #purple
-    PELLCAPPVAL="#2f2aa0", #dark blue
-    PELLCAPPDELTA10="#1E90FF", #blue
-    PELLCAPPDELTA15="#EE00EE", #fucsia
-    PELLCAPPDELTA20="#772b9d", #dark purple
-    PELLCAPPDELTA25="#228c68", #dark green
-    PELLCAPPDELTA30="#00E5EE", #light blue
-    PELLCAPPDELTA35="#f07cab", #pink
-    PELLCAPPDELTA40="#000000", #black
+
+    #CAPPVAL="#8B8B83", #grey
+    #COHCAPPVAL="#b732cc", #purple
+    #PELLCAPPVAL="#2f2aa0", #dark blue
+    #PELLCAPPDELTA10="#1E90FF", #blue
+    #PELLCAPPDELTA15="#EE00EE", #fucsia
+    #PELLCAPPDELTA20="#772b9d", #dark purple
+    #PELLCAPPDELTA25="#228c68", #dark green
+    #PELLCAPPDELTA30="#00E5EE", #light blue
+    #PELLCAPPDELTA35="#f07cab", #pink
+    #PELLCAPPDELTA40="#000000", #black
     )
 
 
@@ -92,8 +93,8 @@ def filter(df):
     if (type_of_graph == "beta"):
         df = df.filter(pl.col("beta").is_between(0,50))
     elif (type_of_graph == "wsize"):
-        df = df.filter(pl.col("wsize").is_between(10000,500000))
-        df = df.filter(pl.col("algorithm").is_in(["JONES", "CAPPDELTA05", "PELLCAPPDELTA05", "PELLCAPPDELTA10", "PELLCAPPDELTA15", "PELLCAPPDELTA20"]))
+        df = df.filter(pl.col("wsize").is_between(10000,200000))
+        df = df.filter(pl.col("algorithm").is_in(["JONES", "CHEN", "CAPPDELTA05", "PELLCAPPDELTA05"]))
     elif (type_of_graph == "type"):
         df = df.filter(pl.col("algorithm").is_in(["JONES", "CAPPDELTA05", "PELLCAPPDELTA05", "PELLCAPPDELTA10", "PELLCAPPDELTA15", "PELLCAPPDELTA20", "PELLCAPPDELTA25", "PELLCAPPDELTA30", "PELLCAPPDELTA35", "PELLCAPPDELTA40"]))
     return df
@@ -126,7 +127,7 @@ def read_and_plot_line(output_file_path):
     dat = pl.concat(dataframe)
 
     for graph in y_axis:
-        g = sns.FacetGrid(dat, col="dataset", col_wrap=3, sharex=False, sharey=False, aspect=2)
+        g = sns.FacetGrid(dat, col="dataset", sharex=False, sharey=False, aspect=1.5)
         g.map_dataframe(
             sns.lineplot,  #barplot or lineplot
             x    = x_axis,   #x axis
@@ -135,7 +136,8 @@ def read_and_plot_line(output_file_path):
             marker="o",
             palette=pal,
             linewidth=3,
-            hue_order = ["PELLCAPPDELTA20", "PELLCAPPDELTA15", "CAPPDELTA05", "PELLCAPPDELTA05",  "JONES", "CHEN"]
+            hue_order = ["JONES", "CHEN", "CAPPDELTA05", "PELLCAPPDELTA05"]
+            #hue_order = ["PELLCAPPDELTA05", "CAPPDELTA05", "CHEN", "JONES"]
             )
         g.add_legend()
         plt.savefig(output_file_path+"_"+graph+".png") #save plot

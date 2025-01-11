@@ -102,11 +102,11 @@ public class TestUtils {
 
     //Test with different wSize on standard datasets
     public static void testWSize() {
-        int[] wSize = {/*500, 1000, 5000,*/ 10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000, 200000, 500000};
-        for (int w : wSize) {
-            testDatasets(true, "w" + w, defaultKi, w, defaultBeta, false);
+        //int[] wSize = {/*500, 1000, 5000,*/ 10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000, 200000, 500000};
+        //for (int w : wSize) {
+            testDatasets(true, "wPELLCAPP" + 500000, defaultKi, 500000, defaultBeta, false);
             System.gc();
-        }
+        //}
     }
 
     //Test of K algorithms different wSize on standard datasets
@@ -262,18 +262,13 @@ public class TestUtils {
 
          */
 
-        algorithms = new Algorithm[5];
-        algorithms[0] = new JONES(kiSet);
+        algorithms = new Algorithm[1];
+        //algorithms[0] = new JONES(kiSet);
 
-        //algorithms[1] = new PELLCAPP(beta, epsilon, kiSet);
+        algorithms[0] = new PELLCAPPDELTAxx(beta, defaultDeltas[0], kiSet);
 
-        int i = 1;
-        for (double dd : defaultDeltas) {
-            algorithms[i] = new CAPPDELTAxx(kiSet, dd, beta, minDist, maxDist);
-            i++;
-        }
-
-        writer.println("JONES;;;;;;PELLCAPP;;;;;;PELLCAPPDELTA05;;;;;;PELLCAPPDELTA10;;;;;;PELLCAPPDELTA15;;;;;;PELLCAPPDELTA20;;;;;;");
+        int i;
+        writer.println("JONES;;;;;;CAPPDELTA05;;;;;;CAPPDELTA10;;;;;;CAPPDELTA15;;;;;;CAPPDELTA20;;;;;;");
 
         String header = "Update Time;Query Time;Radius;Ratio;Memory";
         for (i = 0; i<algorithms.length; i++) {
