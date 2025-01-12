@@ -1,4 +1,4 @@
-﻿dimension;algorithm;update;query;radius;ratio;memory
+﻿dimensions;algorithm;update;query;radius;ratio;memory
 5;CHEN;11170.185;15911172745;14.15535382;1;10000
 10;CHEN;10458.085;16150779580;16.63565845;1;10000
 15;CHEN;10553.76;17502872757;18.0588148;1;10000

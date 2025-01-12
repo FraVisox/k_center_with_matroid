@@ -26,16 +26,16 @@ public class TestUtils {
     private static final int stride = 200;
 
     //Datasets: input files and output files, plus the DatasetReaders to read them
-    private static final String[] datasets = {"Phones_accelerometer.csv", "covtype.dat", "HIGGS.csv",/* "random20.csv", "normalizedcovtype.dat"*/};
-    private static final String[] outFiles = {"TestPhones.csv", "TestCovtype.csv", "TestHiggs.csv", /*"TestRandom20.csv", "TestNormalizedCovtype.csv"*/};
-    private static final Class[] readers = {PhonesReader.class, CovertypeReader.class, HiggsReader.class, /*RandomReader.class, CovertypeReader.class*/};
+    private static final String[] datasets = {"Phones_accelerometer.csv", "covtype.dat", "HIGGS.csv","normalizedcovtype.dat" /* "random20.csv"*/};
+    private static final String[] outFiles = {"TestPhones.csv", "TestCovtype.csv", "TestHiggs.csv",  "TestNormalizedCovtype.csv" /*"TestRandom20.csv"*/};
+    private static final Class[] readers = {PhonesReader.class, CovertypeReader.class, HiggsReader.class, CovertypeReader.class /*RandomReader.class*/};
 
     //Some default parameters that are the same for every dataset
     public static final double defaultEpsilon = 0.9;
-    private static final double[] defaultDeltas = {0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0}; //These are the ones only tested for some values of wsize
+    private static final double[] defaultDeltas = {0.5, 1.0, 1.5, 2.0 };//, 2.5, 3.0, 3.5, 4.0}; //These are the ones only tested for some values of wsize
     public static final double defaultBeta = 2;
     public static int defaultWSize = 10000;
-    private static final int[][] defaultKi = {{2, 2, 2, 2, 2, 2, 2}, {5, 7, 1, 0, 0, 0, 1}, {2, 2} /*,{2, 2, 2, 2, 2, 2}, {5, 7, 1, 0, 0, 0, 1}*/};
+    private static final int[][] defaultKi = {{2, 2, 2, 2, 2, 2, 2}, {5, 7, 1, 0, 0, 0, 1}, {2, 2}, {5, 7, 1, 0, 0, 0, 1} /*,{2, 2, 2, 2, 2, 2}*/};
     public static final double INF = 8900;
 
     //VALUES OF MAX AND MIN DISTANCES (measured with CalculateMinMaxDist):
@@ -44,12 +44,12 @@ public class TestUtils {
     //  HIGGS: maxD = 26.7 and minD = 0.008 (tested for 600000 points and there are 11000000)
     //  RANDOM: maxD = 3.32 and minD = 0.35 (tested for 600000 points and there are 1000000)
     //  COVTYPE NORMALIZED: maxD = 2.9 and minD = 5.8e-4 (tested for all 581012 points)
-    private static final double[] minDist = {8.1e-5, 2.82, 0.008, /* 0.35, 5.8e-4*/};
-    private static final double[] maxDist = {52.6, 8853.4, 26.7, /* 3.32, 2.9*/};
+    private static final double[] minDist = {8.1e-5, 2.82, 0.008, 5.8e-4 /* 0.35*/};
+    private static final double[] maxDist = {52.6, 8853.4, 26.7, 2.9 /* 3.32*/};
 
     //VALUES OF REAL MAX AND MIN DISTANCES for 10.000 points:
-    private static final double[] realMinDist = {0.002, 8.12, 0.02 /*, 0.56, 0.007*/};
-    private static final double[] realMaxDist = {33.7, 8693, 15.4/*, 3.09, 2.7*/};
+    private static final double[] realMinDist = {0.002, 8.12, 0.02, 0.007 /*, 0.56*/};
+    private static final double[] realMaxDist = {33.7, 8693, 15.4, 2.7/*, 3.09*/};
 
     //Test of algorithms with standard parameters on randomized datasets
     public static void testRandomized() {
@@ -102,11 +102,11 @@ public class TestUtils {
 
     //Test with different wSize on standard datasets
     public static void testWSize() {
-        //int[] wSize = {/*500, 1000, 5000,*/ 10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000, 200000, 500000};
-        //for (int w : wSize) {
-            testDatasets(true, "wPELLCAPP" + 500000, defaultKi, 500000, defaultBeta, false);
+        int[] wSize = {500, 1000, 5000, 10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000, 200000, 500000};
+        for (int w : wSize) {
+            testDatasets(true, "w" + 500000, defaultKi, w, defaultBeta, false);
             System.gc();
-        //}
+        }
     }
 
     //Test of K algorithms different wSize on standard datasets
@@ -197,79 +197,64 @@ public class TestUtils {
 
     //GENERAL TESTING: all the PELL versions
 
-    //In every line of the output file we will have a header:
-    //Update Time;Query Time;Radius;Ratio;Memory
+    //In every line of the output file we will have a header
     public static void testAlgorithms(DatasetReader reader, PrintWriter writer, int[] kiSet, int wSize, double epsilon, double beta, double minDist, double maxDist) {
 
         //Testing LinkedList, contains all the window
         LinkedList<Point> window = new LinkedList<>();
 
-        //Initialize the algorithms: for wsize tests we make this conditional if-else just to be sure the program
-        //doesn't crash. The values of wsize of the conditions were tested.
+        //TODO: if you need to change the algorithms to test, do it here
+
         Algorithm[] algorithms;
-
-        /*
-
-        if ((reader instanceof PhonesReader || reader instanceof HiggsReader || reader instanceof CovertypeReader) && wSize == 40000)
+        if (wSize >= 40000 && wSize <= 200000)
         {
             //NO CHEN
-            algorithms = new Algorithm[5];
-
-            algorithms[0] = new PELLCAPP(beta, epsilon, kiSet);
-
-            int i = 1;
-            for (double dd : defaultDeltas) {
-                algorithms[i] = new PELLCAPPDELTAxx(beta, dd, kiSet);
-                i++;
-            }
-
-            writer.println("PELLCAPP;;;;;;PELLCAPPDELTA05;;;;;;PELLCAPPDELTA10;;;;;;PELLCAPPDELTA15;;;;;;PELLCAPPDELTA20;;;;;;");
-
-        } else if ((reader instanceof PhonesReader || reader instanceof HiggsReader || reader instanceof CovertypeReader) && wSize >= 50000) {
-            //NO PELLCAPP
-            algorithms = new Algorithm[4];
-
-            int i = 0;
-            for (;i<defaultDeltas.length;i++) {
-                algorithms[i] = new PELLCAPPDELTAxx(beta, defaultDeltas[i], kiSet);
-            }
-
-            writer.println("PELLCAPPDELTA05;;;;;;PELLCAPPDELTA10;;;;;;PELLCAPPDELTA15;;;;;;PELLCAPPDELTA20;;;;;;");
-        } else if (reader instanceof RandomReader && wSize >= 40000) {
-            //NO PELLCAPPDELTA 0.5 and PELLCAPP
-            algorithms = new Algorithm[3];
-
-            for (int i = 1; i < defaultDeltas.length; i++) {
-                algorithms[i-1] = new PELLCAPPDELTAxx(beta, defaultDeltas[i], kiSet);
-            }
-
-            writer.println("PELLCAPPDELTA10;;;;;;PELLCAPPDELTA15;;;;;;PELLCAPPDELTA20;;;;;;");
-        } else {
-            //DEFAULT, with everything
-            algorithms = new Algorithm[6];
-            algorithms[0] = new CHEN(kiSet);
+            algorithms = new Algorithm[11];
+            algorithms[0] = new JONES(kiSet);
 
             algorithms[1] = new PELLCAPP(beta, epsilon, kiSet);
+            algorithms[2] = new CAPP(kiSet, epsilon, beta, minDist, maxDist);
+
+            int i = 3;
+            for (double dd : defaultDeltas) {
+                algorithms[i++] = new PELLCAPPDELTAxx(beta, dd, kiSet);
+                algorithms[i++] = new CAPPDELTAxx(kiSet, dd, beta, minDist, maxDist);
+            }
+
+            writer.println("JONES;;;;;;PELLCAPP;;;;;;CAPP;;;;;;PELLCAPPDELTA05;;;;;;CAPPDELTA05;;;;;;PELLCAPPDELTA10;;;;;;CAPPDELTA10;;;;;;PELLCAPPDELTA15;;;;;;CAPPDELTA15;;;;;;PELLCAPPDELTA20;;;;;;CAPPDELTA20;;;;;;");
+        } else if (wSize > 200000) {
+            //NO JONES and NO CHEN
+            algorithms = new Algorithm[10];
+
+            algorithms[0] = new PELLCAPP(beta, epsilon, kiSet);
+            algorithms[1] = new CAPP(kiSet, epsilon, beta, minDist, maxDist);
 
             int i = 2;
             for (double dd : defaultDeltas) {
-                algorithms[i] = new PELLCAPPDELTAxx(beta, dd, kiSet);
-                i++;
+                algorithms[i++] = new PELLCAPPDELTAxx(beta, dd, kiSet);
+                algorithms[i++] = new CAPPDELTAxx(kiSet, dd, beta, minDist, maxDist);
             }
 
-            writer.println("CHEN;;;;;;PELLCAPP;;;;;;PELLCAPPDELTA05;;;;;;PELLCAPPDELTA10;;;;;;PELLCAPPDELTA15;;;;;;PELLCAPPDELTA20;;;;;;");
+            writer.println("PELLCAPP;;;;;;CAPP;;;;;;PELLCAPPDELTA05;;;;;;CAPPDELTA05;;;;;;PELLCAPPDELTA10;;;;;;CAPPDELTA10;;;;;;PELLCAPPDELTA15;;;;;;CAPPDELTA15;;;;;;PELLCAPPDELTA20;;;;;;CAPPDELTA20;;;;;;");
+        } else {
+            //DEFAULT, with everything
+            algorithms = new Algorithm[12];
+            algorithms[0] = new JONES(kiSet);
+            algorithms[1] = new CHEN(kiSet);
+
+            algorithms[2] = new PELLCAPP(beta, epsilon, kiSet);
+            algorithms[3] = new CAPP(kiSet, epsilon, beta, minDist, maxDist);
+
+            int i = 4;
+            for (double dd : defaultDeltas) {
+                algorithms[i++] = new PELLCAPPDELTAxx(beta, dd, kiSet);
+                algorithms[i++] = new CAPPDELTAxx(kiSet, dd, beta, minDist, maxDist);
+            }
+            writer.println("JONES;;;;;;CHEN;;;;;;PELLCAPP;;;;;;CAPP;;;;;;PELLCAPPDELTA05;;;;;;CAPPDELTA05;;;;;;PELLCAPPDELTA10;;;;;;CAPPDELTA10;;;;;;PELLCAPPDELTA15;;;;;;CAPPDELTA15;;;;;;PELLCAPPDELTA20;;;;;;CAPPDELTA20;;;;;;");
+
         }
 
-         */
-
-        algorithms = new Algorithm[1];
-        //algorithms[0] = new JONES(kiSet);
-
-        algorithms[0] = new PELLCAPPDELTAxx(beta, defaultDeltas[0], kiSet);
-
         int i;
-        writer.println("JONES;;;;;;CAPPDELTA05;;;;;;CAPPDELTA10;;;;;;CAPPDELTA15;;;;;;CAPPDELTA20;;;;;;");
-
         String header = "Update Time;Query Time;Radius;Ratio;Memory";
         for (i = 0; i<algorithms.length; i++) {
             writer.print(header);
@@ -332,6 +317,8 @@ public class TestUtils {
     //Update Time;Query Time;Radius;Ratio;Memory
     public static void testDiffAlgorithms(DatasetReader reader, PrintWriter writer, double min, double max, double realMin, double realMax, int[] kiSet, int wSize, double epsilon, double beta) {
 
+        // TODO: if you need to modify something, do it here
+
         //Testing LinkedList, contains all the window
         LinkedList<Point> window = new LinkedList<>();
 
@@ -339,37 +326,12 @@ public class TestUtils {
         Algorithm[] algorithms = new Algorithm[9];
         algorithms[0] = new JONES(kiSet);
 
-        /*
-
-        algorithms[1] = new CAPP(kiSet, epsilon, beta, min, max);
-        algorithms[2] = new CAPP(kiSet, epsilon, beta, realMin, realMax);
-        algorithms[3] = new COHCAPP(beta, epsilon, kiSet);
-        algorithms[4] = new PELLCAPP(beta, epsilon, kiSet);
-
-        int i = 5;
-        */
-
         int i = 1;
 
         for (double dd : defaultDeltas) {
             algorithms[i] = new CAPPDELTAxx(kiSet, dd, beta, min, max);
-            //algorithms[i+1] = new CAPPDELTAxx(kiSet, dd, beta, realMin, realMax);
-            //algorithms[i+2] = new COHCAPPDELTAxx(beta, dd, kiSet);
-            //algorithms[i+3] = new PELLCAPPDELTAxx(beta, dd, kiSet);
-            //i += 4;
             i++;
         }
-        /*
-
-        algorithms[i] = new CAPPVAL(kiSet, beta, min, max);
-        algorithms[i+1] = new CAPPVAL(kiSet, beta, realMin, realMax);
-        algorithms[i+2] = new COHCAPPVAL(beta, kiSet);
-        algorithms[i+3] = new PELLCAPPVAL(beta, kiSet);
-
-         */
-
-
-        //writer.println("JONES;;;;;;CAPP;;;;;;REALCAPP;;;;;;COHCAPP;;;;;;PELLCAPP;;;;;;CAPPDELTA05;;;;;;REALCAPPDELTA05;;;;;;COHCAPPDELTA05;;;;;;PELLCAPPDELTA05;;;;;;CAPPDELTA10;;;;;;REALCAPPDELTA10;;;;;;COHCAPPDELTA10;;;;;;PELLCAPPDELTA10;;;;;;CAPPDELTA15;;;;;;REALCAPPDELTA15;;;;;;COHCAPPDELTA15;;;;;;PELLCAPPDELTA15;;;;;;CAPPDELTA20;;;;;;REALCAPPDELTA20;;;;;;COHCAPPDELTA20;;;;;;PELLCAPPDELTA20;;;;;;CAPPVAL;;;;;;REALCAPPVAL;;;;;;COHCAPPVAL;;;;;;PELLCAPPVAL;;;;;;;");
         writer.println("JONES;;;;;;CAPPDELTA05;;;;;;CAPPDELTA10;;;;;;CAPPDELTA15;;;;;;CAPPDELTA20;;;;;;CAPPDELTA25;;;;;;CAPPDELTA30;;;;;;CAPPDELTA35;;;;;;CAPPDELTA40;;;;;;");
 
         String header = "Update Time;Query Time;Radius;Ratio;Memory";
@@ -438,12 +400,10 @@ public class TestUtils {
         LinkedList<Point> window = new LinkedList<>();
 
         //Initialize the algorithms
-        Algorithm[] algorithms = new Algorithm[2];
+        Algorithm[] algorithms = new Algorithm[14];
 
         algorithms[0] = new CHEN(kiSet);
         algorithms[1] = new KCHEN(kiSet);
-
-        /*
 
         algorithms[2] = new CAPP(kiSet, epsilon, beta, min, max);
         algorithms[3] = new KCAPP(kiSet, epsilon, beta, min, max);
@@ -462,9 +422,6 @@ public class TestUtils {
 
         algorithms[12] = new PELLCAPPVAL(beta, kiSet);
         algorithms[13] = new KPELLCAPPVAL(beta, kiSet);
-
-         */
-
 
         writer.println("CHEN;;;;;;KCHEN;;;;;;");
 
