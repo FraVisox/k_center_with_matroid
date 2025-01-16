@@ -15,11 +15,11 @@ y_axis = ["update", "query", "memory", "ratio"]
 color = "algorithm"
 
 # File to read from
-datasets = ["phones", "higgs", "covtype"]
+datasets = ["covtype", "normalized"]#"phones", "higgs", "covtype"]
 file_names = []
 for i in datasets:
     file_names.append(x_axis + "_" + i)
-output_file = "graphs/" + type_of_graph + "_lines"
+output_file = "graphs/CHEN_" + type_of_graph + "_lines"
 
 COLORS = sns.color_palette()
 PALETTE = {
@@ -75,7 +75,7 @@ def filter(df):
     """
     df = df.filter(
         pl.col("dataset") != "RANDOM",
-        pl.col("dataset") != "NORMALIZED",
+        #pl.col("dataset") != "NORMALIZED",
     )
     df = df.with_columns(
         pl.col("update").str.replace(",", ".").cast(pl.Float64).alias("update"),
@@ -113,7 +113,7 @@ def hline(data, **kwargs):
                    linestyle=kwargs["dashes"][color_group])
 
 
-def load(file, basedir="experiments_results/"):
+def load(file, basedir="experiments_results/CHEN/"):
     input_file = basedir + file + ".csv"
     if replace_commas:
         replace_dots_with_commas(input_file)
@@ -150,7 +150,7 @@ def read_and_plot_bar(output_file_path):
         # file = "wsize_jones_" + dataset
         # df = load(file)
         # dataframe.append(df)
-        file = "type_jones_" + dataset
+        file = "type_" + dataset
         df = load(file)#.filter(pl.col("algorithm") == "Ours")
         dataframe.append(df)
         # Add CHEN results

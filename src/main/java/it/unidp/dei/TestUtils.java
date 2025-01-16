@@ -92,6 +92,14 @@ public class TestUtils {
     }
     */
 
+    //Test on different datasets
+    public static void testRotatedPhones() {
+        int[] dimensions = {3,6,9,12,15};
+        for (int d : dimensions) {
+            testRotated(d);
+        }
+    }
+
     //Test with different beta on standard datasets
     public static void testBeta() {
         double[] beta = {0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 5, 10, 15, 20, 30, 40, 50, 70, 100, 200, 500, 1000};
@@ -195,6 +203,31 @@ public class TestUtils {
         }
     }
 
+    private static void testRotated(int dim) {
+        DatasetReader reader;
+        PrintWriter writer;
+
+        double min_distances = 0.002;
+        double max_distances = 33.7;
+
+        //For every different parameter passed, we make tests on all datasets
+        try {
+            reader = new RotatedPhonesReader();
+            reader.setSource(inFolderRandomized + "phones_"+dim+".csv");
+            writer = new PrintWriter(outFolder + "test_rotated_"+dim+".csv");
+        } catch (FileNotFoundException e) {
+            System.out.println("File phones_" + dim + ".csv not found, skipping to next dataset");
+            return;
+        }
+
+        testAlgorithms(reader, writer, defaultKi[0], defaultWSize, defaultEpsilon, defaultBeta, min_distances, max_distances);
+
+        writer.close();
+
+        reader.close();
+        System.out.println("phones_rotated_"+dim+" finished");
+    }
+
     //GENERAL TESTING: all the PELL versions
 
     //In every line of the output file we will have a header
@@ -238,10 +271,15 @@ public class TestUtils {
             writer.println("PELLCAPP;;;;;;CAPP;;;;;;PELLCAPPDELTA05;;;;;;CAPPDELTA05;;;;;;PELLCAPPDELTA10;;;;;;CAPPDELTA10;;;;;;PELLCAPPDELTA15;;;;;;CAPPDELTA15;;;;;;PELLCAPPDELTA20;;;;;;CAPPDELTA20;;;;;;");
         } else {
             //DEFAULT, with everything
-            algorithms = new Algorithm[12];
+            algorithms = new Algorithm[6];
             algorithms[0] = new JONES(kiSet);
             algorithms[1] = new CHEN(kiSet);
+            algorithms[2] = new PELLCAPPDELTAxx(beta, 0.5, kiSet);
+            algorithms[3] = new CAPPDELTAxx(kiSet, 0.5, beta, minDist, maxDist);
+            algorithms[4] = new PELLCAPPDELTAxx(beta, 2, kiSet);
+            algorithms[5] = new CAPPDELTAxx(kiSet, 2, beta, minDist, maxDist);
 
+            /*
             algorithms[2] = new PELLCAPP(beta, epsilon, kiSet);
             algorithms[3] = new CAPP(kiSet, epsilon, beta, minDist, maxDist);
 
@@ -250,7 +288,12 @@ public class TestUtils {
                 algorithms[i++] = new PELLCAPPDELTAxx(beta, dd, kiSet);
                 algorithms[i++] = new CAPPDELTAxx(kiSet, dd, beta, minDist, maxDist);
             }
+
             writer.println("JONES;;;;;;CHEN;;;;;;PELLCAPP;;;;;;CAPP;;;;;;PELLCAPPDELTA05;;;;;;CAPPDELTA05;;;;;;PELLCAPPDELTA10;;;;;;CAPPDELTA10;;;;;;PELLCAPPDELTA15;;;;;;CAPPDELTA15;;;;;;PELLCAPPDELTA20;;;;;;CAPPDELTA20;;;;;;");
+
+             */
+
+            writer.println("JONES;;;;;;CHEN;;;;;;PELLCAPPDELTA05;;;;;;CAPPDELTA05;;;;;;PELLCAPPDELTA20;;;;;;CAPPDELTA20;;;;;;");
 
         }
 

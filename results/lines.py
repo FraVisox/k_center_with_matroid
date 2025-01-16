@@ -4,16 +4,16 @@ import matplotlib.pyplot as plt
 
 #Parameters to change
 replace_commas = False
-type_of_graph = "wsize" #beta, wsize, type, k
+type_of_graph = "type" #beta, wsize, type, k
 
 #File to read from
-datasets = ["phones"]#, "higgs", "covtype"]#, "normalized", "random"]
+datasets = ["covtype", "normalized"]#"phones", "higgs", "covtype"]#, "normalized", "random"]
 file_names = []
 for i in datasets:
     if (type_of_graph == "type" and (i == "random" or i == "higgs")):
             continue
-    file_names.append(type_of_graph+"_jones_"+i)
-output_file = "graphs/"+type_of_graph
+    file_names.append(type_of_graph+"_"+i)
+output_file = "graphs/CHEN"+type_of_graph
 
 #Parameters
 x_axis = type_of_graph
@@ -111,7 +111,7 @@ def read_and_plot_line(output_file_path):
     """
     dataframe = [] 
     for file in file_names:
-        input_file = "experiments_results/"+file+".csv"
+        input_file = "experiments_results/CHEN/"+file+".csv"
         if replace_commas:
             replace_dots_with_commas(input_file)
         df = pl.read_csv(source=input_file, separator=";")
@@ -154,7 +154,7 @@ def read_and_plot_bar_type(output_file_path):
     """
     dataframe = [] 
     for file in file_names:
-        input_file = "experiments_results/"+file+".csv"
+        input_file = "experiments_results/CHEN/"+file+".csv"
         if replace_commas:
             replace_dots_with_commas(input_file)
         df = pl.read_csv(source=input_file, separator=";", infer_schema_length=10000)

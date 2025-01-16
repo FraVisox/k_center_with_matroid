@@ -12,6 +12,10 @@ public class Main {
                     "- window size variation: w\n" +
                     "- dimensionality variation: dd\n" +
                     "- k variation: k\n");
+        } else if (args[0].equalsIgnoreCase("rr")) {
+            System.out.println("\n----------------------\nSTART OF TEST OF ROTATED DATASETS\n----------------------\n");
+            TestUtils.testRotatedPhones();
+            System.out.println("\n----------------------\nTEST OF ROTATED DATASETS FINISHED\n----------------------\n");
         } else if (args[0].equalsIgnoreCase("ro")) {
             System.out.println("\n----------------------\nSTART OF TEST OF RANDOMIZED DATASETS\n----------------------\n");
             TestUtils.testRandomized();

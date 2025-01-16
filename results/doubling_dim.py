@@ -6,9 +6,9 @@ import numpy as np
 
 #File to read from
 first = False
-type_of_graph = "doubling_dimension_jones"
-file_name = "experiments_results/"+type_of_graph+".csv"
-output_file = "graphs/dimensionality"
+type_of_graph = "doubling_dimension"
+file_name = "experiments_results/CHEN/"+type_of_graph+".csv"
+output_file = "graphs/CHEN_dimensionality"
 
 #Parameters
 x_axis = "dimensions"
@@ -43,7 +43,7 @@ def read_and_plot(output_file_path):
     df = df.with_columns(
         pl.lit("blobs").alias("dataset")
     ).filter(
-        pl.col("algorithm").is_in(["JONES", "CAPPDELTA05", "CAPPDELTA20", "PELLCAPPDELTA05", "PELLCAPPDELTA20"])
+        pl.col("algorithm").is_in(["CHEN", "CAPPDELTA05", "CAPPDELTA20", "PELLCAPPDELTA05", "PELLCAPPDELTA20"])
     )
     df = df.with_columns(
         pl.col("algorithm").str.replace("PELLCAPPDELTA05", "OursOblivious 0.5"),
@@ -64,7 +64,7 @@ def read_and_plot(output_file_path):
     )
     for graph in y_axis:
         g = sns.FacetGrid(df, col="dataset", sharex=False, sharey=False, aspect=1.5)
-        hue_order = ["JONES", "OursOblivious 0.5", "Ours 0.5",# "OursOblivious 1.0", "Ours 1.0", "OursOblivious 1.5", "Ours 1.5", 
+        hue_order = ["CHEN", "OursOblivious 0.5", "Ours 0.5",# "OursOblivious 1.0", "Ours 1.0", "OursOblivious 1.5", "Ours 1.5", 
                      "OursOblivious 2.0", "Ours 2.0"]
         g.map_dataframe(
             sns.lineplot,  #barplot or lineplot

@@ -32,27 +32,29 @@ public class BlobsTestUtils {
         PrintWriter writer;
 
         int i = 0;
-        for (int dim : blobsDatasetsDimensions) {
-            try {
-                //Create a dataset reader
-                reader = new RandomReader(dim);
-                reader.setSource(inFolder + "blobs" + dim + ".csv");
-                //Create a results writer
-                writer = new PrintWriter(outFolder + "testBlobs" + dim + ".csv");
-            } catch (FileNotFoundException e) {
-                System.out.println("File blobs" + dim + ".csv not found, skipping to next dataset");
-                continue;
+        for (int wsize = 10000; wsize <= 30000; wsize +=10000) {
+            for (int dim : blobsDatasetsDimensions) {
+                try {
+                    //Create a dataset reader
+                    reader = new RandomReader(dim);
+                    reader.setSource(inFolder + "blobs" + dim + ".csv");
+                    //Create a results writer
+                    writer = new PrintWriter(outFolder + "testBlobs" + dim + "_w_"+wsize+".csv");
+                } catch (FileNotFoundException e) {
+                    System.out.println("File blobs" + dim + ".csv not found, skipping to next dataset");
+                    continue;
+                }
+
+                //TEST THINGS
+                testAlgorithms(reader, writer, blobsKi, wsize, defaultEpsilon, defaultBeta, realBlobsMinDist[i], realBlobsMaxDist[i]);
+
+                //CLOSE
+                writer.close();
+
+                reader.close();
+                System.out.println("blobs" + dim + " finished");
+                i++;
             }
-
-            //TEST THINGS
-            testAlgorithms(reader, writer, blobsKi, defaultWSize, defaultEpsilon, defaultBeta, blobsMinDist[i], blobsMaxDist[i]);
-
-            //CLOSE
-            writer.close();
-
-            reader.close();
-            System.out.println("blobs" + dim + " finished");
-            i++;
         }
     }
 }
