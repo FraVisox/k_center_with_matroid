@@ -46,7 +46,7 @@ def add_columns(df, file_name):
         ).with_columns(
             beta = pl.lit(2.0).alias("beta")
         ).with_columns(
-            k = pl.lit(7).alias("k")
+            k = pl.lit(21).alias("k")
         ).with_columns(
             wsize = pl.lit(10000).cast(pl.Int64).alias("wsize")
         ).with_columns(
@@ -60,7 +60,7 @@ def add_columns(df, file_name):
         ).with_columns(
             beta = pl.lit(2.0).alias("beta")
         ).with_columns(
-            k = pl.lit(7).alias("k")
+            k = pl.lit(21).alias("k")
         ).with_columns(
             wsize = pl.lit(20000).cast(pl.Int64).alias("wsize")
         ).with_columns(
@@ -80,7 +80,7 @@ def add_columns(df, file_name):
         ).with_columns(
             beta = pl.lit(2.0).alias("beta")
         ).with_columns(
-            k = pl.lit(7).alias("k")
+            k = pl.lit(14).alias("k")
         ).with_columns(
             pl.when(pl.col("algorithm").str.contains("CHEN").or_(pl.col("algorithm").str.contains("JONES"))).then(0.0).otherwise(pl.col("algorithm").str.extract(r"DELTA(\d+)").cast(pl.Float64)).alias("delta") / 10
         )
@@ -94,7 +94,7 @@ def add_columns(df, file_name):
         ).with_columns(
             beta = pl.lit(2.0).alias("beta")
         ).with_columns(
-            k = pl.lit(7).alias("k")
+            k = pl.lit(4).alias("k")
         ).with_columns(
             pl.when(pl.col("algorithm").str.contains("CHEN").or_(pl.col("algorithm").str.contains("JONES"))).then(0.0).otherwise(pl.col("algorithm").str.extract(r"DELTA(\d+)").cast(pl.Float64)).alias("delta") / 10
         )
@@ -108,7 +108,7 @@ def add_columns(df, file_name):
         ).with_columns(
             beta = pl.lit(2.0).alias("beta")
         ).with_columns(
-            k = pl.lit(7).alias("k")
+            k = pl.lit(14).alias("k")
         ).with_columns(
             pl.when(pl.col("algorithm").str.contains("CHEN").or_(pl.col("algorithm").str.contains("JONES"))).then(0.0).otherwise(pl.col("algorithm").str.extract(r"DELTA(\d+)").cast(pl.Float64)).alias("delta") / 10
         )
@@ -120,7 +120,7 @@ def add_columns(df, file_name):
         ).with_columns(
             type = pl.lit("Rand").alias("type")
         ).with_columns(
-            k = pl.lit(7).alias("k")
+            k = pl.lit(14).alias("k")
         ).with_columns(
             pl.when(pl.col("algorithm").str.contains("CHEN").or_(pl.col("algorithm").str.contains("JONES"))).then(0.0).otherwise(pl.col("algorithm").str.extract(r"DELTA(\d+)").cast(pl.Float64)).alias("delta") / 10
         ).with_columns(
@@ -137,7 +137,7 @@ def add_columns(df, file_name):
         ).with_columns(
             type = pl.lit("Rand").alias("type")
         ).with_columns(
-            k = pl.lit(7).alias("k")
+            k = pl.lit(4).alias("k")
         ).with_columns(
             pl.when(pl.col("algorithm").str.contains("CHEN").or_(pl.col("algorithm").str.contains("JONES"))).then(0.0).otherwise(pl.col("algorithm").str.extract(r"DELTA(\d+)").cast(pl.Float64)).alias("delta") / 10
         ).with_columns(
@@ -154,7 +154,7 @@ def add_columns(df, file_name):
         ).with_columns(
             type = pl.lit("Rand").alias("type")
         ).with_columns(
-            k = pl.lit(7).alias("k")
+            k = pl.lit(14).alias("k")
         ).with_columns(
             pl.when(pl.col("algorithm").str.contains("CHEN").or_(pl.col("algorithm").str.contains("JONES"))).then(0.0).otherwise(pl.col("algorithm").str.extract(r"DELTA(\d+)").cast(pl.Float64)).alias("delta") / 10
         ).with_columns(
@@ -171,7 +171,7 @@ def add_columns(df, file_name):
         ).with_columns(
             type = pl.lit("Rand").alias("type")
         ).with_columns(
-            k = pl.lit(7).alias("k")
+            k = pl.lit(14).alias("k")
         ).with_columns(
             pl.when(pl.col("algorithm").str.contains("CHEN").or_(pl.col("algorithm").str.contains("JONES"))).then(0.0).otherwise(pl.col("algorithm").str.extract(r"DELTA(\d+)").cast(pl.Float64)).alias("delta") / 10
         ).with_columns(
@@ -186,7 +186,7 @@ def add_columns(df, file_name):
         ).with_columns(
             type = pl.lit("Rand").alias("type")
         ).with_columns(
-            k = pl.lit(7).alias("k")
+            k = pl.lit(21).alias("k")
         ).with_columns(
             pl.when(pl.col("algorithm").str.contains("CHEN").or_(pl.col("algorithm").str.contains("JONES"))).then(0.0).otherwise(pl.col("algorithm").str.extract(r"DELTA(\d+)").cast(pl.Float64)).alias("delta") / 10
         ).with_columns(
@@ -271,7 +271,7 @@ def add_columns(df, file_name):
         ).with_columns(
             dimensions = pl.lit(54).alias("dimensions")
         ).with_columns(
-            k = pl.lit(7).alias("k")
+            k = pl.lit(14).alias("k")
         ).with_columns(
             beta = pl.lit(2.0).alias("beta")
         ).with_columns(
@@ -288,7 +288,7 @@ def add_columns(df, file_name):
         ).with_columns(
             dimensions = pl.lit(7).alias("dimensions")
         ).with_columns(
-            k = pl.lit(7).alias("k")
+            k = pl.lit(4).alias("k")
         ).with_columns(
             beta = pl.lit(2.0).alias("beta")
         ).with_columns(
@@ -305,7 +305,7 @@ def add_columns(df, file_name):
         ).with_columns(
             dimensions = pl.lit(3).alias("dimensions")
         ).with_columns(
-            k = pl.lit(7).alias("k")
+            k = pl.lit(14).alias("k")
         ).with_columns(
             beta = pl.lit(2.0).alias("beta")
         ).with_columns(
@@ -322,7 +322,7 @@ def add_columns(df, file_name):
         ).with_columns(
             dimensions = pl.lit(54).alias("dimensions")
         ).with_columns(
-            k = pl.lit(7).alias("k")
+            k = pl.lit(14).alias("k")
         ).with_columns(
             beta = pl.lit(2.0).alias("beta")
         ).with_columns(
@@ -339,7 +339,7 @@ def add_columns(df, file_name):
         ).with_columns(
             dimensions = pl.lit(54).alias("dimensions")
         ).with_columns(
-            k = pl.lit(7).alias("k")
+            k = pl.lit(14).alias("k")
         ).with_columns(
             beta = pl.lit(2.0).alias("beta")
         ).with_columns(
@@ -356,7 +356,7 @@ def add_columns(df, file_name):
         ).with_columns(
             dimensions = pl.lit(7).alias("dimensions")
         ).with_columns(
-            k = pl.lit(7).alias("k")
+            k = pl.lit(4).alias("k")
         ).with_columns(
             beta = pl.lit(2.0).alias("beta")
         ).with_columns(
@@ -373,7 +373,7 @@ def add_columns(df, file_name):
         ).with_columns(
             dimensions = pl.lit(3).alias("dimensions")
         ).with_columns(
-            k = pl.lit(7).alias("k")
+            k = pl.lit(14).alias("k")
         ).with_columns(
             beta = pl.lit(2.0).alias("beta")
         ).with_columns(
@@ -390,7 +390,7 @@ def add_columns(df, file_name):
         ).with_columns(
             dimensions = pl.lit(54).alias("dimensions")
         ).with_columns(
-            k = pl.lit(7).alias("k")
+            k = pl.lit(14).alias("k")
         ).with_columns(
             beta = pl.lit(2.0).alias("beta")
         ).with_columns(

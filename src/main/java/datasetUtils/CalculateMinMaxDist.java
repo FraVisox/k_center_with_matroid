@@ -65,6 +65,7 @@ public class CalculateMinMaxDist {
 
             writer.flush();
             writer.close();
+            System.out.println("Finished "+datasets[i]);
         }
     }
 }

@@ -204,16 +204,17 @@ public class TestUtils {
     }
 
     private static void testRotated(int dim) {
-        DatasetReader reader;
+        RotatedPhonesReader reader;
         PrintWriter writer;
 
-        double min_distances = 0.002;
-        double max_distances = 33.7;
+        double min_distances = 1.2e-4;
+        double max_distances = 47.6;
 
         //For every different parameter passed, we make tests on all datasets
         try {
             reader = new RotatedPhonesReader();
             reader.setSource(inFolderRandomized + "phones_"+dim+".csv");
+            reader.setDimension(dim);
             writer = new PrintWriter(outFolder + "test_rotated_"+dim+".csv");
         } catch (FileNotFoundException e) {
             System.out.println("File phones_" + dim + ".csv not found, skipping to next dataset");

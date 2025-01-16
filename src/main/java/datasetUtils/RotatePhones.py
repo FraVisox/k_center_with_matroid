@@ -22,7 +22,7 @@ def create_first_dataset():
                 if (j == 0):
                     j += 1
                     continue
-                if (j == 10000):
+                if (j == 100000):
                     break
                 for i in range(3):
                     f.write(row[i+3]+";")
