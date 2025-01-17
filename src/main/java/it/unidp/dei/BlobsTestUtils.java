@@ -31,8 +31,8 @@ public class BlobsTestUtils {
         DatasetReader reader;
         PrintWriter writer;
 
-        int i = 0;
         for (int wsize = 10000; wsize <= 30000; wsize +=10000) {
+            int i = 0;
             for (int dim : blobsDatasetsDimensions) {
                 try {
                     //Create a dataset reader
@@ -52,7 +52,7 @@ public class BlobsTestUtils {
                 writer.close();
 
                 reader.close();
-                System.out.println("blobs" + dim + " finished");
+                System.out.println("blobs " + dim + " finished");
                 i++;
             }
         }
