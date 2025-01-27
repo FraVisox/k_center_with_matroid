@@ -1,0 +1,4 @@
+FINAL: 100022
+Min distance: 0.49389374754818643
+Max distance: 221.856978332175
+
