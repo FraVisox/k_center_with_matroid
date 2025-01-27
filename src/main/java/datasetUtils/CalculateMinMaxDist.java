@@ -10,28 +10,25 @@ import java.util.ArrayList;
 //Find min and max distances in the dataset at the specified output times
 public class CalculateMinMaxDist {
     //private static final String[] datasets = {"blobs2.csv","blobs3.csv","blobs4.csv","blobs5.csv","blobs6.csv","blobs7.csv","blobs8.csv","blobs9.csv","blobs10.csv"};//{"blobs5.csv", "blobs10.csv","blobs15.csv","blobs20.csv","blobs25.csv", "blobs30.csv", "blobs35.csv", "blobs40.csv", "blobs45.csv", "blobs50.csv","random20.csv", "HIGGS.csv", "Phones_accelerometer.csv", "covtype.dat", "normalizedcovtype.dat", "Phones_accelerometer.csv", "covtype.dat", "normalizedcovtype.dat"};
-    private static final String[] datasets = {"phones_3.csv","phones_6.csv","phones_9.csv","phones_12.csv","phones_15.csv",};//{"blobs5.csv", "blobs10.csv","blobs15.csv","blobs20.csv","blobs25.csv", "blobs30.csv", "blobs35.csv", "blobs40.csv", "blobs45.csv", "blobs50.csv","random20.csv", "HIGGS.csv", "Phones_accelerometer.csv", "covtype.dat", "normalizedcovtype.dat", "Phones_accelerometer.csv", "covtype.dat", "normalizedcovtype.dat"};
-    private static final String[] outFiles = {"distPhones3.txt", "distPhones6.txt", "distPhones9.txt", "distPhones12.txt", "distPhones15.txt"};//{"distBlobs5.txt","distBlobs10.txt","distBlobs15.txt","distBlobs20.txt","distBlobs25.txt", "distBlobs30.txt", "distBlobs35.txt", "distBlobs40.txt", "distBlobs45.txt", "distBlobs50.txt","distRandom.txt", "distHiggs.txt","distPhones_accelerometer.txt","distCovtype.txt", "distNormalizedCovtype.txt", "distPhones_accelerometerORIGINAL.txt","distCovtypeORIGINAL.txt", "distNormalizedCovtypeORIGINAL.txt"};
+    private static final String[] datasets = {"perfect_dataset.csv"};//{"phones_3.csv","phones_6.csv","phones_9.csv","phones_12.csv","phones_15.csv",};//{"blobs5.csv", "blobs10.csv","blobs15.csv","blobs20.csv","blobs25.csv", "blobs30.csv", "blobs35.csv", "blobs40.csv", "blobs45.csv", "blobs50.csv","random20.csv", "HIGGS.csv", "Phones_accelerometer.csv", "covtype.dat", "normalizedcovtype.dat", "Phones_accelerometer.csv", "covtype.dat", "normalizedcovtype.dat"};
+    private static final String[] outFiles = {"distPerfect.txt"};//{"distPhones3.txt", "distPhones6.txt", "distPhones9.txt", "distPhones12.txt", "distPhones15.txt"};//{"distBlobs5.txt","distBlobs10.txt","distBlobs15.txt","distBlobs20.txt","distBlobs25.txt", "distBlobs30.txt", "distBlobs35.txt", "distBlobs40.txt", "distBlobs45.txt", "distBlobs50.txt","distRandom.txt", "distHiggs.txt","distPhones_accelerometer.txt","distCovtype.txt", "distNormalizedCovtype.txt", "distPhones_accelerometerORIGINAL.txt","distCovtypeORIGINAL.txt", "distNormalizedCovtypeORIGINAL.txt"};
 
     //Upper bound to the max distance (in the case of our datasets)
     private static final double INFINITE = 10e20;
     private static final int[] outputTime = {/*500, 1000, 5000, 10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000, 200000, 500000,*/ 600000};
     public static void main(String[] args) {
-        RotatedPhonesReader reader;
+        RandomReader reader;
         PrintWriter writer;
-
-        int[] dimensions = {3,6,9,12,15};
 
         for (int i = 0; i<datasets.length; i++) {
             String set = datasets[i];
             try {
-                reader = new RotatedPhonesReader();
+                reader = new RandomReader(15);
                 //Create a file reader. We use the randomized datasets
-                reader.setDimension(dimensions[i]);
                 //if (set.equals("HIGGS.csv") || i >= datasets.length-3) {
                   //  reader.setSource(TestUtils.inFolderOriginals + set);
                 //} else {
-                    reader.setSource(TestUtils.inFolderRandomized + set);
+                reader.setSource(TestUtils.inFolderRandomized + set);
                 //}
                 writer = new PrintWriter(TestUtils.outFolder+outFiles[i]);
             } catch (FileNotFoundException e) {

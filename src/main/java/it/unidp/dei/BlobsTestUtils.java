@@ -17,7 +17,7 @@ public class BlobsTestUtils {
     private static final int[] blobsDatasetsDimensions = {2,3,4,5,6,7,8,9,10};//{5, 10, 15, 20, 25, 30, 35, 40, 45, 50};
 
     //Ki of the blobs
-    private static final int[] blobsKi = {3,3,3,3,3,3,3};
+    public static final int[] blobsKi = {3,3,3,3,3,3,3};
 
     //VALUES OF MAX AND MIN DISTANCES (measured with CalculateMinMaxDist on 600 000 points)
     private static final double[] blobsMinDist = {1.57e-5, 0.002, 0.007, 0.048, 0.11, 0.18, 0.38, 0.49, 0.65};//{0.04, 0.65, 1.71, 2.81, 4, 4.36, 5.83, 6.84, 7.4, 8.9};
@@ -31,11 +31,13 @@ public class BlobsTestUtils {
         DatasetReader reader;
         PrintWriter writer;
 
-        for (int wsize = 10000; wsize <= 30000; wsize +=10000) {
+        for (int wsize = 30000; wsize <= 30000; wsize +=10000) {
             int i = 0;
-            for (int dim : blobsDatasetsDimensions) {
+            for (int jj = 7; i<9; i++) {
+                int dim = jj+2;
                 try {
                     //Create a dataset reader
+
                     reader = new RandomReader(dim);
                     reader.setSource(inFolder + "blobs" + dim + ".csv");
                     //Create a results writer

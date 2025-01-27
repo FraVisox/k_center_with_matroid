@@ -15,6 +15,9 @@ public class Point implements Comparable<Point> {
     public int getGroup() {
         return group;
     }
+    public double[] getCoordinates() {
+        return coords;
+    }
 
     //Tells if it has expired (it remembers the exitTime when it is constructed)
     public boolean hasExpired(int currentTime) {

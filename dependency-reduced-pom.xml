@@ -20,7 +20,7 @@
               <shadedArtifactAttached>true</shadedArtifactAttached>
               <transformers>
                 <transformer>
-                  <mainClass>it.unidp.dei.Main</mainClass>
+                  <mainClass>datasetUtils.DoublingDimension</mainClass>
                 </transformer>
               </transformers>
               <filters>

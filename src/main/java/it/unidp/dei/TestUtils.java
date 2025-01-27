@@ -3,6 +3,8 @@ package it.unidp.dei;
 import it.unidp.dei.CAPPELLOTTO.CAPPDELTAxx.*;
 import it.unidp.dei.CAPPELLOTTO.CAPP.*;
 import it.unidp.dei.CAPPELLOTTO.CAPPVAL.*;
+import it.unidp.dei.CAPPELLOTTO.PELL.PELL;
+import it.unidp.dei.CAPPELLOTTO.PELL.PELLOBL;
 import it.unidp.dei.CHENETAL.CHEN;
 import it.unidp.dei.CHENETAL.KCHEN;
 import it.unidp.dei.JONES.JONES;
@@ -14,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Locale;
+
+import static it.unidp.dei.BlobsTestUtils.blobsKi;
 
 //Methods called by Main.java to test PHONES, COVERTYPE, HIGGS, RANDOM and NORMALIZED
 public class TestUtils {
@@ -92,11 +96,76 @@ public class TestUtils {
     }
     */
 
-    //Test on different datasets
+    //Test on rotated Phones
     public static void testRotatedPhones() {
         int[] dimensions = {3,6,9,12,15};
         for (int d : dimensions) {
             testRotated(d);
+        }
+    }
+
+    public static void testPerfectDataset() {
+        RandomReader reader;
+        PrintWriter writer;
+
+        double min_distances = 0.49;
+        double max_distances = 221.9;
+
+        //For every different parameter passed, we make tests on all datasets
+        try {
+            reader = new RandomReader(15);
+            reader.setSource(inFolderRandomized + "perfect_dataset.csv");
+            writer = new PrintWriter(outFolder + "test_perfect.csv");
+        } catch (FileNotFoundException e) {
+            System.out.println("File perfect_dataset.csv not found, skipping to next dataset");
+            return;
+        }
+
+        testAlgorithms(reader, writer, blobsKi, defaultWSize, defaultEpsilon, defaultBeta, min_distances, max_distances);
+
+        writer.close();
+
+        reader.close();
+    }
+
+    //Test on different datasets
+    public static void testPriceOfFairness() {
+        DatasetReader reader;
+        PrintWriter writer;
+
+        //For every different parameter passed, we make tests on all datasets
+        for (int i = 0; i < 3; i++) {
+            String set = datasets[i];
+            try {
+                //Create a dataset reader
+                reader = (DatasetReader) readers[i].newInstance();
+
+                //Instantiate the file
+                if (reader instanceof HiggsReader) {
+                    reader.setSource(inFolderOriginals + set);
+                } else {
+                    reader.setSource(inFolderRandomized + set);
+                }
+
+                    //Create a results writer
+                writer = new PrintWriter(outFolder + "price_of_fairness_" + outFiles[i]);
+
+            } catch (FileNotFoundException e) {
+                System.out.println("File " + set + " not found, skipping to next dataset");
+                continue;
+            } catch (InstantiationException | IllegalAccessException e) {
+                System.out.println("Problem with the search of the right reader for the "+set+"dataset");
+                continue;
+            }
+
+            //Depending on deltas, call the testings
+            testFairness(reader, writer, defaultKi[i], defaultWSize, defaultEpsilon, defaultBeta, minDist[i], maxDist[i]);
+
+            //CLOSE
+            writer.close();
+
+            reader.close();
+            System.out.println(set+" finished");
         }
     }
 
@@ -231,6 +300,83 @@ public class TestUtils {
 
     //GENERAL TESTING: all the PELL versions
 
+    public static void testFairness(DatasetReader reader, PrintWriter writer, int[] kiSet, int wSize, double epsilon, double beta, double minDist, double maxDist) {
+
+        //Testing LinkedList, contains all the window
+        LinkedList<Point> window = new LinkedList<>();
+
+        Algorithm[] algorithms;
+        //DEFAULT, with everything
+        algorithms = new Algorithm[8];
+        algorithms[0] = new PELLOBL(kiSet, 0.5, beta);
+        algorithms[1] = new PELL(kiSet, 0.5, beta, minDist, maxDist);
+        algorithms[2] = new PELLOBL(kiSet, 2.0, beta);
+        algorithms[3] = new PELL(kiSet, 2.0, beta, minDist, maxDist);
+        algorithms[4] = new PELLCAPPDELTAxx(beta, 0.5, kiSet);
+        algorithms[5] = new CAPPDELTAxx(kiSet, 0.5, beta, minDist, maxDist);
+        algorithms[6] = new PELLCAPPDELTAxx(beta, 2, kiSet);
+        algorithms[7] = new CAPPDELTAxx(kiSet, 2, beta, minDist, maxDist);
+
+        writer.println("PELLOBL05;;;;;;PELL05;;;;;;PELLOBL20;;;;;;PELL20;;;;;;PELLCAPPDELTA05;;;;;;CAPPDELTA05;;;;;;PELLCAPPDELTA20;;;;;;CAPPDELTA20;;;;;;");
+
+
+        int i;
+        String header = "Update Time;Query Time;Radius;Ratio;Memory";
+        for (i = 0; i<algorithms.length; i++) {
+            writer.print(header);
+            writer.print(";;");
+        }
+        writer.println();
+
+        for (int time = 1; time <= wSize+stride && reader.hasNext(); time++) {
+            Point p = reader.nextPoint(time, wSize);
+
+            if (p == null) {
+                System.out.println("NULL POINT");
+                continue;
+            }
+
+            //Update the window
+            window.addLast(p);
+
+            //If window is not full, we don't query
+            if (time <= wSize) {
+                for (Algorithm alg : algorithms) {
+                    alg.update(p, time);
+                }
+                continue;
+            }
+
+            if (time % 50 == 0) {
+                //Check of passing of time
+                System.out.println(time);
+            }
+
+            window.removeFirst();
+
+            double minR = -1;
+
+            //Tests
+            i = 0;
+            for (Algorithm algorithm : algorithms) {
+                calcUpdateTime(algorithm, p, time, writer);
+                if (i == 0) {
+                    minR = calcQuery(algorithm, writer, window, kiSet, -1);
+                }
+                else {
+                    calcQuery(algorithm, writer, window, kiSet, minR);
+                }
+                calcMemory(algorithm, writer);
+                writer.print(";;");
+                i++;
+            }
+            writer.println();
+
+            //FLUSH
+            writer.flush();
+        }
+    }
+
     //In every line of the output file we will have a header
     public static void testAlgorithms(DatasetReader reader, PrintWriter writer, int[] kiSet, int wSize, double epsilon, double beta, double minDist, double maxDist) {
 
@@ -272,13 +418,15 @@ public class TestUtils {
             writer.println("PELLCAPP;;;;;;CAPP;;;;;;PELLCAPPDELTA05;;;;;;CAPPDELTA05;;;;;;PELLCAPPDELTA10;;;;;;CAPPDELTA10;;;;;;PELLCAPPDELTA15;;;;;;CAPPDELTA15;;;;;;PELLCAPPDELTA20;;;;;;CAPPDELTA20;;;;;;");
         } else {
             //DEFAULT, with everything
-            algorithms = new Algorithm[6];
+            algorithms = new Algorithm[8];
             algorithms[0] = new JONES(kiSet);
             algorithms[1] = new CHEN(kiSet);
-            algorithms[2] = new PELLCAPPDELTAxx(beta, 0.5, kiSet);
-            algorithms[3] = new CAPPDELTAxx(kiSet, 0.5, beta, minDist, maxDist);
-            algorithms[4] = new PELLCAPPDELTAxx(beta, 2, kiSet);
-            algorithms[5] = new CAPPDELTAxx(kiSet, 2, beta, minDist, maxDist);
+            algorithms[2] = new PELLCAPP(beta, epsilon, kiSet);
+            algorithms[3] = new CAPP(kiSet, epsilon, beta, minDist, maxDist);
+            algorithms[4] = new PELLCAPPDELTAxx(beta, 0.5, kiSet);
+            algorithms[5] = new CAPPDELTAxx(kiSet, 0.5, beta, minDist, maxDist);
+            algorithms[6] = new PELLCAPPDELTAxx(beta, 2, kiSet);
+            algorithms[7] = new CAPPDELTAxx(kiSet, 2, beta, minDist, maxDist);
 
             /*
             algorithms[2] = new PELLCAPP(beta, epsilon, kiSet);
@@ -294,7 +442,7 @@ public class TestUtils {
 
              */
 
-            writer.println("JONES;;;;;;CHEN;;;;;;PELLCAPPDELTA05;;;;;;CAPPDELTA05;;;;;;PELLCAPPDELTA20;;;;;;CAPPDELTA20;;;;;;");
+            writer.println("JONES;;;;;;CHEN;;;;;;PELLCAPP;;;;;;CAPP;;;;;;PELLCAPPDELTA05;;;;;;CAPPDELTA05;;;;;;PELLCAPPDELTA20;;;;;;CAPPDELTA20;;;;;;");
 
         }
 
@@ -540,6 +688,7 @@ public class TestUtils {
     private static double calcQuery(Algorithm alg, PrintWriter writer, LinkedList<Point> window, int[] kiSet, double minRadius) {
         ArrayList<Point> centers;
         long startTime, endTime;
+        minRadius = 12;
 
         //1. TIME TEST: we call explicitly the garbage collector to allow our algorithm
         //              to run without having to wait for the garbage collector
@@ -555,18 +704,15 @@ public class TestUtils {
 
         //2. QUALITY TEST: Check of the radius of the centers returned and the independence of the set
         double radius = maxDistanceBetweenSets(window, centers);
+
         if (!isIndependent(centers, kiSet)) {
             throw new RuntimeException(alg.getClass()+" did not solve the problem correctly");
         }
+
+
         writer.print(String.format(Locale.ITALIAN, "%.16f", radius)+";");
 
-        if (radius == 0) {
-            writer.print("0,0;");
-        } else if (minRadius != -1) {
-            writer.print(String.format(Locale.ITALIAN, "%.16f", radius / minRadius) + ";");
-        } else {
-            writer.print("1,0;");
-        }
+        writer.print(String.format(Locale.ITALIAN, "%.16f", radius / minRadius) + ";");
         return radius;
     }
 

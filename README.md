@@ -1,6 +1,13 @@
 # K-CENTER CLUSTERING WITH PARTITION MATROID (FAIR K-CENTER CLUSTERING)
 The following project is the bachelor thesis of Francesco Visona'.
 
+# TODO:
+- Estimate the doubling dimension of the datasets (IN PROGRESS)
+- Blobs with more wsize (IN PROGRESS)
+- Compare the performances of our algorithm with the one from Pellizzoni without the fairness constraint
+- Create a dataset where you know the optimal value of the solution and test on it
+- Rotated phones
+
 ## FAIR K-CENTER CLUSTERING
 The problem addressed is the Fair K-Center Clustering, a problem of K-Center Clustering where the set of centers calculated by the algorithm should 
 be an independent set for a given partition matroid. This problem is addressed on the sliding window model.
@@ -48,4 +55,4 @@ In that folder can be found:
 - /results/distributions_of_ki/ contains all the distributions of k_i calculated with the class FindNumberOfK for all the datasets, both originals and randomized
 - /results/experiments_results/ contains all the results of the experiments as tidy data, as explained in /results/use.md
 - /results/graphs/ contains the graphs created from the tidy data
-- all the algorithms (*.py) used to create the graphs, which use is explained in /results/use.md
+- all the algorithms (*.py) used to create the graphs, whose use is explained in /results/use.md
