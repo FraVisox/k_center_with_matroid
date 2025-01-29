@@ -1,0 +1,2 @@
+Best starting node: [-2.44448, 1.9931729, 9.001000999999999]
+Best doubling dimension: 9.611024797307353
